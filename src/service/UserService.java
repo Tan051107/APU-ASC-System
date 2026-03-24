@@ -51,7 +51,7 @@ public class UserService {
                 .orElse(null);
     }
 
-    public void signUpUser(User userToSignUp){
+    public void signUpUser(User userToSignUp) throws SignUpException, GetUsersException {
         boolean userHasExisted = getUserById(userToSignUp.getId()) != null;
         if(userHasExisted){
             throw new SignUpException("User has existed. Please select another user id to sign up user");
@@ -75,7 +75,7 @@ public class UserService {
         }
     }
 
-    public void deleteUser(String userId){
+    public void deleteUser(String userId) throws GetUsersException, DeleteUserException {
         List<User> users = getUsers();
         boolean hasRemovedUser = users.removeIf(user -> user.getId().equalsIgnoreCase(userId));
         if(!hasRemovedUser){

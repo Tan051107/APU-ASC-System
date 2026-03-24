@@ -76,20 +76,12 @@ public class Customer extends User{
     }
 
     public void generateId() throws GetUsersException {
-        List<Customer> customers = customerService.getCustomers();
-        boolean hasGenerated = false;
-        boolean isNewId = true;
-        while(!hasGenerated){
-            String id = RandomIdGenerator.generateId("TP" ,5);
-            for(Customer customer : customers){
-                if(customer.getId().equals(id)){
-                    isNewId = false;
-                    break;
-                }
-            }
-            if(isNewId){
-                hasGenerated = true;
+        while(true){
+            String id = RandomIdGenerator.generateId("TP" , 5);
+            Customer customer = customerService.getCustomerById(id);
+            if(customer == null){
                 setId(id);
+                break;
             }
         }
     }
