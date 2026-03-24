@@ -77,7 +77,7 @@ public class SignUpController {
                             JOptionPane.INFORMATION_MESSAGE
                     );
                 }
-                catch (GetUsersException | SignUpException e){
+                catch (SignUpException e){
                     JOptionPane.showMessageDialog(
                             signUpPanel,
                             e.getMessage(),

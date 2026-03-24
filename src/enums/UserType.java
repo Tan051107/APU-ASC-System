@@ -1,10 +1,10 @@
 package enums;
 
 public enum UserType {
-    Manager("Manager"),
-    CounterStaff("Counter Staff"),
-    Technician ("Technician"),
-    Customer("Customer");
+    MANAGER("Manager"),
+    COUNTER_STAFF("Counter Staff"),
+    TECHNICIAN ("Technician"),
+    CUSTOMER("Customer");
 
     private final String displayUserType;
 

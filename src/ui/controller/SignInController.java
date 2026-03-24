@@ -41,13 +41,6 @@ public class SignInController {
                     "Login Error",
                     JOptionPane.ERROR_MESSAGE
             );
-        } catch (GetUsersException e) {
-            JOptionPane.showMessageDialog(
-                    signInPanel,
-                    e.getMessage(),
-                    "Retrieve Users Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
         }
         return null;
     }

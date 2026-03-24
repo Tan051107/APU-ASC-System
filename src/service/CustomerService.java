@@ -16,6 +16,7 @@ public class CustomerService {
     private final String CUSTOMER_FILE = "txt_files/Customer.txt";
     private final UserService userService = new UserService();
 
+
     public List<Customer> getCustomers() throws GetUsersException{
         List<Customer> customers = new ArrayList<>();
         try(BufferedReader reader = new BufferedReader(new FileReader(CUSTOMER_FILE))){
@@ -59,12 +60,12 @@ public class CustomerService {
                 .orElse(null);
     }
 
-    public void signUpCustomer (Customer customerToSignUp) throws GetUsersException, SignUpException {
-        boolean customerHasExisted = getCustomerById(customerToSignUp.getId()) != null || getCustomerByEmail(customerToSignUp.getEmail()) != null;
-        if(customerHasExisted){
-            throw new SignUpException("User id has existed. Please select another user id to sign up user");
-        }
+    public void signUpCustomer (Customer customerToSignUp) throws SignUpException {
         try{
+            boolean customerHasExisted = getCustomerById(customerToSignUp.getId()) != null || getCustomerByEmail(customerToSignUp.getEmail()) != null;
+            if(customerHasExisted){
+                throw new SignUpException("User id has existed. Please select another user id to sign up user");
+            }
             customerToSignUp.generateId();
             User signUpUser = customerToSignUp.toUser();
             String signUpCustomerString = customerToSignUp.toCustomerOnlyDataString();
@@ -73,13 +74,13 @@ public class CustomerService {
                 customerFileWriter.println(signUpCustomerString);
             }
         } catch (Exception e) {
-            throw new SignUpException("Failed to sign up user:" + e.getMessage());
+            throw new SignUpException(e.getMessage());
         }
     }
 
-    public void deleteCustomer (String customerId) throws GetUsersException, DeleteUserException {
-        List<Customer> customers = getCustomers();
+    public void deleteCustomer (String customerId) throws DeleteUserException {
         try{
+            List<Customer> customers = getCustomers();
             userService.deleteUser(customerId);
             boolean hasRemovedCustomer = customers.removeIf(customer -> customer.getId().equalsIgnoreCase(customerId));
             if(!hasRemovedCustomer){
@@ -90,7 +91,7 @@ public class CustomerService {
                 String customerString = customer.toCustomerOnlyDataString();
                 customerFileWriter.println(customerString);
             }
-        } catch (IOException | DeleteUserException e) {
+        } catch (Exception e) {
             throw new DeleteUserException(e.getMessage());
         }
     }

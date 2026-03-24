@@ -51,12 +51,12 @@ public class UserService {
                 .orElse(null);
     }
 
-    public void signUpUser(User userToSignUp) throws SignUpException, GetUsersException {
-        boolean userHasExisted = getUserById(userToSignUp.getId()) != null;
-        if(userHasExisted){
-            throw new SignUpException("User has existed. Please select another user id to sign up user");
-        }
+    public void signUpUser(User userToSignUp) throws SignUpException {
         try {
+            boolean userHasExisted = getUserById(userToSignUp.getId()) != null;
+            if(userHasExisted){
+                throw new SignUpException("User has existed. Please select another user id to sign up user");
+            }
             ValidationResult validationResult = new ValidationResult();
             Validator.required(validationResult, "Name", userToSignUp.getName());
             Validator.validateEmail(validationResult, userToSignUp.getEmail());
@@ -70,24 +70,24 @@ public class UserService {
                 String signUpUserString = userToSignUp.toString();
                 userFileWriter.println(signUpUserString);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new SignUpException("Failed to write to user file");
         }
     }
 
-    public void deleteUser(String userId) throws GetUsersException, DeleteUserException {
-        List<User> users = getUsers();
-        boolean hasRemovedUser = users.removeIf(user -> user.getId().equalsIgnoreCase(userId));
-        if(!hasRemovedUser){
-            throw new DeleteUserException("User id not found in user file");
-        }
+    public void deleteUser(String userId) throws DeleteUserException {
         try{
+            List<User> users = getUsers();
+            boolean hasRemovedUser = users.removeIf(user -> user.getId().equalsIgnoreCase(userId));
+            if(!hasRemovedUser){
+                throw new DeleteUserException("User id not found in user file");
+            }
             PrintWriter userFileWriter = new PrintWriter(new BufferedWriter(new FileWriter(USER_FILE)));
             for(User user: users){
                 String userString = user.toString();
                 userFileWriter.println(userString);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new DeleteUserException("Failed to write to user file");
         }
     }
