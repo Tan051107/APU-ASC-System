@@ -1,9 +1,7 @@
 package ui.controller;
 
-import exceptions.GetUsersException;
-import model.User;
-import service.AuthService;
-import service.UserService;
+import models.User;
+import services.AuthService;
 import ui.pages.SignInPanel;
 
 import javax.security.auth.login.LoginException;

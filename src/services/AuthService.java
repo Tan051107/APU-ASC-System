@@ -1,15 +1,16 @@
-package service;
+package services;
 
-import exceptions.GetUsersException;
-import model.User;
-import validator.ValidationResult;
-import validator.Validator;
+import exceptions.GetEntityListException;
+import models.User;
+import validators.ValidationResult;
+import validators.Validator;
 
 import javax.security.auth.login.LoginException;
 
 public class AuthService {
 
     private final UserService userService = new UserService();
+
 
     public User login(String email, String password) throws LoginException{
         ValidationResult validationResult = new ValidationResult();
@@ -29,7 +30,7 @@ public class AuthService {
             }
             return loginUser;
         }
-        catch(GetUsersException e){
+        catch(GetEntityListException e){
             throw new LoginException(e.getMessage());
         }
     }

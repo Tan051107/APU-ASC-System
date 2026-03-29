@@ -101,6 +101,7 @@ public class UIUtils {
 
         btn.setFocusPainted(false);
         btn.setBackground(base);
+        btn.setAlignmentX(Component.LEFT_ALIGNMENT);
         btn.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -161,5 +162,21 @@ public class UIUtils {
         });
 
         return comboBox;
+    }
+
+    public static String getActualText(JTextField field, String placeholder) {
+        String text = field.getText();
+        if (text.equals(placeholder)) {
+            return "";
+        }
+        return text;
+    }
+
+    public static String getActualPassword(JPasswordField field, String placeholder) {
+        String text = String.valueOf(field.getPassword());
+        if (text.equals(placeholder)) {
+            return "";
+        }
+        return text;
     }
 }

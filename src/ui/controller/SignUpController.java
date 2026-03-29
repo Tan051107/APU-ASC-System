@@ -1,13 +1,16 @@
 package ui.controller;
 
+
+import dto.AddCustomerDto;
 import enums.UserType;
-import exceptions.GetUsersException;
 import exceptions.SignUpException;
-import model.Customer;
-import service.CustomerService;
+import dto.AddCarDto;
+import models.User;
+import services.CustomerService;
 import ui.pages.SignUpPanel;
 
 import javax.swing.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,30 +21,25 @@ public class SignUpController {
 
     public SignUpController(SignUpPanel signUpPanel){
         this.signUpPanel = signUpPanel;
-        setUpListener();
+        initListeners();
     }
 
-    private void setUpListener(){
+    private void initListeners() {
         signUpPanel.userTypeSelectionComboBox.addActionListener(e -> validateToShowCarModelAndCarPlateField());
         signUpPanel.completeSignUpButton.addActionListener(e -> signUpUser());
+    }
 
+    private void handleCustomerSignUp(User user) throws SignUpException {
+        List<AddCarDto> cars = signUpPanel.getCarData();
+        cars.removeIf(car->car.getCarPlate().trim().isEmpty() || car.getCarModel().trim().isEmpty());
+        AddCustomerDto addCustomerDto = new AddCustomerDto(user , cars);
+        customerService.signUpCustomer(addCustomerDto);
     }
 
     private void validateToShowCarModelAndCarPlateField(){
-        int selectedUserType =signUpPanel.userTypeSelectionComboBox.getSelectedIndex();
-        if(selectedUserType < 1){
-            return;
-        }
-        System.out.println(selectedUserType);
-        boolean showCarModelAndCarPlateField = selectedUserType == 4;
-        if(showCarModelAndCarPlateField){
-            signUpPanel.carModelLabel.setVisible(true);
-            signUpPanel.carModelField.setVisible(true);
-            signUpPanel.carModelBottomSpacing.setVisible(true);
-            signUpPanel.carPlateLabel.setVisible(true);
-            signUpPanel.carPlateField.setVisible(true);
-            signUpPanel.carPlateBottomSpacing.setVisible(true);
-        }
+        signUpPanel.updateAddCarButtonVisibility();
+        int selectedUserType = signUpPanel.userTypeSelectionComboBox.getSelectedIndex();
+        signUpPanel.carFieldsContainer.setVisible(selectedUserType == 4);
     }
 
     private void signUpUser(){
@@ -51,57 +49,58 @@ public class SignUpController {
         String email = signUpPanel.emailField.getText();
         String password = signUpPanel.passwordField.getText();
         String contactNumber = signUpPanel.phoneField.getText();
-        UserType userType = UserType.fromString(selectedUserType);
-        String carModel = signUpPanel.carModelField.getText();
-        String carPlate =signUpPanel.carPlateField.getText();
         String confirmPassword = signUpPanel.confirmPasswordField.getText();
-        switch (selectedUserType){
-            case "Customer":
-                Customer customer = new Customer();
-                customer.setName(name);
-                customer.setEmail(email);
-                customer.setPassword(password);
-                customer.setContactNumber(contactNumber);
-                customer.setUserType(userType);
-                customer.setCarModel(carModel);
-                customer.setCarPlate(carPlate);
-                try{
-                    customerService.signUpCustomer(customer);
-                    if(!confirmPassword.equals(password)){
-                        throw new SignUpException("Please confirm password correctly");
-                    }
-                    JOptionPane.showMessageDialog(
-                            signUpPanel,
-                            "Successfully signed up a new account",
-                            "Registration Completed",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                }
-                catch (SignUpException e){
-                    JOptionPane.showMessageDialog(
-                            signUpPanel,
-                            e.getMessage(),
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE,e.getMessage());
-                }
-                break;
-            case "Manager":
-                break;
-            case "Counter Staff":
-                break;
-            case "Technician":
-                break;
-            default:
-                JOptionPane.showMessageDialog(
-                        signUpPanel,
-                        "Please select a valid user type",
-                        "Invalid user type",
-                        JOptionPane.WARNING_MESSAGE
-                );
+        if(!confirmPassword.equals(password)){
+            JOptionPane.showMessageDialog(
+                    signUpPanel,
+                    "Please confirm password correctly",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setContactNumber(contactNumber);
+        try{
+            switch (selectedUserType){
+                case "Customer":
+                    user.setUserType(UserType.CUSTOMER);
+                    handleCustomerSignUp(user);
+                    break;
+                case "Manager":
+                    break;
+                case "Counter Staff":
+                    break;
+                case "Technician":
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(
+                            signUpPanel,
+                            "Please select a valid user type",
+                            "Invalid user type",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+            }
+            JOptionPane.showMessageDialog(
+                    signUpPanel,
+                    "Successfully registered",
+                    "Registration Successful",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        }
+        catch (SignUpException e) {
+            JOptionPane.showMessageDialog(
+                    signUpPanel,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,e.getMessage());
+        }
+
 
     }
 }

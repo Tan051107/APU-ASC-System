@@ -1,4 +1,6 @@
-package validator;
+package validators;
+
+import java.util.List;
 
 public class Validator {
 
@@ -48,8 +50,13 @@ public class Validator {
         if(value.trim().length() != 10){
             result.addError("Phone number length must be 10");
         }
+    }
 
-
+    public static <T> void validateRequiredList(ValidationResult result , String fieldName, List<T> values){
+        if(values.isEmpty()){
+            String errorMessage = fieldName + " is required";
+            result.addError(errorMessage);
+        }
     }
 
     public static void validateInteger(ValidationResult result , String fieldName ,String value){
