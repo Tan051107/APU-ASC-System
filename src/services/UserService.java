@@ -8,8 +8,8 @@ import mapper.UserMapper;
 import models.User;
 import repositories.CrudRepository;
 import utils.RandomIdGenerator;
-import validators.ValidationResult;
-import validators.Validator;
+import utils.validators.ValidationResult;
+import utils.validators.Validator;
 
 import java.util.List;
 import java.util.logging.Logger;

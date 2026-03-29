@@ -2,8 +2,8 @@ package services;
 
 import exceptions.GetEntityListException;
 import models.User;
-import validators.ValidationResult;
-import validators.Validator;
+import utils.validators.ValidationResult;
+import utils.validators.Validator;
 
 import javax.security.auth.login.LoginException;
 
