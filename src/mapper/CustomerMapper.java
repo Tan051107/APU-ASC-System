@@ -13,7 +13,7 @@ public class CustomerMapper implements Mapper<Customer> {
         Customer customer = new Customer();
         String[] data = row.split("\\|");
         if(data.length !=8){
-            throw new FileCorruptedException("User file contains extra data or has missing data");
+            throw new FileCorruptedException("Customer file contains extra data or has missing data");
         }
         customer.setId(data[0]);
         customer.setName(data[1]);

@@ -15,7 +15,7 @@ public class UserMapper implements Mapper<User> {
         User user = new User();
         String[] data = row.split("\\|");
         if(data.length !=8){
-            throw new FileCorruptedException("Customer file contains extra data or has missing data");
+            throw new FileCorruptedException("User file contains extra data or has missing data");
         }
         user.setId(data[0]);
         user.setName(data[1]);
