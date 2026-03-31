@@ -27,7 +27,7 @@ public class AppointmentRepository {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
             // Format the data as a comma-separated string
-            String record = String.join(",",
+            String record = String.join("|",
                     appointment.getId(),
                     appointment.getCustomerId(),
                     appointment.getTechnicianId(),
@@ -112,14 +112,14 @@ public class AppointmentRepository {
                 if (line.trim().isEmpty()) continue;
 
                 // Split the comma-separated line into an array
-                String[] data = line.split(",");
+                String[] data = line.split("|");
 
                 // Reconstruct the Appointment object
                 // Note: The order here MUST match the exact order you saved them in!
                 Appointment appointment = new Appointment(
                         data[0],                         // id
-                        LocalDateTime.parse(data[7]),    // createdAt (Now at index 7)
-                        LocalDateTime.parse(data[8]),    // updatedAt (Now at index 8)
+                        LocalDateTime.parse(data[7]),    // createdAt (index 7)
+                        LocalDateTime.parse(data[8]),    // updatedAt (index 8)
                         data[1],                         // customerId
                         data[2],                         // technicianId
                         data[3],                         // serviceId
