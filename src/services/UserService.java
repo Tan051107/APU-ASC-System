@@ -1,5 +1,6 @@
 package services;
 
+import enums.UserType;
 import exceptions.DeleteException;
 import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
@@ -38,6 +39,10 @@ public class UserService {
 
     public User getUserByEmail(String email) throws GetEntityListException {
         try{
+            List<User> users = userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(email)).stream().toList();
+            if(users.isEmpty()){
+                return null;
+            }
             return userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(email)).getFirst();
         }
         catch (FileCorruptedException e){

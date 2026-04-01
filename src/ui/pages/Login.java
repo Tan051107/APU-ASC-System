@@ -1,7 +1,7 @@
 package ui.pages;
 
 import ui.controller.SignInController;
-import ui.controller.SignUpController;
+import ui.utils.UIUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,14 +9,17 @@ import java.util.Objects;
 
 public class Login {
 
-    private CardLayout cardLayout;
-    private JPanel cardContainer;
-    private JButton signInTab;
-    private JButton signUpTab;
+    public JTextField emailField;
+    public JTextField passwordField;
+    public JButton signInButton;
+    public JButton demoManagerButton;
+    public JButton demoCustomerButton;
+    public JButton demoTechnicianButton;
+    public JButton demoCounterStaffButton;
+    private JFrame frame;
 
     public void createUI() {
-        JFrame frame = new JFrame("APU - ASC");
-        frame.setSize(500, 750);
+        frame = new JFrame("APU - ASC");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
@@ -77,48 +80,20 @@ public class Login {
         authCard.setBackground(Color.WHITE);
         authCard.setLayout(new GridBagLayout());
         authCard.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
-        authCard.setPreferredSize(new Dimension(400, 580));
-        authCard.setMinimumSize(new Dimension(400, 580));
-        authCard.setMaximumSize(new Dimension(400, 580));
         authCard.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         GridBagConstraints ac = new GridBagConstraints();
         ac.gridx = 0;
         ac.gridy = 0;
         ac.weightx = 1;
-        ac.weighty = 0;
-        ac.fill = GridBagConstraints.HORIZONTAL;
-        ac.anchor = GridBagConstraints.NORTHWEST;
-
-        // Tab Switcher
-        authCard.add(createTabSwitcher(), ac);
-
-        // Card Content — full width so BoxLayout forms inside are not centered as a narrow column
-        ac.gridy = 1;
-        ac.insets = new Insets(25, 0, 0, 0);
         ac.weighty = 1;
         ac.fill = GridBagConstraints.BOTH;
+        ac.anchor = GridBagConstraints.NORTHWEST;
 
-        cardLayout = new CardLayout();
-        cardContainer = new JPanel(cardLayout);
-        cardContainer.setOpaque(false);
+        JPanel signInPanel = createSignInPanel();
+        new SignInController(this);
 
-        SignUpPanel signUpPanel = new SignUpPanel(this);
-        SignInPanel signInPanel = new SignInPanel(this);
-        new SignUpController(signUpPanel);
-        new SignInController(signInPanel);
-
-        cardContainer.add(signInPanel, "SIGN_IN");
-        cardContainer.add(signUpPanel, "SIGN_UP");
-
-        JScrollPane scrollPane = new JScrollPane(cardContainer);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-        authCard.add(scrollPane, ac);
+        authCard.add(signInPanel, ac);
 
         mainContainer.add(header);
         mainContainer.add(Box.createRigidArea(new Dimension(0, 30)));
@@ -127,60 +102,81 @@ public class Login {
         background.add(mainContainer, gbc);
 
         frame.setContentPane(background);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
-    private JPanel createTabSwitcher() {
-        RoundedPanel container = new RoundedPanel(12);
-        container.setBackground(new Color(245, 245, 245));
-        container.setLayout(new GridLayout(1, 2, 5, 5));
-        container.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        container.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        container.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        signInTab = new JButton("Sign In");
-        signUpTab = new JButton("Sign Up");
-
-        styleTabButton(signInTab, true);
-        styleTabButton(signUpTab, false);
-
-        signInTab.addActionListener(e -> switchToSignIn());
-        signUpTab.addActionListener(e -> switchToSignUp());
-
-        container.add(signInTab);
-        container.add(signUpTab);
-
-        return container;
-    }
-
-    public void switchToSignIn() {
-        cardLayout.show(cardContainer, "SIGN_IN");
-        updateTabs(true);
-    }
-
-    public void switchToSignUp() {
-        cardLayout.show(cardContainer, "SIGN_UP");
-        updateTabs(false);
-    }
-
-    private void updateTabs(boolean isSignIn) {
-        styleTabButton(signInTab, isSignIn);
-        styleTabButton(signUpTab, !isSignIn);
-    }
-
-    private void styleTabButton(JButton btn, boolean isActive) {
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        if (isActive) {
-            btn.setBackground(new Color(37, 99, 235));
-            btn.setForeground(Color.WHITE);
-        } else {
-            btn.setBackground(new Color(245, 245, 245));
-            btn.setForeground(new Color(150, 150, 150));
+    public void dispose() {
+        if (frame != null) {
+            frame.dispose();
         }
+    }
+
+    private JPanel createSignInPanel() {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(UIUtils.createLabel("Email *"));
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+        emailField = UIUtils.createTextField("Ahmad@apu-asc.com");
+        panel.add(emailField);
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        panel.add(UIUtils.createLabel("Password *"));
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+        passwordField = UIUtils.createPasswordField("Enter password");
+        panel.add(passwordField);
+        panel.add(Box.createRigidArea(new Dimension(0, 25)));
+
+        signInButton = UIUtils.createPrimaryButton("Sign In");
+        panel.add(signInButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        // Quick Demo Login
+        JLabel demoLabel = new JLabel("QUICK DEMO LOGIN");
+        demoLabel.setForeground(new Color(140, 140, 140));
+        demoLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        demoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(demoLabel);
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        JPanel rolePanel = new JPanel(new GridLayout(2, 2, 6, 6));
+        rolePanel.setOpaque(false);
+        rolePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        demoManagerButton = createRoleButton("Manager");
+        rolePanel.add(wrapRoleButton(demoManagerButton));
+        demoCounterStaffButton = createRoleButton("Counter Staff");
+        rolePanel.add(wrapRoleButton(demoCounterStaffButton));
+        demoCustomerButton = createRoleButton("Customer");
+        rolePanel.add(wrapRoleButton(demoCustomerButton));
+        demoTechnicianButton = createRoleButton("Technician");
+        rolePanel.add(wrapRoleButton(demoTechnicianButton));
+        Dimension rolePref = rolePanel.getPreferredSize();
+        rolePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, rolePref.height));
+        panel.add(rolePanel);
+
+        panel.setPreferredSize(new Dimension(350, panel.getPreferredSize().height));
+        return panel;
+    }
+
+    private JButton createRoleButton(String text) {
+        JButton btn = UIUtils.createSecondaryButton(text);
+        btn.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        Dimension size = new Dimension(132, 26);
+        btn.setPreferredSize(size);
+        btn.setMinimumSize(size);
+        btn.setMaximumSize(size);
+        return btn;
+    }
+
+    private static JPanel wrapRoleButton(JButton btn) {
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        p.setOpaque(false);
+        p.add(btn);
+        return p;
     }
 
     // ---------- CUSTOM PANELS ----------

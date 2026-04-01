@@ -81,7 +81,7 @@ public class CrudRepository<T extends BaseModel> implements BaseRepository<T> {
     public void create(T object) throws IOException {
         object.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")));
         object.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")));
-        try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))){
+        try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath,true)))){
             String row = mapper.toString(object);
             writer.println(row);
         }
@@ -113,7 +113,7 @@ public class CrudRepository<T extends BaseModel> implements BaseRepository<T> {
         }
     }
 
-    private void writeAll(List<T> objects){
+    public void writeAll(List<T> objects){
         try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))) {
             for(T object:objects){
                 String row = mapper.toString(object);

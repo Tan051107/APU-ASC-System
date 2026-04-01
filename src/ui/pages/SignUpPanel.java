@@ -95,11 +95,11 @@ public class SignUpPanel extends JPanel {
         add(createLeftAlignedRigidArea(0, 20));
 
         // Link back to Sign In
-        JPanel backPanel = getJPanel(parent);
+        JPanel backPanel = getJPanel();
         add(backPanel);
     }
 
-    private static JPanel getJPanel(Login parent) {
+    private static JPanel getJPanel() {
         JPanel backPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         backPanel.setOpaque(false);
         backPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -112,11 +112,6 @@ public class SignUpPanel extends JPanel {
         signInLink.setForeground(new Color(37, 99, 235));
         signInLink.setFont(new Font("Segoe UI", Font.BOLD, 13));
         signInLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        signInLink.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                parent.switchToSignIn();
-            }
-        });
 
         backPanel.add(backText);
         backPanel.add(signInLink);

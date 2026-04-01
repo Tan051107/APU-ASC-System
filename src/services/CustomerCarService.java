@@ -4,10 +4,9 @@ import exceptions.*;
 import mapper.CustomerCarMapper;
 import models.CustomerCar;
 import repositories.CrudRepository;
+import utils.RandomIdGenerator;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class CustomerCarService {
@@ -25,10 +24,16 @@ public class CustomerCarService {
         return customerCarCrudRepository.getAll(customerCar -> customerCar.getCustomerId().equalsIgnoreCase(customerId));
     }
 
+    public CustomerCar getCarById(String id) throws GetEntityListException {
+        try {
+            return customerCarCrudRepository.getOne(id);
+        } catch (FileCorruptedException e) {
+            throw new GetEntityListException(e.getMessage());
+        }
+    }
+
     public void addCar(CustomerCar carToAdd) throws AddCarException {
         try{
-            Path path = Paths.get(CUSTOMER_CAR_FILE);
-            System.out.println(path);
             boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate())).isEmpty();
             final int maxCarAllowed = 3;
             boolean hasReachedMaxCarAllowed = getCustomerCars(carToAdd.getCustomerId()).size() >=maxCarAllowed;
@@ -38,6 +43,8 @@ public class CustomerCarService {
             if(hasReachedMaxCarAllowed){
                 throw new AddCarException("Already reached maximum car allowed to be added");
             }
+            String carId = generateCarId();
+            carToAdd.setId(carId);
             customerCarCrudRepository.create(carToAdd);
         }
         catch (FileCorruptedException | IOException e){
@@ -46,8 +53,31 @@ public class CustomerCarService {
     }
 
 
-    public void deleteCar(String carPlate) throws DeleteException {
-        customerCarCrudRepository.delete(carPlate);
+    public void deleteCarById(String carId) throws DeleteException {
+        customerCarCrudRepository.delete(carId);
+    }
+
+    public void deleteCarByCustomerId(String customerId) throws DeleteException {
+        try {
+            List<CustomerCar> cars = getCars();
+            cars.removeIf(customerCar -> customerCar.getCustomerId().equals(customerId));
+            customerCarCrudRepository.writeAll(cars);
+        } catch (FileCorruptedException e) {
+            throw new DeleteException(e.getMessage());
+        }
+    }
+
+    private String generateCarId(){
+        try {
+            while(true){
+                String carId = RandomIdGenerator.generateId("CAR" ,6);
+                if(getCarById(carId) == null){
+                    return carId;
+                }
+            }
+        } catch (GetEntityListException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

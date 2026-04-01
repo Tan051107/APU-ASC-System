@@ -1,6 +1,4 @@
 package ui.controller;
-
-
 import dto.AddCustomerDto;
 import enums.UserType;
 import exceptions.SignUpException;
@@ -33,7 +31,7 @@ public class SignUpController {
         List<AddCarDto> cars = signUpPanel.getCarData();
         cars.removeIf(car->car.getCarPlate().trim().isEmpty() || car.getCarModel().trim().isEmpty());
         AddCustomerDto addCustomerDto = new AddCustomerDto(user , cars);
-        customerService.signUpCustomer(addCustomerDto);
+        customerService.addCustomer(addCustomerDto);
     }
 
     private void validateToShowCarModelAndCarPlateField(){

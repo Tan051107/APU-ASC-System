@@ -19,4 +19,17 @@ public class Customer extends User{
         setUserType(UserType.CUSTOMER);
     }
 
+    public static Customer fromUser(User user){
+        Customer customer = new Customer();
+        customer.setId(user.getId());
+        customer.setName(user.getName());
+        customer.setEmail(user.getEmail());
+        customer.setPassword(user.getPassword());
+        customer.setContactNumber(user.getContactNumber());
+        customer.setUserType(UserType.CUSTOMER);
+        customer.setCreatedAt(user.getCreatedAt());
+        customer.setUpdatedAt(user.getUpdatedAt());
+        return customer;
+    }
+
 }
