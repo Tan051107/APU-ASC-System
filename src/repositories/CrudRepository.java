@@ -64,7 +64,7 @@ public class CrudRepository<T extends BaseModel> implements BaseRepository<T> {
         boolean isExists = false;
         for(int i = 0 ; i< objects.size() ; i++){
             if(objects.get(i).getId().equalsIgnoreCase(objectToUpdate.getId())){
-                objects.get(i).setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")));
+                objectToUpdate.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")));
                 objects.set(i,objectToUpdate);
                 isExists = true;
             }

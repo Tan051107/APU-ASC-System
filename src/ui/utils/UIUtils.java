@@ -179,4 +179,67 @@ public class UIUtils {
         }
         return text;
     }
+
+    public static JLabel createMenuTitle(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.BOLD, 16));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return label;
+    }
+
+    public static JButton createCRUDButton(String text) {
+        JButton button = new JButton(text);
+        Dimension buttonSize = new Dimension(150, 50);
+        button.setPreferredSize(buttonSize);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(99, 110, 114));
+        button.setForeground(Color.WHITE);
+        button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
+        return button;
+    }
+
+    public static JButton createIconButton(String icon, Color color) {
+        JButton btn = new JButton(icon);
+        btn.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 16));
+        btn.setForeground(new Color(150, 150, 150));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setToolTipText(icon.equals("✎") ? "Edit" : "Delete");
+        
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setForeground(color);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setForeground(new Color(150, 150, 150));
+            }
+        });
+        return btn;
+    }
+
+    public static JButton createLinkButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setForeground(new Color(37, 99, 235));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
+    public static JPanel createBadge(String text) {
+        RoundedPanel badge = new RoundedPanel(10);
+        badge.setBackground(new Color(243, 244, 246));
+        badge.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 2));
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        label.setForeground(new Color(107, 114, 128));
+        badge.add(label);
+        return badge;
+    }
 }

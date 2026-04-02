@@ -1,10 +1,7 @@
 package services;
 
 import enums.UserType;
-import exceptions.DeleteException;
-import exceptions.FileCorruptedException;
-import exceptions.GetEntityListException;
-import exceptions.SignUpException;
+import exceptions.*;
 import mapper.UserMapper;
 import models.User;
 import repositories.CrudRepository;
@@ -71,6 +68,10 @@ public class UserService {
             throw new SignUpException(e.getMessage());
 
         }
+    }
+
+    public void updateUser(User user) throws FileCorruptedException, NotFoundException {
+        userRepository.update(user);
     }
 
     public void deleteUser(String userId) throws DeleteException {

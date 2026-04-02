@@ -1,5 +1,10 @@
 package ui.pages;
 
+import ui.controller.CounterStaffControllers.CustomerManagementController;
+import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
+import ui.pages.CounterStaffPanels.ManageCustomerPanel;
+import ui.pages.CounterStaffPanels.ManagePaymentPanel;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -64,17 +69,18 @@ public class CounterStaffMenu extends JFrame {
 
         // Add the individual function panels to the CardLayout
         // The string acts as an ID to call the specific panel later
-        contentPanel.add(createManageCustomerPanel(), "Manage Users");
-        contentPanel.add(createManageAppointmentPanel(), "Service Pricing");
-        contentPanel.add(createManagePaymentPanel(), "View Feedback");
-        contentPanel.add(createReportsPanel(), "Reporting");
+        ManageCustomerPanel manageCustomerPanel = new ManageCustomerPanel();
+        new CustomerManagementController(manageCustomerPanel);
+        contentPanel.add(manageCustomerPanel, "Manage Customer");
+        contentPanel.add(new ManageAppointmentPanel(), "Manage Appointment");
+        contentPanel.add(new ManagePaymentPanel(), "Manage Payment");
 
         add(contentPanel, BorderLayout.CENTER);
 
         // 3. Add Action Listeners to swap cards when buttons are clicked
-        manageCustomerBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Users"));
-        manageAppointmentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Service Pricing"));
-        managePaymentBtn.addActionListener(e -> cardLayout.show(contentPanel, "View Feedback"));
+        manageCustomerBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Customer"));
+        manageAppointmentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Appointment"));
+        managePaymentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Payment"));
     }
 
     private void toggleSidebar() {
@@ -116,108 +122,5 @@ public class CounterStaffMenu extends JFrame {
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         return button;
     }
-
-    // --- View Generation Methods ---
-
-    private JPanel createManageCustomerPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel title = displayMenuTitle("Customer Account Management");
-        panel.add(title, BorderLayout.NORTH);
-
-        // Placeholder for JTable
-        String[][] data = {{"1", "John Doe", "Customer"}, {"2", "Jane Smith", "Technician"}};
-        String[] columns = {"User ID", "Name", "Role"};
-        JTable table = new JTable(data, columns);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
-
-        // CRUD Action Buttons
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton addCustomerBtn = createCRUDButton("Add Customer");
-        bottomPanel.add(addCustomerBtn);
-        JButton editCustomerBtn = createCRUDButton("Edit Customer");
-        bottomPanel.add(editCustomerBtn);
-        JButton deleteCustomerBtn = createCRUDButton("Delete Customer");
-        bottomPanel.add(deleteCustomerBtn);
-        panel.add(bottomPanel, BorderLayout.SOUTH);
-
-        return panel;
-    }
-
-    private JPanel createManageAppointmentPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel title = displayMenuTitle("Customer Appointment Management");
-        panel.add(title, BorderLayout.NORTH);
-        String[][] data = {{"Standard Oil Change", "RM 120.00"}, {"Tire Rotation", "RM 40.00"}};
-        String[] columns = {"Service Type", "Current Price"};
-        JTable table = new JTable(data, columns);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton updatePrice = createCRUDButton("Update Price");
-        bottomPanel.add(updatePrice);
-        panel.add(bottomPanel, BorderLayout.SOUTH);
-
-        return panel;
-    }
-
-    private JPanel createManagePaymentPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel title = displayMenuTitle("Customer Payment Management");
-        panel.add(title, BorderLayout.NORTH);
-
-        /* JTextArea feedbackArea = new JTextArea("Review ID 101: Great service on my car, highly recommended!\n\nReview ID 102: Waiting time was a bit longer than expected.");
-        feedbackArea.setEditable(false);
-        feedbackArea.setMargin(new Insets(10, 10, 10, 10));
-        panel.add(new JScrollPane(feedbackArea), BorderLayout.CENTER); */
-
-        // Placeholder for JTable
-        String[][] data = {{"F001", "John Doe", "Car Kaput"}, {"F002", "Jane Smith", "HP increase"}};
-        String[] columns = {"Feedback ID", "Customer Name", "Feedback Type"};
-        JTable table = new JTable(data, columns);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton viewDetails = createCRUDButton("View Details");
-        bottomPanel.add(viewDetails);
-        panel.add(bottomPanel, BorderLayout.SOUTH);
-
-        return panel;
-    }
-
-    private JPanel createReportsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel title = displayMenuTitle("Service Centre Reporting & Analytics");
-        panel.add(title, BorderLayout.NORTH);
-
-        JTextArea reportArea = new JTextArea("--- Monthly Summary ---\nTotal Revenue: RM 15,400\nTotal Vehicles Serviced: 142\nMost Popular Service: Standard Oil Change");
-        reportArea.setEditable(false);
-        reportArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        reportArea.setMargin(new Insets(10, 10, 10, 10));
-        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JLabel displayMenuTitle(String text) {
-        JLabel label = new JLabel(text);
-        label.setFont(new Font("Arial", Font.BOLD, 16));
-        /* label.setHorizontalTextPosition(SwingConstants.CENTER); */
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        return label;
-    }
-
-    private JButton createCRUDButton(String text) {
-        JButton button = new JButton(text);
-        Dimension buttonSize = new Dimension(150, 50);
-        button.setPreferredSize(buttonSize);
-        button.setFocusPainted(false);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(99, 110, 114));
-        button.setForeground(Color.WHITE);
-        button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
-        return button;
-    }
-
 
 }

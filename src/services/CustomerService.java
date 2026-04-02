@@ -7,6 +7,7 @@ import exceptions.*;
 import mapper.CustomerMapper;
 import models.Customer;
 import models.CustomerCar;
+import models.User;
 import repositories.CrudRepository;
 
 import java.util.List;
@@ -18,23 +19,9 @@ public class CustomerService {
     private final CustomerMapper customerMapper = new CustomerMapper();
     private final CrudRepository<Customer> customerCrudRepository = new CrudRepository<>(USER_FILE,customerMapper);
 
-    public void addCustomer(AddCustomerDto addCustomerDto) throws SignUpException {
-        userService.signUpUser(addCustomerDto.getUser());
-        if(addCustomerDto.getCarsToBeAdded().isEmpty()){
-            throw new SignUpException("At least one car must be added");
-        }
-        for(AddCarDto car : addCustomerDto.getCarsToBeAdded()){
-            CustomerCar customerCar = new CustomerCar();
-            customerCar.setId(car.getCarPlate());
-            customerCar.setCustomerId(addCustomerDto.getUser().getId());
-            customerCar.setCarModel(car.getCarModel());
-            customerCar.setCarPlate(car.getCarPlate());
-            try {
-                customerCarService.addCar(customerCar);
-            } catch (AddCarException e) {
-                throw new SignUpException(e.getMessage());
-            }
-        }
+    public void addCustomer(User customerToSignUp) throws SignUpException {
+        customerToSignUp.setUserType(UserType.CUSTOMER);
+        userService.signUpUser(customerToSignUp);
     }
 
     public void deleteCustomer(String customerId) throws DeleteException {
@@ -50,7 +37,7 @@ public class CustomerService {
         }
     }
 
-    public void getCustomers() throws FileCorruptedException {
-        List<Customer> customers = customerCrudRepository.getAll(customer -> customer.getUserType().equals(UserType.CUSTOMER));
+    public List<Customer> getCustomers() throws FileCorruptedException {
+        return customerCrudRepository.getAll(customer -> customer.getUserType().equals(UserType.CUSTOMER));
     }
 }
