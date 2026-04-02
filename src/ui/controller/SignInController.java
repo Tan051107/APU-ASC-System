@@ -3,7 +3,7 @@ package ui.controller;
 import models.User;
 import services.AuthService;
 import ui.pages.SignInPanel;
-import ui.pages.TechnicianMenu;
+//import ui.pages.TechnicianMenu;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.*;
