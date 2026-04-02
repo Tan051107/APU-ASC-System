@@ -6,14 +6,14 @@ import ui.controller.ManagerMenuController;
 
 import java.awt.*;
 
-public class managermenu extends JFrame {
+public class ManagerMenu extends JFrame {
     
     // Panel that will hold all the different views
     private JPanel contentPanel;
     private CardLayout cardLayout;
     private final ManagerMenuController controller = new ManagerMenuController();
 
-    public managermenu() {
+    public ManagerMenu() {
         setTitle("APU-ASC Manager Dashboard");
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

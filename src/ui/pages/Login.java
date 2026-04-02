@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
-public class Login {
+public class Login extends Component {
 
     public JTextField emailField;
     public JPasswordField passwordField;
