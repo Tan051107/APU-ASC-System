@@ -8,6 +8,7 @@ import ui.pages.managermenu;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.*;
+import java.awt.*;
 
 public class SignInController {
     private final Login loginPage;
@@ -68,17 +69,25 @@ public class SignInController {
     public void demoManagerLogin(){
         loginPage.emailField.setText("Jacob@gmail.com");
         loginPage.passwordField.setText("12345678");
+        loginPage.emailField.setForeground(Color.BLACK);
+        loginPage.passwordField.setForeground(Color.BLACK);
     }
     public void demoCustomerLogin(){
         loginPage.emailField.setText("Ben@gmail.com");
         loginPage.passwordField.setText("12345678");
+        loginPage.emailField.setForeground(Color.BLACK);
+        loginPage.passwordField.setForeground(Color.BLACK);
     }
     public void demoTechnicianLogin(){
         loginPage.emailField.setText("Smith@gmail.com");
         loginPage.passwordField.setText("12345678");
+        loginPage.emailField.setForeground(Color.BLACK);
+        loginPage.passwordField.setForeground(Color.BLACK);
     }
     public void demoCounterStaffLogin(){
         loginPage.emailField.setText("Abu@gmail.com");
         loginPage.passwordField.setText("12345678");
+        loginPage.emailField.setForeground(Color.BLACK);
+        loginPage.passwordField.setForeground(Color.BLACK);
     }
 }

@@ -8,12 +8,18 @@ import ui.utils.UIUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerCard extends RoundedPanel {
     public JButton editCustomerBtn;
     public JButton deleteCustomerBtn;
     public JButton addVehicleBtn;
+    private final List<VehicleRow> vehicleRows = new ArrayList<>();
+
+    public List<VehicleRow> getVehicleRows() {
+        return vehicleRows;
+    }
 
     public CustomerCard(Customer customer) {
         super(15);
@@ -73,14 +79,19 @@ public class CustomerCard extends RoundedPanel {
 
         try {
             List<CustomerCar> cars = customer.getCars();
-            JLabel vehicleCountLabel = new JLabel(cars.size() + " vehicle(s)");
+            int count = cars.size();
+            JLabel vehicleCountLabel = new JLabel(
+                    count + " " + (count > 1 ? "vehicles" : "vehicle")
+            );
             vehicleCountLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
             vehicleCountLabel.setForeground(new Color(107, 114, 128));
             vehicleCountLabel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 0));
             vehicleHeader.add(vehicleCountLabel, BorderLayout.WEST);
             // Vehicle Rows
             for (CustomerCar car : cars) {
-                content.add(new VehicleRow(car));
+                VehicleRow row = new VehicleRow(car);
+                vehicleRows.add(row);
+                content.add(row);
             }
         } catch (FileCorruptedException e) {
             content.add(new JLabel("Error loading vehicles"));

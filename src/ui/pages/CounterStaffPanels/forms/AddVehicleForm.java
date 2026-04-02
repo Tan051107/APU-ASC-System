@@ -24,7 +24,8 @@ public class AddVehicleForm extends JFrame {
         this.customer = customer;
         this.isEdit = true;
         this.customerCar = customerCar;
-        setTitle("Add New Vehicle for " + customer.getName());
+        String windowTitle = isEdit ? "Add New Vehicle for" : "Update Vehicle for";
+        setTitle(windowTitle + customer.getName());
         setSize(450, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -65,14 +66,14 @@ public class AddVehicleForm extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Fuel Type *"));
-        String[] fuelTypes = {"Petrol", "Diesel", "Electric", "Hybrid"};
+        String[] fuelTypes = {"Petrol", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid"};
         fuelTypeCombo = new JComboBox<>(fuelTypes);
         fuelTypeCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         fuelTypeCombo.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(fuelTypeCombo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 25)));
 
-        addVehicleButton = UIUtils.createPrimaryButton("Add Vehicle");
+        addVehicleButton = UIUtils.createPrimaryButton(isEdit ? "Update Vehicle" :" Add Vehicle");
         mainPanel.add(addVehicleButton);
 
         JScrollPane scrollPane = new JScrollPane(mainPanel);

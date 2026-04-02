@@ -11,7 +11,7 @@ import java.util.Objects;
 public class Login {
 
     public JTextField emailField;
-    public JTextField passwordField;
+    public JPasswordField passwordField;
     public JButton signInButton;
     public JButton demoManagerButton;
     public JButton demoCustomerButton;

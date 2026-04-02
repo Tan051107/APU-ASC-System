@@ -10,8 +10,14 @@ import java.awt.*;
 public class VehicleRow extends JPanel {
     public JButton editBtn;
     public JButton deleteBtn;
+    private final CustomerCar car;
+
+    public CustomerCar getCar() {
+        return car;
+    }
 
     public VehicleRow(CustomerCar car) {
+        this.car = car;
         setOpaque(false);
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
@@ -20,21 +26,23 @@ public class VehicleRow extends JPanel {
         JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         infoPanel.setOpaque(false);
 
+        //For car plate display
         JLabel plateLabel = new JLabel(car.getCarPlate());
         plateLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
         plateLabel.setForeground(new Color(31, 41, 55));
 
+        //For car model display
         JLabel modelLabel = new JLabel(car.getCarModel());
         modelLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         modelLabel.setForeground(new Color(75, 85, 99));
 
-        // Placeholder for year and mileage as they are not in CustomerCar model yet
-        // Based on image: 2022, 35,000 km, Petrol badge
-        JLabel yearLabel = new JLabel("2022"); // Placeholder
+        //For manufacture year display
+        JLabel yearLabel = new JLabel(String.valueOf(car.getManufactureYear())); // Placeholder
         yearLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         yearLabel.setForeground(new Color(156, 163, 175));
 
-        JLabel mileageLabel = new JLabel("35,000 km"); // Placeholder
+        //For mileage display
+        JLabel mileageLabel = new JLabel(String.valueOf(car.getMileage()) + " km"); // Placeholder
         mileageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         mileageLabel.setForeground(new Color(156, 163, 175));
 
@@ -42,7 +50,7 @@ public class VehicleRow extends JPanel {
         infoPanel.add(modelLabel);
         infoPanel.add(yearLabel);
         infoPanel.add(mileageLabel);
-        infoPanel.add(UIUtils.createBadge("Petrol"));
+        infoPanel.add(UIUtils.createBadge(car.getFuelType().toString()));
 
         add(infoPanel, BorderLayout.WEST);
 

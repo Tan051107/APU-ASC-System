@@ -69,7 +69,7 @@ public class CustomerCar extends BaseModel{
         this.carBrand = carBrand;
     }
 
-    public double getManufactureYear() {
+    public int getManufactureYear() {
         return manufactureYear;
     }
 

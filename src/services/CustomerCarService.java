@@ -50,7 +50,7 @@ public class CustomerCarService {
             customerCarCrudRepository.create(carToAdd);
         }
         catch (FileCorruptedException | IOException e){
-            throw new AddCarException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

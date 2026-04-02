@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class SignInPanel extends JPanel {
     public JTextField emailField;
-    public JTextField passwordField;
+    public JPasswordField passwordField;
     public JButton signInButton;
     public SignInPanel(Login parent) {
         setOpaque(false);
