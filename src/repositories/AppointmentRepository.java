@@ -27,20 +27,21 @@ public class AppointmentRepository {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
             // Format the data as a comma-separated string
-            String record = String.join("|",
+            String record = String.join("\\|",
                     appointment.getId(),
                     appointment.getCustomerId(),
+                    appointment.getStaffId(),
                     appointment.getTechnicianId(),
                     appointment.getServiceId(),
                     appointment.getDate().toString(),
                     appointment.getTime().toString(),
-                    appointment.getStatusService().name(), // Saves "ASSIGNED" or "COMPLETED"
+                    appointment.getStatusService().name(), // "ASSIGNED"/"COMPLETED"
                     appointment.getCreatedAt().toString(),
                     appointment.getUpdatedAt().toString()
             );
 
             writer.write(record);
-            writer.newLine(); // Move to the next line for the next entry
+            writer.newLine();
             System.out.println("Successfully saved: " + newId);
 
         } catch (IOException e) {
@@ -78,15 +79,12 @@ public class AppointmentRepository {
         }
 
         // Extract the ID from the last line
-        // Assuming format is: APP-001,timestamp,timestamp,customerId...
-        String[] columns = lastLine.split(",");
+        String[] columns = lastLine.split("\\|");
         String lastId = columns[0]; // Gets "APP-045"
 
         try {
-            // Extract the number part ("045"), convert to integer, and add 1
             int nextNumber = Integer.parseInt(lastId.split("-")[1]) + 1;
             
-            // Format it back into a 3-digit string (e.g., 46 becomes "APP-046")
             return String.format("APP-%03d", nextNumber);
             
         } catch (Exception e) {
@@ -100,7 +98,6 @@ public class AppointmentRepository {
         List<Appointment> appointments = new ArrayList<>();
         File file = new File(FILE_PATH);
 
-        // If the file doesn't exist yet, just return an empty list
         if (!file.exists()) {
             return appointments;
         }
@@ -108,24 +105,22 @@ public class AppointmentRepository {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Skip any blank lines
                 if (line.trim().isEmpty()) continue;
 
-                // Split the comma-separated line into an array
-                String[] data = line.split("|");
+                String[] data = line.split("\\|");
 
                 // Reconstruct the Appointment object
-                // Note: The order here MUST match the exact order you saved them in!
                 Appointment appointment = new Appointment(
                         data[0],                         // id
-                        LocalDateTime.parse(data[7]),    // createdAt (index 7)
-                        LocalDateTime.parse(data[8]),    // updatedAt (index 8)
+                        LocalDateTime.parse(data[8]),    // createdAt (index 7)
+                        LocalDateTime.parse(data[9]),    // updatedAt (index 8)
                         data[1],                         // customerId
-                        data[2],                         // technicianId
-                        data[3],                         // serviceId
-                        LocalDate.parse(data[4]),        // date
-                        LocalTime.parse(data[5]),        // time
-                        AppointmentStatus.valueOf(data[6]) // statusService
+                        data[2],
+                        data[3],                         // technicianId
+                        data[4],                         // serviceId
+                        LocalDate.parse(data[5]),        // date
+                        LocalTime.parse(data[6]),        // time
+                        AppointmentStatus.valueOf(data[7]) // statusService
                 );
 
                 appointments.add(appointment);
