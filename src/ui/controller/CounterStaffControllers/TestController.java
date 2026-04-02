@@ -20,7 +20,7 @@ public class SignInController {
     public void setUpController(){
         signInPanel.signInButton.addActionListener(e -> {
             User loggedInUser = signIn();
-            
+
             if (loggedInUser != null) {
                 routeUser(loggedInUser);
             }
@@ -53,18 +53,18 @@ public class SignInController {
 
     private void routeUser(User user) {
 
-        String role = user.getUserType().getDisplayUserType(); 
+        String role = user.getUserType().getDisplayUserType();
 
         // Open dashboard based on the role
         if (role.equalsIgnoreCase("Technician")) {
-            
+
             TechnicianMenu techMenu = new TechnicianMenu(user);
             techMenu.setVisible(true);
-            
+
         } else if (role.equalsIgnoreCase("Manager")) {
             // ManagerMenu managerMenu = new AdminMenu(user.getId());
             // managerMenu.setVisible(true);
-            
+
         } else if (role.equalsIgnoreCase("Customer")) {
             // CustomerMenu customerMenu = new CustomerMenu(user.getId());
             // customerMenu.setVisible(true);
