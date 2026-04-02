@@ -20,6 +20,7 @@ public class CounterStaffMenu extends JFrame {
     private final JButton manageAppointmentBtn;
     private final JButton managePaymentBtn;
     private final JButton myProfileBtn;
+    public final JButton logOutBtn;
 
     public CounterStaffMenu() {
         setTitle("APU-ASC Counter Staff Dashboard");
@@ -52,6 +53,7 @@ public class CounterStaffMenu extends JFrame {
         manageAppointmentBtn = createSidebarButton("Manage Appointments");
         managePaymentBtn = createSidebarButton("Manage Payment");
         myProfileBtn = createSidebarButton("My Profile");
+        logOutBtn = createSidebarButton("Log Out");
 
         sidebar.add(manageCustomerBtn);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -60,6 +62,8 @@ public class CounterStaffMenu extends JFrame {
         sidebar.add(managePaymentBtn);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(myProfileBtn);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(logOutBtn);
 
         add(sidebar, BorderLayout.WEST);
 
@@ -81,6 +85,7 @@ public class CounterStaffMenu extends JFrame {
         manageCustomerBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Customer"));
         manageAppointmentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Appointment"));
         managePaymentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Payment"));
+        logOutBtn.addActionListener(e->logOut());
     }
 
     private void toggleSidebar() {
@@ -121,6 +126,11 @@ public class CounterStaffMenu extends JFrame {
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         return button;
+    }
+
+    private void logOut(){
+        this.dispose();
+        new Login().createUI();
     }
 
 }
