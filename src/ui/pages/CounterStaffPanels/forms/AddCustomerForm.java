@@ -55,24 +55,24 @@ public class AddCustomerForm extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         mainPanel.add(UIUtils.createLabel("Full Name *"));
-        nameField = UIUtils.createTextField("Enter customer's full name");
+        nameField = UIUtils.createTextField();
         mainPanel.add(nameField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Email Address *"));
-        emailField = UIUtils.createTextField("Enter customer's email");
+        emailField = UIUtils.createTextField();
         mainPanel.add(emailField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Phone Number *"));
-        phoneField = UIUtils.createTextField("Enter customer's phone number");
+        phoneField = UIUtils.createTextField();
         mainPanel.add(phoneField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         passwordLabel = UIUtils.createLabel("Password *");
         mainPanel.add(passwordLabel);
         passwordLabel.setVisible(!isEdit);
-        passwordField = UIUtils.createPasswordField("Min. 8 characters");
+        passwordField = UIUtils.createPasswordField();
         mainPanel.add(passwordField);
         passwordField.setVisible(!isEdit);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -80,7 +80,7 @@ public class AddCustomerForm extends JFrame {
         confirmPasswordLabel = UIUtils.createLabel("Confirm Password *");
         mainPanel.add(confirmPasswordLabel);
         confirmPasswordLabel.setVisible(!isEdit);
-        confirmPasswordField = UIUtils.createPasswordField("Re-enter password");
+        confirmPasswordField = UIUtils.createPasswordField();
         mainPanel.add(confirmPasswordField);
         confirmPasswordField.setVisible(!isEdit);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 25)));

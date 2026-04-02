@@ -16,13 +16,13 @@ public class SignInPanel extends JPanel {
 
         add(UIUtils.createLabel("Email *"));
         add(Box.createRigidArea(new Dimension(0, 8)));
-        emailField = UIUtils.createTextField("Ahmad@apu-asc.com");
+        emailField = UIUtils.createTextField();
         add(emailField);
         add(Box.createRigidArea(new Dimension(0, 15)));
 
         add(UIUtils.createLabel("Password *"));
         add(Box.createRigidArea(new Dimension(0, 8)));
-        passwordField = UIUtils.createPasswordField("Enter password");
+        passwordField = UIUtils.createPasswordField();
         add(passwordField);
         add(Box.createRigidArea(new Dimension(0, 25)));
 

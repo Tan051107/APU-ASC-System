@@ -1,13 +1,14 @@
 package ui.controller.CounterStaffControllers;
 
 import enums.UserType;
-import exceptions.NotFoundException;
-import exceptions.SignUpException;
+import exceptions.*;
 import models.Customer;
 import models.User;
 import services.UserService;
 import ui.pages.CounterStaffPanels.forms.AddCustomerForm;
 import utils.DialogUtil;
+import utils.validators.ValidationResult;
+import utils.validators.Validator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,54 +54,67 @@ public class AddCustomerFormController {
 
     private void addCustomer() {
         String name = form.nameField.getText();
-        String email = form.emailField.getText();
         String password = form.passwordField.getText();
-        String contactNumber = form.phoneField.getText();
         String confirmPassword = form.confirmPasswordField.getText();
 
         if (!confirmPassword.equals(password)) {
             DialogUtil.showWarningMessage("Validation Error" , "Passwords do not match");
             return;
         }
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setContactNumber(contactNumber);
-        user.setUserType(UserType.CUSTOMER);
         try {
+            ValidationResult validationResult = new ValidationResult();
+            User user = getUser(validationResult);
+            Validator.validatePassword(validationResult,"Password" , password);
+            if(validationResult.hasError()){
+                throw new ValidationException(validationResult.getErrors());
+            }
+            user.setPassword(password);
             userService.signUpUser(user);
-            form.dispose();
             DialogUtil.showInfoMessage("Added Successfully" , String.format("Successfully added %s." , name));
-        } catch (SignUpException e) {
+            form.dispose();
+        } catch (SignUpException | ValidationException e) {
             DialogUtil.showWarningMessage("Validation Error" , e.getMessage());
         }
     }
 
     private void updateCustomer(){
-        Customer customerToEdit = form.getCustomerToEdit();
-        String name = form.nameField.getText();
-        String email = form.emailField.getText();
-        String contactNumber = form.phoneField.getText();
-        User user = new User();
-        user.setId(customerToEdit.getId());
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(customerToEdit.getPassword());
-        user.setContactNumber(contactNumber);
-        user.setUserType(UserType.CUSTOMER);
-        user.setCreatedAt(customerToEdit.getCreatedAt());
         try {
+            ValidationResult validationResult = new ValidationResult();
+            User user = getUser(validationResult);
+            Customer customerToEdit = form.getCustomerToEdit();
+            user.setId(customerToEdit.getId());
+            user.setCreatedAt(customerToEdit.getCreatedAt());
+            Validator.validatePassword(validationResult,"Password" , customerToEdit.getPassword());
+            if(validationResult.hasError()){
+                throw new ValidationException(validationResult.getErrors());
+            }
+            user.setPassword(customerToEdit.getPassword());
             userService.updateUser(user);
+            DialogUtil.showInfoMessage("Updated Successfully" , String.format("Successfully updated %s." , user.getName()));
             form.dispose();
-            DialogUtil.showInfoMessage("Updated Successfully" , "Successfully updated customer");
         }
-        catch (NotFoundException e) {
+        catch (NotFoundException | ValidationException | UpdateException e ) {
             DialogUtil.showErrorMessage("Failed to Update Customer" , e.getMessage());
         }
         catch (Exception e) {
             DialogUtil.showErrorMessage("Failed to Update Customer" , "Encountered error when updating customer");
             logger.log(Level.SEVERE ,e.getMessage());
         }
+    }
+
+
+    private User getUser(ValidationResult validationResult) throws ValidationException {
+        String name = form.nameField.getText();
+        String email = form.emailField.getText();
+        String contactNumber = form.phoneField.getText();
+        Validator.required(validationResult, "Name", name);
+        Validator.validateEmail(validationResult, email);
+        Validator.validatePhone(validationResult , contactNumber);
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setContactNumber(contactNumber);
+        user.setUserType(UserType.CUSTOMER);
+        return user;
     }
 }

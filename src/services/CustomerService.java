@@ -24,7 +24,8 @@ public class CustomerService {
         userService.signUpUser(customerToSignUp);
     }
 
-    public void deleteCustomer(String customerId) throws DeleteException {
+    //TODO:If got appointment don't allow delete
+    public void deleteCustomer(String customerId) throws FileCorruptedException, DeleteException {
         userService.deleteUser(customerId);
         customerCarService.deleteCarByCustomerId(customerId);
     }

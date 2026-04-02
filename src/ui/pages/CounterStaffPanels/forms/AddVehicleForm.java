@@ -22,9 +22,9 @@ public class AddVehicleForm extends JFrame {
 
     public AddVehicleForm(Customer customer , boolean isEdit , CustomerCar customerCar) {
         this.customer = customer;
-        this.isEdit = true;
+        this.isEdit = isEdit;
         this.customerCar = customerCar;
-        String windowTitle = isEdit ? "Add New Vehicle for" : "Update Vehicle for";
+        String windowTitle = isEdit ? "Update Vehicle for " : "Add New Vehicle for ";
         setTitle(windowTitle + customer.getName());
         setSize(450, 600);
         setLocationRelativeTo(null);
@@ -41,27 +41,27 @@ public class AddVehicleForm extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         mainPanel.add(UIUtils.createLabel("Car Plate *"));
-        plateField = UIUtils.createTextField("Enter car plate number");
+        plateField = UIUtils.createTextField();
         mainPanel.add(plateField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Brand *"));
-        brandField = UIUtils.createTextField("e.g. Toyota, Honda, Proton");
+        brandField = UIUtils.createTextField();
         mainPanel.add(brandField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Model *"));
-        modelField = UIUtils.createTextField("e.g. Vios, City, X50");
+        modelField = UIUtils.createTextField();
         mainPanel.add(modelField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Manufacture Year *"));
-        yearField = UIUtils.createTextField("e.g. 2022");
+        yearField = UIUtils.createTextField();
         mainPanel.add(yearField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Mileage (km) *"));
-        mileageField = UIUtils.createTextField("e.g. 35000");
+        mileageField = UIUtils.createTextField();
         mainPanel.add(mileageField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 

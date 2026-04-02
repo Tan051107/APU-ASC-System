@@ -5,6 +5,8 @@ import services.AuthService;
 import ui.pages.Login;
 import ui.pages.CounterStaffMenu;
 import ui.pages.managermenu;
+import utils.validators.ValidationResult;
+import utils.validators.Validator;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.*;
@@ -29,9 +31,16 @@ public class SignInController {
 
     public User signIn() {
         AuthService authService = new AuthService();
-        String password = loginPage.passwordField.getText();
+        char[] passwordChars = loginPage.passwordField.getPassword();
+        String password = new String(passwordChars);
         String email = loginPage.emailField.getText();
         try{
+            ValidationResult validationResult = new ValidationResult();
+            Validator.validateEmail(validationResult,email);
+            Validator.validatePassword(validationResult,"Password" ,password);
+            if(validationResult.hasError()){
+                throw new LoginException(validationResult.getErrors());
+            }
             User user = authService.login(email,password);
             switch (user.getUserType()){
                 case CUSTOMER:

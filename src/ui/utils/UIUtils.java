@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class UIUtils {
-    public static JTextField createTextField(String placeholder) {
+    public static JTextField createTextField() {
         JTextField field = new JTextField();
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -13,29 +13,12 @@ public class UIUtils {
                 BorderFactory.createEmptyBorder(12, 12, 12, 12)
         ));
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        field.setText(placeholder);
-        field.setForeground(Color.GRAY);
-
-        field.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent e) {
-                if (field.getText().equals(placeholder)) {
-                    field.setText("");
-                    field.setForeground(Color.BLACK);
-                }
-            }
-
-            public void focusLost(java.awt.event.FocusEvent e) {
-                if (field.getText().isEmpty()) {
-                    field.setText(placeholder);
-                    field.setForeground(Color.GRAY);
-                }
-            }
-        });
+        field.setForeground(Color.BLACK);
 
         return field;
     }
 
-    public static JPasswordField createPasswordField(String placeholder) {
+    public static JPasswordField createPasswordField() {
         JPasswordField field = new JPasswordField();
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -44,27 +27,7 @@ public class UIUtils {
                 BorderFactory.createEmptyBorder(12, 12, 12, 12)
         ));
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        field.setText(placeholder);
-        field.setForeground(Color.GRAY);
-        field.setEchoChar((char) 0);
-
-        field.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent e) {
-                if (String.valueOf(field.getPassword()).equals(placeholder)) {
-                    field.setText("");
-                    field.setForeground(Color.BLACK);
-                    field.setEchoChar('•');
-                }
-            }
-
-            public void focusLost(java.awt.event.FocusEvent e) {
-                if (field.getPassword().length == 0) {
-                    field.setText(placeholder);
-                    field.setForeground(Color.GRAY);
-                    field.setEchoChar((char) 0);
-                }
-            }
-        });
+        field.setForeground(Color.BLACK);
 
         return field;
     }
@@ -125,7 +88,7 @@ public class UIUtils {
         return label;
     }
 
-    public static JComboBox<String> createJComboBox(String[] options, String placeholder) {
+    public static JComboBox<String> createJComboBox(String[] options) {
         JComboBox<String> comboBox = new JComboBox<>(options);
 
         comboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
@@ -139,45 +102,7 @@ public class UIUtils {
                 BorderFactory.createEmptyBorder(8, 10, 8, 10)
         ));
 
-        // Add placeholder-like behavior
-        comboBox.insertItemAt(placeholder, 0);
-        comboBox.setSelectedIndex(0);
-
-        comboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(
-                    JList<?> list, Object value, int index,
-                    boolean isSelected, boolean cellHasFocus) {
-
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-                if (value != null && value.equals(placeholder)) {
-                    setForeground(Color.GRAY);
-                } else {
-                    setForeground(Color.BLACK);
-                }
-
-                return this;
-            }
-        });
-
         return comboBox;
-    }
-
-    public static String getActualText(JTextField field, String placeholder) {
-        String text = field.getText();
-        if (text.equals(placeholder)) {
-            return "";
-        }
-        return text;
-    }
-
-    public static String getActualPassword(JPasswordField field, String placeholder) {
-        String text = String.valueOf(field.getPassword());
-        if (text.equals(placeholder)) {
-            return "";
-        }
-        return text;
     }
 
     public static JLabel createMenuTitle(String text) {

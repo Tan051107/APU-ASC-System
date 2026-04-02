@@ -7,6 +7,7 @@ import repositories.CrudRepository;
 import utils.RandomIdGenerator;
 
 import java.io.*;
+import java.time.Year;
 import java.util.List;
 
 public class CustomerCarService {
@@ -34,38 +35,46 @@ public class CustomerCarService {
         }
     }
 
-    public void addCar(CustomerCar carToAdd) throws AddCarException {
-        try{
-            boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate())).isEmpty();
-            final int maxCarAllowed = 3;
-            boolean hasReachedMaxCarAllowed = getCustomerCars(carToAdd.getCustomerId()).size() >=maxCarAllowed;
-            if(carPlateHasExisted){
-                throw new AddCarException("Car plate has existed");
-            }
-            if(hasReachedMaxCarAllowed){
-                throw new AddCarException("Already reached maximum car allowed to be added");
-            }
-            String carId = generateCarId();
-            carToAdd.setId(carId);
-            customerCarCrudRepository.create(carToAdd);
+    public void addCar(CustomerCar carToAdd) throws AddException, IOException, FileCorruptedException {
+        boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate())).isEmpty();
+        final int maxCarAllowed = 3;
+        boolean hasReachedMaxCarAllowed = getCustomerCars(carToAdd.getCustomerId()).size() >=maxCarAllowed;
+        if(carPlateHasExisted){
+            throw new AddException("Car plate has existed");
         }
-        catch (FileCorruptedException | IOException e){
-            throw new RuntimeException(e);
+        if(hasReachedMaxCarAllowed){
+            throw new AddException("Already reached maximum car allowed to be added");
         }
+        if(hasExceededCurrentYear(carToAdd.getManufactureYear())){
+            throw new AddException("Invalid manufacture year");
+        }
+        String carId = generateCarId();
+        carToAdd.setId(carId);
+        customerCarCrudRepository.create(carToAdd);
     }
-
 
     public void deleteCarById(String carId) throws DeleteException {
         customerCarCrudRepository.delete(carId);
     }
 
-    public void deleteCarByCustomerId(String customerId) throws DeleteException {
+    public void deleteCarByCustomerId(String customerId) throws FileCorruptedException {
+        List<CustomerCar> cars = getCars();
+        cars.removeIf(customerCar -> customerCar.getCustomerId().equals(customerId));
+        customerCarCrudRepository.writeAll(cars);
+    }
+
+    public void updateCar(CustomerCar carToUpdate) throws FileCorruptedException,UpdateException {
+        boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar ->customerCar.getCarPlate().equalsIgnoreCase(carToUpdate.getCarPlate()) && !customerCar.getId().equalsIgnoreCase(carToUpdate.getId())).isEmpty();
+        if(carPlateHasExisted){
+            throw new UpdateException("Car plate has already been recorded");
+        }
+        if(hasExceededCurrentYear(carToUpdate.getManufactureYear())){
+            throw new UpdateException("Invalid manufacture year");
+        }
         try {
-            List<CustomerCar> cars = getCars();
-            cars.removeIf(customerCar -> customerCar.getCustomerId().equals(customerId));
-            customerCarCrudRepository.writeAll(cars);
-        } catch (FileCorruptedException e) {
-            throw new DeleteException(e.getMessage());
+            customerCarCrudRepository.update(carToUpdate);
+        } catch (NotFoundException e) {
+            throw new UpdateException(e.getMessage());
         }
     }
 
@@ -82,5 +91,9 @@ public class CustomerCarService {
         }
     }
 
+    private boolean hasExceededCurrentYear(int year){
+        int currentYear = Year.now().getValue();
+        return year > currentYear;
+    }
 
 }

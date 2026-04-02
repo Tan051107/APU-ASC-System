@@ -122,13 +122,13 @@ public class Login {
 
         panel.add(UIUtils.createLabel("Email *"));
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
-        emailField = UIUtils.createTextField("Ahmad@apu-asc.com");
+        emailField = UIUtils.createTextField();
         panel.add(emailField);
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         panel.add(UIUtils.createLabel("Password *"));
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
-        passwordField = UIUtils.createPasswordField("Enter password");
+        passwordField = UIUtils.createPasswordField();
         panel.add(passwordField);
         panel.add(Box.createRigidArea(new Dimension(0, 25)));
 

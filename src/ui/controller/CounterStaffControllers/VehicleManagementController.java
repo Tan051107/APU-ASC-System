@@ -1,7 +1,10 @@
 package ui.controller.CounterStaffControllers;
 
+import exceptions.DeleteException;
+import exceptions.FileCorruptedException;
 import models.Customer;
 import models.CustomerCar;
+import services.CustomerCarService;
 import ui.pages.CounterStaffPanels.components.VehicleRow;
 import ui.pages.CounterStaffPanels.forms.AddVehicleForm;
 import utils.DialogUtil;
@@ -10,13 +13,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class VehicleManagementController {
-    private final Component parent;
+    private final CustomerCarService customerCarService = new CustomerCarService();
     private final Runnable refreshCallback;
+    Logger logger = Logger.getLogger(VehicleManagementController.class.getName());
 
-    public VehicleManagementController(Component parent, Runnable refreshCallback) {
-        this.parent = parent;
+    public VehicleManagementController(Runnable refreshCallback) {
         this.refreshCallback = refreshCallback;
     }
 
@@ -40,16 +45,29 @@ public class VehicleManagementController {
     }
 
     private void deleteVehicle(CustomerCar car) {
-        boolean confirm = DialogUtil.showConfirmationMessage(
-                "Confirm Delete?",
-                String.format("Are you sure you want to delete vehicle: %s?", car.getCarPlate())
-        );
-        if (confirm) {
-            // Logic for deleting vehicle would go here, calling a service
-            JOptionPane.showMessageDialog(parent, "Vehicle delete logic not yet implemented for: " + car.getCarPlate());
-            if (refreshCallback != null) {
+        boolean confirmDelete = DialogUtil.showConfirmationMessage("Confirm Delete?" , String.format("Are you sure you want to delete %s" , car.getCarPlate()));
+        if(confirmDelete){
+            try {
+                customerCarService.deleteCarById(car.getId());
                 refreshCallback.run();
+                DialogUtil.showInfoMessage("Deleted Successfully" , "Successfully deleted vehicle");
+            } catch (DeleteException e) {
+                DialogUtil.showErrorMessage("Failed to delete vehicle", e.getMessage());
             }
+        }
+    }
+
+    public void addVehicle(Customer owner){
+        try {
+            int maxCarAllowed = 3;
+            boolean hasReachedMaxCarAllowed = customerCarService.getCustomerCars(owner.getId()).size() >= maxCarAllowed;
+            if(hasReachedMaxCarAllowed){
+                DialogUtil.showWarningMessage("Error Adding Car" , "Only allowed to add a maximum of 3 cars. Please remove one of the cars to add new car");
+                return;
+            }
+            openVehicleForm(owner,false,null);
+        } catch (FileCorruptedException e) {
+            logger.log(Level.SEVERE,e.getMessage());
         }
     }
 }

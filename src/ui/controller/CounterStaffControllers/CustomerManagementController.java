@@ -3,7 +3,6 @@ package ui.controller.CounterStaffControllers;
 import exceptions.DeleteException;
 import exceptions.FileCorruptedException;
 import models.Customer;
-import models.CustomerCar;
 import services.CustomerService;
 import ui.pages.CounterStaffPanels.forms.AddCustomerForm;
 import ui.pages.CounterStaffPanels.ManageCustomerPanel;
@@ -28,7 +27,7 @@ public class CustomerManagementController {
 
     public CustomerManagementController(ManageCustomerPanel manageCustomerPanel) {
         this.manageCustomerPanel = manageCustomerPanel;
-        this.vehicleController = new VehicleManagementController(manageCustomerPanel, this::loadCustomers);
+        this.vehicleController = new VehicleManagementController(this::loadCustomers);
         initListeners();
         loadCustomers();
     }
@@ -64,7 +63,7 @@ public class CustomerManagementController {
                 card.editCustomerBtn.addActionListener(e -> openAddCustomerForm(true, customer));
                 card.deleteCustomerBtn.addActionListener(e -> deleteCustomer(customer));
                 if (card.addVehicleBtn != null) {
-                    card.addVehicleBtn.addActionListener(e -> vehicleController.openVehicleForm(customer, false, null));
+                    card.addVehicleBtn.addActionListener(e -> vehicleController.addVehicle(customer));
                 }
 
                 // Add Listeners to each Vehicle Row via VehicleManagementController
@@ -87,6 +86,7 @@ public class CustomerManagementController {
             try {
                 customerService.deleteCustomer(customer.getId());
                 loadCustomers();
+                DialogUtil.showInfoMessage("Deleted Successfully" , "Successfully deleted customer");
             } catch (DeleteException e) {
                 DialogUtil.showErrorMessage("Failed to Delete Customer" , e.getMessage());
             } catch (Exception e) {
@@ -95,4 +95,5 @@ public class CustomerManagementController {
             }
         }
     }
+
 }
