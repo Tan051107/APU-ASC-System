@@ -1,6 +1,9 @@
 package ui.pages;
 
 import javax.swing.*;
+
+import ui.controller.ManagerMenuController;
+
 import java.awt.*;
 
 public class managermenu extends JFrame {
@@ -8,6 +11,7 @@ public class managermenu extends JFrame {
     // Panel that will hold all the different views
     private JPanel contentPanel;
     private CardLayout cardLayout;
+    private final ManagerMenuController controller = new ManagerMenuController();
 
     public managermenu() {
         setTitle("APU-ASC Manager Dashboard");
@@ -73,10 +77,8 @@ public class managermenu extends JFrame {
         JLabel title = displayMenuTitle("User Management (CRUD)");
         panel.add(title, BorderLayout.NORTH);
         
-        // Placeholder for JTable
-        String[][] data = {{"1", "John Doe", "Customer"}, {"2", "Jane Smith", "Technician"}};
-        String[] columns = {"User ID", "Name", "Role"};
-        JTable table = new JTable(data, columns);
+        JTable table = new JTable();
+        table.setModel(controller.loadUserToTable());
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         // CRUD Action Buttons
