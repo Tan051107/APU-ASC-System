@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class SignInPanel extends JPanel {
     public JTextField emailField;
-    public JTextField passwordField;
+    public JPasswordField passwordField;
     public JButton signInButton;
     public SignInPanel(Login parent) {
         setOpaque(false);
@@ -16,23 +16,18 @@ public class SignInPanel extends JPanel {
 
         add(UIUtils.createLabel("Email *"));
         add(Box.createRigidArea(new Dimension(0, 8)));
-        emailField = UIUtils.createTextField("Ahmad@apu-asc.com");
+        emailField = UIUtils.createTextField();
         add(emailField);
         add(Box.createRigidArea(new Dimension(0, 15)));
 
         add(UIUtils.createLabel("Password *"));
         add(Box.createRigidArea(new Dimension(0, 8)));
-        passwordField = UIUtils.createPasswordField("Enter password");
+        passwordField = UIUtils.createPasswordField();
         add(passwordField);
         add(Box.createRigidArea(new Dimension(0, 25)));
 
         signInButton= UIUtils.createPrimaryButton("Sign In");
         add(signInButton);
-        add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // Hint Text
-        JPanel hintPanel = getJPanel(parent);
-        add(hintPanel);
         add(Box.createRigidArea(new Dimension(0, 30)));
 
         // Quick Demo Login
@@ -55,30 +50,6 @@ public class SignInPanel extends JPanel {
         Dimension rolePref = rolePanel.getPreferredSize();
         rolePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, rolePref.height));
         add(rolePanel);
-    }
-
-    private static JPanel getJPanel(Login parent) {
-        JPanel hintPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        hintPanel.setOpaque(false);
-        hintPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        hintPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        JLabel hintText = new JLabel("Don't have an account? ");
-        hintText.setForeground(new Color(150, 150, 150));
-        hintText.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-
-        JLabel signUpLink = new JLabel("Sign Up");
-        signUpLink.setForeground(new Color(37, 99, 235));
-        signUpLink.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        signUpLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        signUpLink.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                parent.switchToSignUp();
-            }
-        });
-
-        hintPanel.add(hintText);
-        hintPanel.add(signUpLink);
-        return hintPanel;
     }
 
     private JButton createRoleButton(String text) {

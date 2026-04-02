@@ -1,9 +1,7 @@
 package services;
 
-import exceptions.DeleteException;
-import exceptions.FileCorruptedException;
-import exceptions.GetEntityListException;
-import exceptions.SignUpException;
+import enums.UserType;
+import exceptions.*;
 import mapper.UserMapper;
 import models.User;
 import repositories.CrudRepository;
@@ -38,6 +36,10 @@ public class UserService {
 
     public User getUserByEmail(String email) throws GetEntityListException {
         try{
+            List<User> users = userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(email)).stream().toList();
+            if(users.isEmpty()){
+                return null;
+            }
             return userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(email)).getFirst();
         }
         catch (FileCorruptedException e){
@@ -47,17 +49,9 @@ public class UserService {
 
     public void signUpUser(User userToSignUp) throws SignUpException {
         try {
-            boolean userHasExisted = getUserById(userToSignUp.getId()) != null;
+            boolean userHasExisted = getUserByEmail(userToSignUp.getEmail()) !=null;
             if(userHasExisted){
-                throw new SignUpException("User has existed. Please select another user id to sign up user");
-            }
-            ValidationResult validationResult = new ValidationResult();
-            Validator.required(validationResult, "Name", userToSignUp.getName());
-            Validator.validateEmail(validationResult, userToSignUp.getEmail());
-            Validator.validatePassword(validationResult,"Password" , userToSignUp.getPassword());
-            Validator.validatePhone(validationResult , userToSignUp.getContactNumber());
-            if(validationResult.hasError()){
-                throw new SignUpException(validationResult.getErrors());
+                throw new SignUpException("Email is taken. Please select another email");
             }
             String userId = generateUserId();
             userToSignUp.setId(userId);
@@ -66,6 +60,14 @@ public class UserService {
             throw new SignUpException(e.getMessage());
 
         }
+    }
+
+    public void updateUser(User userToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, UpdateException {
+        boolean userHasExisted = !userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(userToUpdate.getEmail()) && !user.getId().equalsIgnoreCase(userToUpdate.getId())).isEmpty();
+        if(userHasExisted){
+            throw new UpdateException("Email is taken. Please select another email");
+        }
+        userRepository.update(userToUpdate);
     }
 
     public void deleteUser(String userId) throws DeleteException {
