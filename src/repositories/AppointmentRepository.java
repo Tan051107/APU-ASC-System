@@ -132,23 +132,4 @@ public class AppointmentRepository {
         return appointments;
     }
 
-    // find by appointmentID
-    public Appointment findById(String targetId) {
-        return findAll().stream()
-                .filter(appt -> appt.getId().equals(targetId))
-                .findFirst()
-                .orElse(null); // Not found
-    }
-
-    // find by date
-    public List<Appointment> findByDate(LocalDate targetDate) {
-        List<Appointment> matchingAppointments = new ArrayList<>();
-        for (Appointment appt : findAll()) {
-            if (appt.getDate().equals(targetDate)) {
-                matchingAppointments.add(appt);
-            }
-        }
-        return matchingAppointments;
-    }
-
 }
