@@ -2,8 +2,10 @@ package ui.pages;
 
 import javax.swing.*;
 
+import models.Appointment;
 import models.User;
 import ui.controller.TechnicianMenuController;
+import ui.pages.TechnicianPanels.ViewAppointment;
 
 import java.awt.*;
 import java.time.LocalDate;
@@ -21,6 +23,8 @@ public class TechnicianMenu extends JFrame {
     private final JButton historyBtn;
     private final JButton myProfileBtn;
     private final JButton logOutBtn;
+    private Runnable refreshAppointmentsTask;
+    private Runnable refreshHistoryTask;
 
     public TechnicianMenu(User user) {
         this.controller = new TechnicianMenuController(user.getId());
@@ -76,8 +80,20 @@ public class TechnicianMenu extends JFrame {
         add(contentPanel, BorderLayout.CENTER);
 
         // Action Listeners
-        appointmentsBtn.addActionListener(e -> cardLayout.show(contentPanel, "Appointments"));
-        historyBtn.addActionListener(e -> cardLayout.show(contentPanel, "History"));
+        appointmentsBtn.addActionListener(e -> {
+            if (refreshAppointmentsTask != null) {
+                refreshAppointmentsTask.run();
+            }
+            cardLayout.show(contentPanel, "Appointments");
+        });
+
+        historyBtn.addActionListener(e -> {
+            if (refreshHistoryTask != null) {
+                refreshHistoryTask.run();
+            }
+            cardLayout.show(contentPanel, "History");
+        });
+
         logOutBtn.addActionListener(e -> {
             this.dispose();
             new Login().createUI(); 
@@ -172,7 +188,7 @@ public class TechnicianMenu extends JFrame {
         // Date Switcher:END
 
         // Table reset event listener
-        Runnable refreshTable = () -> {
+        refreshAppointmentsTask = () -> {
             dateField.setText(currentDate[0].format(formatter));
             String currentSearch = searchField.getText();
             
@@ -183,23 +199,23 @@ public class TechnicianMenu extends JFrame {
         };
 
         // Listeners
-        searchField.addActionListener(e -> refreshTable.run());
+        searchField.addActionListener(e -> refreshAppointmentsTask.run());
 
         prevDateBtn.addActionListener(e -> {
             currentDate[0] = currentDate[0].minusDays(1);
-            refreshTable.run();
+            refreshAppointmentsTask.run();
         });
 
         nextDateBtn.addActionListener(e -> {
             currentDate[0] = currentDate[0].plusDays(1);
-            refreshTable.run();
+            refreshAppointmentsTask.run();
         });
 
         dateField.addActionListener(e -> {
             try {
                 // Try to parse what the user typed
                 currentDate[0] = LocalDate.parse(dateField.getText(), formatter);
-                refreshTable.run();
+                refreshAppointmentsTask.run();
             } catch (DateTimeParseException ex) {
                 // If they type gibberish, show an error and revert to the last valid date
                 JOptionPane.showMessageDialog(panel, "Invalid date format. Please use YYYY-MM-DD", "Date Error", JOptionPane.ERROR_MESSAGE);
@@ -222,6 +238,50 @@ public class TechnicianMenu extends JFrame {
         // Action Buttons
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton viewBtn = createCRUDButton("View");
+
+        // Action Buttons Listener
+        viewBtn.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(null, 
+                    "Please select an appointment from the table first.", 
+                    "No Selection", 
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String selectedId = table.getValueAt(selectedRow, 0).toString();
+
+            try {
+                Appointment selectedAppointment = controller.findAppointmentById(selectedId);
+                
+                if (selectedAppointment != null) {
+                    User customer = controller.findCustomerById(selectedAppointment.getCustomerId());
+                    User staff = controller.findStaffById(selectedAppointment.getStaffId()); 
+                    
+                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff);
+                    viewPopup.completeButton.addActionListener(event -> {
+                        controller.completeAppointment(selectedAppointment, viewPopup);
+                        table.setModel(controller.getAppointmentsTableModel()); 
+                    });
+
+                    viewPopup.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, 
+                        "Error: Could not find appointment details.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                // Catch FileCorruptedException or general exceptions from reading the files
+                JOptionPane.showMessageDialog(null, 
+                    "Error reading data: " + ex.getMessage(), 
+                    "Data Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+
+
+        });
         bottomPanel.add(viewBtn);
         panel.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -256,7 +316,7 @@ public class TechnicianMenu extends JFrame {
         // Search Bar:END
 
         // Table reset event listener
-        Runnable refreshTable = () -> {
+        refreshHistoryTask = () -> {
             String currentSearch = searchField.getText();
             
             table.setModel(controller.getHistoryAppointmentsTableModel(currentSearch));
@@ -266,7 +326,7 @@ public class TechnicianMenu extends JFrame {
         };
 
         // Listeners
-        searchField.addActionListener(e -> refreshTable.run());
+        searchField.addActionListener(e -> refreshHistoryTask.run());
 
         controlsPanel.add(searchField);
         controlsPanel.add(Box.createHorizontalStrut(30)); 
@@ -311,12 +371,26 @@ public class TechnicianMenu extends JFrame {
     private JButton createCRUDButton(String text) {
         JButton button = new JButton(text);
         Dimension buttonSize = new Dimension(150, 50);
+        Color base = new Color(37, 99, 235);
+        Color hover = new Color(29, 78, 216);
+
         button.setPreferredSize(buttonSize);
         button.setFocusPainted(false);
         button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(99, 110, 114));
+        button.setBackground(base);
         button.setForeground(Color.WHITE);
         button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hover);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(base);
+            }
+        });
+
         return button;
     }
 

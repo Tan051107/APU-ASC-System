@@ -14,6 +14,7 @@ public class Appointment extends BaseModel{
     private LocalDate date;
     private LocalTime time;
     private AppointmentStatus statusService;
+    private String description;
 
     public Appointment() {
         super();
@@ -100,6 +101,14 @@ public class Appointment extends BaseModel{
 
     public void setStatusService(AppointmentStatus statusService) {
         this.statusService = statusService;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
