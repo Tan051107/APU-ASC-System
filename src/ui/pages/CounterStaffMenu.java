@@ -95,12 +95,16 @@ public class CounterStaffMenu extends JFrame {
             manageCustomerBtn.setVisible(true);
             manageAppointmentBtn.setVisible(true);
             managePaymentBtn.setVisible(true);
+            myProfileBtn.setVisible(true);
+            logOutBtn.setVisible(true);
             toggleButton.setText("≡");
         } else {
             sidebar.setPreferredSize(new Dimension(60, getHeight()));
             manageCustomerBtn.setVisible(false);
             manageAppointmentBtn.setVisible(false);
             managePaymentBtn.setVisible(false);
+            myProfileBtn.setVisible(false);
+            logOutBtn.setVisible(false);
             toggleButton.setText("»");
         }
         sidebar.revalidate();
