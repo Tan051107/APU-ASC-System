@@ -6,14 +6,22 @@ import ui.controller.ManagerMenuController;
 
 import java.awt.*;
 
-public class managermenu extends JFrame {
+public class ManagerMenu extends JFrame {
     
     // Panel that will hold all the different views
     private JPanel contentPanel;
     private CardLayout cardLayout;
+    private boolean isExpanded = true;
+    private final JPanel sidebar;
+    private final JButton toggleButton;
+    private final JButton btnManageUsers;
+    private final JButton btnSetPrices;
+    private final JButton btnFeedback;
+    private final JButton btnReports;
+    private final JButton btnLogOut;
     private final ManagerMenuController controller = new ManagerMenuController();
 
-    public managermenu() {
+    public ManagerMenu() {
         setTitle("APU-ASC Manager Dashboard");
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -21,22 +29,43 @@ public class managermenu extends JFrame {
         setLayout(new BorderLayout());
 
         // 1. Create the Sidebar Navigation
-        JPanel sidebar = new JPanel();
-        sidebar.setLayout(new GridLayout(6, 1, 10, 10));
+        sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setBackground(new Color(45, 52, 54)); // Dark grey background
-        sidebar.setPreferredSize(new Dimension(200, getHeight()));
-        sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        sidebar.setPreferredSize(new Dimension(220, getHeight()));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Toggle Button
+        toggleButton = new JButton("≡");
+        styleToggleButton(toggleButton);
+        toggleButton.addActionListener(e -> toggleSidebar());
+        
+        JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        togglePanel.setOpaque(false);
+        togglePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        togglePanel.add(toggleButton);
+        sidebar.add(togglePanel);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // Create Navigation Buttons
-        JButton btnManageUsers = createSidebarButton("Manage Users");
-        JButton btnSetPrices = createSidebarButton("Service Pricing");
-        JButton btnFeedback = createSidebarButton("View Feedback");
-        JButton btnReports = createSidebarButton("Reporting");
+        btnManageUsers = createSidebarButton("Manage Users");
+        btnSetPrices = createSidebarButton("Service Pricing");
+        btnFeedback = createSidebarButton("View Feedback");
+        btnReports = createSidebarButton("Reporting");
+        btnLogOut = createSidebarButton("Log Out");
 
         sidebar.add(btnManageUsers);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnSetPrices);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnFeedback);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnReports);
+        
+        // 1. Add this "glue" to push everything below it to the bottom
+        sidebar.add(Box.createVerticalGlue()); 
+        
+        sidebar.add(btnLogOut);
 
         add(sidebar, BorderLayout.WEST);
 
@@ -60,6 +89,38 @@ public class managermenu extends JFrame {
         btnReports.addActionListener(e -> cardLayout.show(contentPanel, "Reporting"));
     }
 
+    private void toggleSidebar() {
+        isExpanded = !isExpanded;
+        if (isExpanded) {
+            sidebar.setPreferredSize(new Dimension(220, getHeight()));
+            btnManageUsers.setVisible(true);
+            btnSetPrices.setVisible(true);
+            btnFeedback.setVisible(true);
+            btnReports.setVisible(true);
+            btnLogOut.setVisible(true);
+            toggleButton.setText("≡");
+        } else {
+            sidebar.setPreferredSize(new Dimension(60, getHeight()));
+            btnManageUsers.setVisible(false);
+            btnSetPrices.setVisible(false);
+            btnFeedback.setVisible(false);
+            btnReports.setVisible(false);
+            btnLogOut.setVisible(false);
+            toggleButton.setText("»");
+        }
+        sidebar.revalidate();
+        sidebar.repaint();
+    }
+
+    private void styleToggleButton(JButton btn) {
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setFont(new Font("Arial", Font.BOLD, 20));
+        btn.setBackground(new Color(45, 52, 54));
+        btn.setForeground(Color.WHITE);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
     // Helper method to style buttons uniformly
     private JButton createSidebarButton(String text) {
         JButton button = new JButton(text);
@@ -67,6 +128,8 @@ public class managermenu extends JFrame {
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setBackground(new Color(99, 110, 114));
         button.setForeground(Color.WHITE);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         return button;
     }
 
@@ -98,9 +161,9 @@ public class managermenu extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel title = displayMenuTitle("Automotive Service Pricing Management");
         panel.add(title, BorderLayout.NORTH);
-        String[][] data = {{"Standard Oil Change", "RM 120.00"}, {"Tire Rotation", "RM 40.00"}};
-        String[] columns = {"Service Type", "Current Price"};
-        JTable table = new JTable(data, columns);
+
+        JTable table = new JTable();
+        table.setModel(controller.loadServiceToTable());
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));

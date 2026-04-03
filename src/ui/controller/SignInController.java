@@ -3,7 +3,8 @@ package ui.controller;
 import models.User;
 import services.AuthService;
 import ui.pages.SignInPanel;
-import ui.pages.TechnicianMenu;
+/* import ui.pages.TechnicianMenu; */
+import ui.pages.ManagerMenu;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.*;
@@ -61,8 +62,8 @@ public class SignInController {
             techMenu.setVisible(true); */
             
         } else if (role.equalsIgnoreCase("Manager")) {
-            // ManagerMenu managerMenu = new AdminMenu(user.getId());
-            // managerMenu.setVisible(true);
+            ManagerMenu managerMenu = new ManagerMenu();
+            managerMenu.setVisible(true);
             
         } else if (role.equalsIgnoreCase("Customer")) {
             // CustomerMenu customerMenu = new CustomerMenu(user.getId());
