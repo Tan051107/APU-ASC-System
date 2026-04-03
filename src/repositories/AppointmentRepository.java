@@ -27,7 +27,7 @@ public class AppointmentRepository {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
             // Format the data as a comma-separated string
-            String record = String.join("\\|",
+            String record = String.join("|",
                     appointment.getId(),
                     appointment.getCustomerId(),
                     appointment.getStaffId(),
@@ -109,46 +109,35 @@ public class AppointmentRepository {
 
                 String[] data = line.split("\\|");
 
-                // Reconstruct the Appointment object
-                Appointment appointment = new Appointment(
-                        data[0],                         // id
-                        LocalDateTime.parse(data[8]),    // createdAt (index 7)
-                        LocalDateTime.parse(data[9]),    // updatedAt (index 8)
-                        data[1],                         // customerId
-                        data[2],
-                        data[3],                         // technicianId
-                        data[4],                         // serviceId
-                        LocalDate.parse(data[5]),        // date
-                        LocalTime.parse(data[6]),        // time
-                        AppointmentStatus.valueOf(data[7]) // statusService
-                );
+                if (data.length < 10) {
+                    System.err.println("Skipping uncomplete data line (expected 10 columns, found " + data.length + "): " + line);
+                    continue; 
+                }
+                try {
+                    Appointment appointment = new Appointment(
+                            data[0],                         // id
+                            LocalDateTime.parse(data[8]),    // createdAt (index 7)
+                            LocalDateTime.parse(data[9]),    // updatedAt (index 8)
+                            data[1],                         // customerId
+                            data[2],
+                            data[3],                         // technicianId
+                            data[4],                         // serviceId
+                            LocalDate.parse(data[5]),        // date
+                            LocalTime.parse(data[6]),        // time
+                            AppointmentStatus.valueOf(data[7]) // statusService
+                    );
 
-                appointments.add(appointment);
+                    appointments.add(appointment);
+                } catch (Exception parseEx) {
+                    System.err.println("Error parsing row data: " + line + " | Error: " + parseEx.getMessage());
+                }
+                
             }
         } catch (Exception e) {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
         return appointments;
-    }
-
-    // find by appointmentID
-    public Appointment findById(String targetId) {
-        return findAll().stream()
-                .filter(appt -> appt.getId().equals(targetId))
-                .findFirst()
-                .orElse(null); // Not found
-    }
-
-    // find by date
-    public List<Appointment> findByDate(LocalDate targetDate) {
-        List<Appointment> matchingAppointments = new ArrayList<>();
-        for (Appointment appt : findAll()) {
-            if (appt.getDate().equals(targetDate)) {
-                matchingAppointments.add(appt);
-            }
-        }
-        return matchingAppointments;
     }
 
 }

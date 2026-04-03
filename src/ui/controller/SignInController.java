@@ -57,8 +57,8 @@ public class SignInController {
         // Open dashboard based on the role
         if (role.equalsIgnoreCase("Technician")) {
             
-            /* TechnicianMenu techMenu = new TechnicianMenu(user.getId());
-            techMenu.setVisible(true); */
+            TechnicianMenu techMenu = new TechnicianMenu(user);
+            techMenu.setVisible(true);
             
         } else if (role.equalsIgnoreCase("Manager")) {
             // ManagerMenu managerMenu = new AdminMenu(user.getId());

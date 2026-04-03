@@ -1,0 +1,324 @@
+package ui.pages;
+
+import javax.swing.*;
+
+import models.User;
+import ui.controller.TechnicianMenuController;
+
+import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+public class TechnicianMenu extends JFrame {
+    private final TechnicianMenuController controller;
+    private final JPanel contentPanel;
+    private final CardLayout cardLayout;
+    private boolean isExpanded = true;
+    private final JPanel sidebar;
+    private final JButton toggleButton;
+    private final JButton appointmentsBtn;
+    private final JButton historyBtn;
+    private final JButton myProfileBtn;
+    private final JButton logOutBtn;
+
+    public TechnicianMenu(User user) {
+        this.controller = new TechnicianMenuController(user.getId());
+        setTitle("APU-ASC Technnician Dashboard");
+        setSize(900, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        // Sidebar
+        sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBackground(new Color(45, 52, 54)); // Dark grey background
+        sidebar.setPreferredSize(new Dimension(220, getHeight()));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Toggle Buttons
+        toggleButton = new JButton("≡");
+        styleToggleButton(toggleButton);
+        toggleButton.addActionListener(e -> toggleSidebar());
+        
+        JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        togglePanel.setOpaque(false);
+        togglePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        togglePanel.add(toggleButton);
+        sidebar.add(togglePanel);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Sidebar Buttons
+        appointmentsBtn = createSidebarButton("Appointments");
+        historyBtn = createSidebarButton("History");
+        myProfileBtn = createSidebarButton("My Profile");
+        logOutBtn = createSidebarButton("Log Out");
+
+        sidebar.add(appointmentsBtn);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(historyBtn);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(myProfileBtn);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(logOutBtn);
+
+        add(sidebar, BorderLayout.WEST);
+
+        // 2. Create the Content Panel with CardLayout
+        cardLayout = new CardLayout();
+        contentPanel = new JPanel(cardLayout);
+
+        contentPanel.add(createAppointmentsPanel(), "Appointments");
+        contentPanel.add(createHistoryPanel(), "History");
+        /* contentPanel.add(createReportsPanel(), "Reporting"); */
+
+        add(contentPanel, BorderLayout.CENTER);
+
+        // Action Listeners
+        appointmentsBtn.addActionListener(e -> cardLayout.show(contentPanel, "Appointments"));
+        historyBtn.addActionListener(e -> cardLayout.show(contentPanel, "History"));
+        logOutBtn.addActionListener(e -> {
+            this.dispose();
+            new Login().createUI(); 
+        });
+
+    }
+
+    private void toggleSidebar() {
+        isExpanded = !isExpanded;
+        if (isExpanded) {
+            sidebar.setPreferredSize(new Dimension(220, getHeight()));
+            appointmentsBtn.setVisible(true);
+            historyBtn.setVisible(true);
+            myProfileBtn.setVisible(true);
+            logOutBtn.setVisible(true);
+            toggleButton.setText("≡");
+        } else {
+            sidebar.setPreferredSize(new Dimension(60, getHeight()));
+            appointmentsBtn.setVisible(false);
+            historyBtn.setVisible(false);
+            myProfileBtn.setVisible(false);
+            logOutBtn.setVisible(false);
+            toggleButton.setText("»");
+        }
+        sidebar.revalidate();
+        sidebar.repaint();
+    }
+
+    private void styleToggleButton(JButton btn) {
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setFont(new Font("Arial", Font.BOLD, 20));
+        btn.setBackground(new Color(45, 52, 54));
+        btn.setForeground(Color.WHITE);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    //Button Styles
+    private JButton createSidebarButton(String text) {
+        JButton button = new JButton(text);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(99, 110, 114));
+        button.setForeground(Color.WHITE);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        return button;
+    }
+
+    //Main Content Builder
+
+    private JPanel createAppointmentsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JPanel topContainer = new JPanel();
+        topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
+
+        JLabel title = displayMenuTitle("Technician Appointment Management");
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        topContainer.add(title);
+
+        JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+
+        // Data
+        JTable table = new JTable(){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
+        };
+        table.setModel(controller.getAppointmentsTableModel());
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getTableHeader().setReorderingAllowed(false);
+
+        // Search Bar:START
+        controlsPanel.add(new JLabel("Search:"));
+        JTextField searchField = new JTextField(20);
+        // Search Bar:END
+
+        // Date Switcher:START
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final LocalDate[] currentDate = { LocalDate.now() }; // Array used so it can be updated inside lambdas
+
+        JButton prevDateBtn = new JButton("<");
+        prevDateBtn.setFocusPainted(false);
+
+        JTextField dateField = new JTextField(currentDate[0].format(formatter), 10);
+        dateField.setHorizontalAlignment(JTextField.CENTER);
+        dateField.setFont(new Font("Arial", Font.BOLD, 14));
+        
+        JButton nextDateBtn = new JButton(">");
+        nextDateBtn.setFocusPainted(false);
+        // Date Switcher:END
+
+        // Table reset event listener
+        Runnable refreshTable = () -> {
+            dateField.setText(currentDate[0].format(formatter));
+            String currentSearch = searchField.getText();
+            
+            table.setModel(controller.getAppointmentsTableModel(currentDate[0], currentSearch));
+
+            table.revalidate();
+            table.repaint();
+        };
+
+        // Listeners
+        searchField.addActionListener(e -> refreshTable.run());
+
+        prevDateBtn.addActionListener(e -> {
+            currentDate[0] = currentDate[0].minusDays(1);
+            refreshTable.run();
+        });
+
+        nextDateBtn.addActionListener(e -> {
+            currentDate[0] = currentDate[0].plusDays(1);
+            refreshTable.run();
+        });
+
+        dateField.addActionListener(e -> {
+            try {
+                // Try to parse what the user typed
+                currentDate[0] = LocalDate.parse(dateField.getText(), formatter);
+                refreshTable.run();
+            } catch (DateTimeParseException ex) {
+                // If they type gibberish, show an error and revert to the last valid date
+                JOptionPane.showMessageDialog(panel, "Invalid date format. Please use YYYY-MM-DD", "Date Error", JOptionPane.ERROR_MESSAGE);
+                dateField.setText(currentDate[0].format(formatter));
+            }
+        });
+
+        controlsPanel.add(searchField);
+        controlsPanel.add(Box.createHorizontalStrut(30)); 
+        controlsPanel.add(prevDateBtn);
+        controlsPanel.add(dateField);
+        controlsPanel.add(nextDateBtn);
+
+        // Add the controls under the title, then put the whole thing in NORTH
+        topContainer.add(controlsPanel);
+        panel.add(topContainer, BorderLayout.NORTH);
+
+        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Action Buttons
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton viewBtn = createCRUDButton("View");
+        bottomPanel.add(viewBtn);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JPanel createHistoryPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JPanel topContainer = new JPanel();
+        topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
+
+        JLabel title = displayMenuTitle("Appointment History");
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        topContainer.add(title);
+
+        JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+
+        // Data
+        JTable table = new JTable(){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
+        };
+        table.setModel(controller.getHistoryAppointmentsTableModel());
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getTableHeader().setReorderingAllowed(false);
+
+        // Search Bar:START
+        controlsPanel.add(new JLabel("Search:"));
+        JTextField searchField = new JTextField(20);
+        // Search Bar:END
+
+        // Table reset event listener
+        Runnable refreshTable = () -> {
+            String currentSearch = searchField.getText();
+            
+            table.setModel(controller.getHistoryAppointmentsTableModel(currentSearch));
+
+            table.revalidate();
+            table.repaint();
+        };
+
+        // Listeners
+        searchField.addActionListener(e -> refreshTable.run());
+
+        controlsPanel.add(searchField);
+        controlsPanel.add(Box.createHorizontalStrut(30)); 
+        
+        topContainer.add(controlsPanel);
+        panel.add(topContainer, BorderLayout.NORTH);
+
+        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Action Buttons
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton viewBtn = createCRUDButton("View");
+        bottomPanel.add(viewBtn);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    /* private JPanel createReportsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel title = displayMenuTitle("Service Centre Reporting & Analytics");
+        panel.add(title, BorderLayout.NORTH);
+
+        JTextArea reportArea = new JTextArea("--- Monthly Summary ---\nTotal Revenue: RM 15,400\nTotal Vehicles Serviced: 142\nMost Popular Service: Standard Oil Change");
+        reportArea.setEditable(false);
+        reportArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        reportArea.setMargin(new Insets(10, 10, 10, 10));
+        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
+
+        return panel;
+    } */
+
+    private JLabel displayMenuTitle(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.BOLD, 16));
+        /* label.setHorizontalTextPosition(SwingConstants.CENTER); */
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return label;
+    }
+
+    private JButton createCRUDButton(String text) {
+        JButton button = new JButton(text);
+        Dimension buttonSize = new Dimension(150, 50);
+        button.setPreferredSize(buttonSize);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(99, 110, 114));
+        button.setForeground(Color.WHITE);
+        button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
+        return button;
+    }
+
+
+}
