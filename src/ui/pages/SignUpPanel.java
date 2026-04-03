@@ -34,23 +34,23 @@ public class SignUpPanel extends JPanel {
 
 
         add(UIUtils.createLabel("Full Name *"));
-        nameField = UIUtils.createTextField("Enter your full name");
+        nameField = UIUtils.createTextField();
         add(nameField);
         add(createLeftAlignedRigidArea(0, 15));
 
         add(UIUtils.createLabel("Email Address *"));
-        emailField = UIUtils.createTextField("Enter your email");
+        emailField = UIUtils.createTextField();
         add(emailField);
         add(createLeftAlignedRigidArea(0, 15));
 
         add(UIUtils.createLabel("Phone Number *"));
-        phoneField = UIUtils.createTextField("Enter your phone number");
+        phoneField = UIUtils.createTextField();
         add(phoneField);
         add(createLeftAlignedRigidArea(0, 15));
 
         add(UIUtils.createLabel("User Type*"));
         String [] userTypes = {"Manager" , "Counter Staff" , "Technicians" , "Customer"};
-        userTypeSelectionComboBox = UIUtils.createJComboBox(userTypes , "Select user type");
+        userTypeSelectionComboBox = UIUtils.createJComboBox(userTypes);
         add(userTypeSelectionComboBox);
         add(createLeftAlignedRigidArea(0, 15));
 
@@ -81,12 +81,12 @@ public class SignUpPanel extends JPanel {
         });
 
         add(UIUtils.createLabel("Password *"));
-        passwordField = UIUtils.createPasswordField("Min.8 characters");
+        passwordField = UIUtils.createPasswordField();
         add(passwordField);
         add(createLeftAlignedRigidArea(0, 25));
 
         add(UIUtils.createLabel("Confirm Password*"));
-        confirmPasswordField = UIUtils.createPasswordField("Re-enter password");
+        confirmPasswordField = UIUtils.createPasswordField();
         add(confirmPasswordField);
         add(createLeftAlignedRigidArea(0, 25));
 
@@ -95,11 +95,11 @@ public class SignUpPanel extends JPanel {
         add(createLeftAlignedRigidArea(0, 20));
 
         // Link back to Sign In
-        JPanel backPanel = getJPanel(parent);
+        JPanel backPanel = getJPanel();
         add(backPanel);
     }
 
-    private static JPanel getJPanel(Login parent) {
+    private static JPanel getJPanel() {
         JPanel backPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         backPanel.setOpaque(false);
         backPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -112,11 +112,6 @@ public class SignUpPanel extends JPanel {
         signInLink.setForeground(new Color(37, 99, 235));
         signInLink.setFont(new Font("Segoe UI", Font.BOLD, 13));
         signInLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        signInLink.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                parent.switchToSignIn();
-            }
-        });
 
         backPanel.add(backText);
         backPanel.add(signInLink);
@@ -170,12 +165,12 @@ public class SignUpPanel extends JPanel {
         entryPanel.add(createLeftAlignedRigidArea(0, 10));
 
         entryPanel.add(UIUtils.createLabel("Car Model *"));
-        fields.carModelField = UIUtils.createTextField("Enter car model");
+        fields.carModelField = UIUtils.createTextField();
         entryPanel.add(fields.carModelField);
         entryPanel.add(createLeftAlignedRigidArea(0, 10));
 
         entryPanel.add(UIUtils.createLabel("Car Plate *"));
-        fields.carPlateField = UIUtils.createTextField("Enter car plate");
+        fields.carPlateField = UIUtils.createTextField();
         entryPanel.add(fields.carPlateField);
         entryPanel.add(createLeftAlignedRigidArea(0, 15));
 
@@ -186,8 +181,8 @@ public class SignUpPanel extends JPanel {
     public List<AddCarDto> getCarData() {
         List<AddCarDto> data = new ArrayList<>();
         for (CarEntryFields entry : carEntries) {
-            String model = UIUtils.getActualText(entry.carModelField, "Enter car model").trim();
-            String plate = UIUtils.getActualText(entry.carPlateField, "Enter car plate").trim();
+            String model = entry.carModelField.getText().trim();
+            String plate = entry.carPlateField.getText().trim();
             data.add(new AddCarDto(model, plate));
         }
         return data;

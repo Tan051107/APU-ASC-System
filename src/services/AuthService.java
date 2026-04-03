@@ -13,12 +13,6 @@ public class AuthService {
 
 
     public User login(String email, String password) throws LoginException{
-        ValidationResult validationResult = new ValidationResult();
-        Validator.validateEmail(validationResult,email);
-        Validator.validatePassword(validationResult,"Password" ,password);
-        if(validationResult.hasError()){
-            throw new LoginException(validationResult.getErrors());
-        }
         try{
             User loginUser = userService.getUserByEmail(email);
             boolean userHasExisted = loginUser != null;

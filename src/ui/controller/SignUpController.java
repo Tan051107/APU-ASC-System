@@ -1,6 +1,4 @@
 package ui.controller;
-
-
 import dto.AddCustomerDto;
 import enums.UserType;
 import exceptions.SignUpException;
@@ -8,6 +6,7 @@ import dto.AddCarDto;
 import models.User;
 import services.CustomerService;
 import ui.pages.SignUpPanel;
+import utils.DialogUtil;
 
 import javax.swing.*;
 import java.util.List;
@@ -30,10 +29,7 @@ public class SignUpController {
     }
 
     private void handleCustomerSignUp(User user) throws SignUpException {
-        List<AddCarDto> cars = signUpPanel.getCarData();
-        cars.removeIf(car->car.getCarPlate().trim().isEmpty() || car.getCarModel().trim().isEmpty());
-        AddCustomerDto addCustomerDto = new AddCustomerDto(user , cars);
-        customerService.signUpCustomer(addCustomerDto);
+        customerService.addCustomer(user);
     }
 
     private void validateToShowCarModelAndCarPlateField(){
@@ -51,12 +47,7 @@ public class SignUpController {
         String contactNumber = signUpPanel.phoneField.getText();
         String confirmPassword = signUpPanel.confirmPasswordField.getText();
         if(!confirmPassword.equals(password)){
-            JOptionPane.showMessageDialog(
-                    signUpPanel,
-                    "Please confirm password correctly",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            DialogUtil.showErrorMessage("Sign Up Error" ,"Please confirm password correctly" );
         }
         User user = new User();
         user.setName(name);
@@ -66,7 +57,6 @@ public class SignUpController {
         try{
             switch (selectedUserType){
                 case "Customer":
-                    user.setUserType(UserType.CUSTOMER);
                     handleCustomerSignUp(user);
                     break;
                 case "Manager":
@@ -76,31 +66,14 @@ public class SignUpController {
                 case "Technician":
                     break;
                 default:
-                    JOptionPane.showMessageDialog(
-                            signUpPanel,
-                            "Please select a valid user type",
-                            "Invalid user type",
-                            JOptionPane.WARNING_MESSAGE
-                    );
+                    DialogUtil.showWarningMessage("Invalid User Type" , "Please select a valid user type");
             }
-            JOptionPane.showMessageDialog(
-                    signUpPanel,
-                    "Successfully registered",
-                    "Registration Successful",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+            DialogUtil.showInfoMessage("Registration Successful" ,"Successfully Registered" );
         }
         catch (SignUpException e) {
-            JOptionPane.showMessageDialog(
-                    signUpPanel,
-                    e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            DialogUtil.showErrorMessage("Sign Up Error" , e.getMessage());
         } catch (Exception e) {
             logger.log(Level.SEVERE,e.getMessage());
         }
-
-
     }
 }
