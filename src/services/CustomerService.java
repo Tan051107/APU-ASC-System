@@ -41,4 +41,11 @@ public class CustomerService {
     public List<Customer> getCustomers() throws FileCorruptedException {
         return customerCrudRepository.getAll(customer -> customer.getUserType().equals(UserType.CUSTOMER));
     }
+
+    public List<Customer> getCustomersByNameOrEmail(String keyword) throws FileCorruptedException {
+        return getCustomers().stream()
+                .filter(customer -> customer.getName().contains(keyword) || customer.getEmail().contains(keyword))
+                .toList();
+    }
+
 }

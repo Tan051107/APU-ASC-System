@@ -22,8 +22,6 @@ public class CustomerCarService {
     }
 
     public List<CustomerCar> getCustomerCars(String customerId) throws FileCorruptedException {
-        File file = new File(CUSTOMER_CAR_FILE);
-        System.out.println(file.getAbsolutePath());
         return customerCarCrudRepository.getAll(customerCar -> customerCar.getCustomerId().equalsIgnoreCase(customerId));
     }
 
