@@ -170,8 +170,88 @@ public class ManagerMenu extends JFrame {
         JButton updatePrice = createCRUDButton("Update Price");
         bottomPanel.add(updatePrice);
         panel.add(bottomPanel, BorderLayout.SOUTH);
+
+        updatePrice.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            
+            // 1. Check if a row is actually selected (-1 means no selection)
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, 
+                    "Please select a service from the table to update.", 
+                    "No Selection", 
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // 2. Extract the data from the selected row
+            String serviceId = table.getValueAt(selectedRow, 0).toString();
+            String serviceName = table.getValueAt(selectedRow, 1).toString();
+            String currentPriceStr = table.getValueAt(selectedRow, 2).toString(); 
+
+            // 3. Remove "RM " if it's there so the text field only shows the number
+            String cleanPrice = currentPriceStr.replace("RM", "").trim();
+
+            // 4. Open the custom popup dialog
+            showUpdatePriceDialog(serviceId, serviceName, cleanPrice, table);
+        });
         
         return panel;
+    }
+
+    private void showUpdatePriceDialog(String id, String name, String currentPrice, JTable table) {
+        // Create a panel with a grid layout (3 rows, 2 columns) for the form
+        JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+
+        // Row 1: ID (Read-only)
+        formPanel.add(new JLabel("Service ID:"));
+        formPanel.add(new JLabel(id));
+
+        // Row 2: Name (Read-only)
+        formPanel.add(new JLabel("Service Name:"));
+        formPanel.add(new JLabel(name));
+
+        // Row 3: Price Input
+        formPanel.add(new JLabel("New Price (RM):"));
+        JTextField priceField = new JTextField(currentPrice);
+        formPanel.add(priceField);
+
+        // Show the popup dialog
+        int result = JOptionPane.showConfirmDialog(
+            this, 
+            formPanel, 
+            "Update Service Price", 
+            JOptionPane.OK_CANCEL_OPTION, 
+            JOptionPane.PLAIN_MESSAGE
+        );
+
+        // If the user clicks "OK"
+        /* if (result == JOptionPane.OK_OPTION) {
+            try {
+                // Parse the user's input into a double
+                double newPrice = Double.parseDouble(priceField.getText().trim());
+                
+                // Optional: Round to 2 decimal places to ensure clean data
+                newPrice = Math.round(newPrice * 100.0) / 100.0;
+
+                // TODO: Here you need to call a method in your ManagerMenuController 
+                // to actually save the new price to the Services.txt file. 
+                // Example: controller.updateServicePrice(id, newPrice);
+
+                // Refresh the table to show the newly updated data
+                table.setModel(controller.loadServiceToTable());
+                
+                JOptionPane.showMessageDialog(this, "Price successfully updated!");
+
+            } catch (NumberFormatException ex) {
+                // If they type letters or symbols instead of a valid number
+                JOptionPane.showMessageDialog(
+                    this, 
+                    "Invalid price format. Please enter numbers only.", 
+                    "Input Error", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        } */
     }
 
     private JPanel createFeedbackPanel() {
@@ -233,5 +313,6 @@ public class ManagerMenu extends JFrame {
         return button;
     }
 
+    
 
 }
