@@ -6,6 +6,7 @@ import models.Appointment;
 import models.User;
 import ui.controller.TechnicianMenuController;
 import ui.pages.TechnicianPanels.ViewAppointment;
+import ui.utils.UIUtils;
 
 import java.awt.*;
 import java.time.LocalDate;
@@ -29,7 +30,7 @@ public class TechnicianMenu extends JFrame {
     public TechnicianMenu(User user) {
         this.controller = new TechnicianMenuController(user.getId());
         setTitle("APU-ASC Technnician Dashboard");
-        setSize(900, 600);
+        setSize(1100, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -157,34 +158,35 @@ public class TechnicianMenu extends JFrame {
         JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         // Data
-        JTable table = new JTable(){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; 
-            }
-        };
+        JTable table = UIUtils.createTable(controller.getAppointmentsTableModel());
         table.setModel(controller.getAppointmentsTableModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getTableHeader().setReorderingAllowed(false);
 
         // Search Bar:START
-        controlsPanel.add(new JLabel("Search:"));
-        JTextField searchField = new JTextField(20);
+        controlsPanel.add(UIUtils.createLabel("Search: "));
+        JTextField searchField = UIUtils.createTextField();
+        searchField.setColumns(20);
         // Search Bar:END
 
         // Date Switcher:START
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        final LocalDate[] currentDate = { LocalDate.now() }; // Array used so it can be updated inside lambdas
+        final LocalDate[] currentDate = { LocalDate.now() }; 
+        Dimension rectangleSize = new Dimension(30, 42);
 
-        JButton prevDateBtn = new JButton("<");
+        JButton prevDateBtn = UIUtils.createPrimaryButton("<");
         prevDateBtn.setFocusPainted(false);
+        prevDateBtn.setPreferredSize(rectangleSize);
 
-        JTextField dateField = new JTextField(currentDate[0].format(formatter), 10);
+        JTextField dateField = UIUtils.createTextField();
+        dateField.setText(currentDate[0].format(formatter));
+        dateField.setColumns(10);
         dateField.setHorizontalAlignment(JTextField.CENTER);
         dateField.setFont(new Font("Arial", Font.BOLD, 14));
         
-        JButton nextDateBtn = new JButton(">");
+        JButton nextDateBtn = UIUtils.createPrimaryButton(">");
         nextDateBtn.setFocusPainted(false);
+        nextDateBtn.setPreferredSize(rectangleSize);
         // Date Switcher:END
 
         // Table reset event listener
@@ -262,7 +264,9 @@ public class TechnicianMenu extends JFrame {
                     ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff);
                     viewPopup.completeButton.addActionListener(event -> {
                         controller.completeAppointment(selectedAppointment, viewPopup);
-                        table.setModel(controller.getAppointmentsTableModel()); 
+                        if (refreshAppointmentsTask != null) {
+                            refreshAppointmentsTask.run();
+                        } 
                     });
 
                     viewPopup.setVisible(true);
@@ -300,19 +304,16 @@ public class TechnicianMenu extends JFrame {
         JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         // Data
-        JTable table = new JTable(){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; 
-            }
-        };
+        JTable table = UIUtils.createTable(controller.getHistoryAppointmentsTableModel());
         table.setModel(controller.getHistoryAppointmentsTableModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getTableHeader().setReorderingAllowed(false);
 
         // Search Bar:START
-        controlsPanel.add(new JLabel("Search:"));
-        JTextField searchField = new JTextField(20);
+        controlsPanel.add(UIUtils.createLabel("Search: "));
+        JTextField searchField = UIUtils.createTextField();
+        searchField.setColumns(30);
+
         // Search Bar:END
 
         // Table reset event listener

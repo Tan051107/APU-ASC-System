@@ -46,7 +46,6 @@ public class ViewAppointment extends JDialog{
         mainPanel.add(title);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Create all fields using the helper method
         appointmentIdField = addReadOnlyField(mainPanel, "Appointment ID:");
         customerField = addReadOnlyField(mainPanel, "Customer:");
         carField = addReadOnlyField(mainPanel, "Car:");
@@ -55,8 +54,8 @@ public class ViewAppointment extends JDialog{
         statusField = addReadOnlyField(mainPanel, "Status:");
         descriptionArea = addReadOnlyArea(mainPanel, "Description:");
 
-        // Populate the fields with data from the model
-        if (this.appointment != null) {
+        // Populate field
+        if (this.appointment != null && this.customer != null && this.staff != null) {
             appointmentIdField.setText(appointment.getId());
             customerField.setText(appointment.getCustomerId()+" | "+customer.getName());
             carField.setText(appointment.getCarId()+" | ");
@@ -70,7 +69,7 @@ public class ViewAppointment extends JDialog{
 
         completeButton = UIUtils.createPrimaryButton("Mark as COMPLETED");
         
-        // Disable the button if the status is already completed
+        // Disable button if already Completed
         if (appointment != null && AppointmentStatus.COMPLETED.equals(appointment.getStatusService())) {
             completeButton.setEnabled(false);
         }

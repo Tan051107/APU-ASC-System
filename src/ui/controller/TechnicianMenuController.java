@@ -232,7 +232,7 @@ public class TechnicianMenuController {
                 "Encountered an unexpected error when updating the appointment.", 
                 "System Error", 
                 JOptionPane.ERROR_MESSAGE);
-            // logger.log(Level.SEVERE, e.getMessage()); // Keep this if you have a logger set up
+            // logger.log(Level.SEVERE, e.getMessage());
         }
     }
 }
