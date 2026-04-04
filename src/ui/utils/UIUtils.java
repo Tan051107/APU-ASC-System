@@ -2,6 +2,7 @@ package ui.utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Vector;
 
 public class UIUtils {
     public static JTextField createTextField() {
@@ -88,9 +89,23 @@ public class UIUtils {
         return label;
     }
 
-    public static JComboBox<String> createJComboBox(String[] options) {
-        JComboBox<String> comboBox = new JComboBox<>(options);
+    public static <T> JComboBox<T> createJComboBox(T[] options) {
+        return styleJComboBox(new JComboBox<>(options));
+    }
 
+    public static <T> JComboBox<T> createJComboBox() {
+        return styleJComboBox(new JComboBox<>());
+    }
+
+    public static <T> JComboBox<T> createJComboBox(ComboBoxModel<T> model) {
+        return styleJComboBox(new JComboBox<>(model));
+    }
+
+    public static <T> JComboBox<T> createJComboBox(Vector<T> options) {
+        return styleJComboBox(new JComboBox<>(options));
+    }
+
+    private static <T> JComboBox<T> styleJComboBox(JComboBox<T> comboBox) {
         comboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         comboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));

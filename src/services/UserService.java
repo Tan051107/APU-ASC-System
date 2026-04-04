@@ -62,7 +62,7 @@ public class UserService {
         }
     }
 
-    public void updateUser(User userToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, UpdateException {
+    public void updateUser(User userToUpdate) throws FileCorruptedException, NotFoundException,UpdateException {
         boolean userHasExisted = !userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(userToUpdate.getEmail()) && !user.getId().equalsIgnoreCase(userToUpdate.getId())).isEmpty();
         if(userHasExisted){
             throw new UpdateException("Email is taken. Please select another email");

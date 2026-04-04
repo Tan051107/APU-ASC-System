@@ -1,18 +1,22 @@
 package ui.pages.CounterStaffPanels.forms;
 
+import ui.ComboBoxItems.ServiceComboBoxItem;
 import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
 public class AddAppointmentForm extends JFrame {
     public JComboBox<String> customerSelectionCombo;
-    public JComboBox<String> serviceTypeCombo;
+    public JComboBox<ServiceComboBoxItem> serviceTypeCombo;
     public JFormattedTextField dateField;
     public JFormattedTextField timeField;
     public JTextArea descriptionArea;
     public JLabel carPlateLabel;
     public JComboBox<String> carPlateSelectionCombo;
     public Component carPlateSpacing;
+    public JLabel technicianLabel;
+    public JComboBox<String> technicianSelectionCombo;
+    public Component technicianSpacing;
     public JButton createAppointmentBtn;
 
     public AddAppointmentForm() {
@@ -53,7 +57,7 @@ public class AddAppointmentForm extends JFrame {
         // --- Service Type ---
         mainPanel.add(UIUtils.createLabel("Service Type *"));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        String[] serviceTypes = {"Normal", "Major"};
+        ServiceComboBoxItem[] serviceTypes = {};
         serviceTypeCombo = UIUtils.createJComboBox(serviceTypes);
         mainPanel.add(serviceTypeCombo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -71,6 +75,16 @@ public class AddAppointmentForm extends JFrame {
         timeField = UIUtils.createTimeField();
         mainPanel.add(timeField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        //--- Available Technician ---
+        technicianLabel = UIUtils.createLabel("Select Available Technician *");
+        mainPanel.add(technicianLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+        String[] technicianOptions = {}; // Placeholders
+        technicianSelectionCombo = UIUtils.createJComboBox(technicianOptions);
+        mainPanel.add(technicianSelectionCombo);
+        technicianSpacing = Box.createRigidArea(new Dimension(0, 20));
+        mainPanel.add(technicianSpacing);
 
         // --- Description ---
         mainPanel.add(UIUtils.createLabel("Description / Notes"));
