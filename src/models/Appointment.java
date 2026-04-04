@@ -15,13 +15,14 @@ public class Appointment extends BaseModel{
     private LocalTime time;
     private AppointmentStatus statusService;
     private String description;
+    private String carId;
 
     public Appointment() {
         super();
     }
 
     public Appointment(String customerId,String staffId, String technicianId, String serviceId, 
-                       LocalDate date, LocalTime time, AppointmentStatus statusService) {
+                       LocalDate date, LocalTime time, AppointmentStatus statusService, String description, String carId) {
         super(); // Calls BaseModel's default constructor
         this.customerId = customerId;
         this.staffId = staffId;                
@@ -30,11 +31,13 @@ public class Appointment extends BaseModel{
         this.date = date;
         this.time = time;
         this.statusService = statusService;
+        this.description = description;
+        this.carId = carId;
     }
 
     public Appointment(String id, LocalDateTime createdAt, LocalDateTime updatedAt, 
                        String customerId, String staffId, String technicianId, String serviceId, 
-                       LocalDate date, LocalTime time, AppointmentStatus statusService) {
+                       LocalDate date, LocalTime time, AppointmentStatus statusService, String description, String carId) {
         super(id, createdAt, updatedAt); // Passes ID and timestamps up to BaseModel
         this.customerId = customerId;
         this.staffId = staffId;
@@ -43,6 +46,8 @@ public class Appointment extends BaseModel{
         this.date = date;
         this.time = time;
         this.statusService = statusService;
+        this.description = description;
+        this.carId = carId;
     }
 
     // --- Getters and Setters ---
@@ -111,6 +116,18 @@ public class Appointment extends BaseModel{
         this.description = description;
     }
 
+    public String getCarId() {
+        return carId;
+    }
+
+    public void setCarId(String carId) {
+        this.carId = carId;
+    }
+
+
+
+
+
     @Override
     public String toString() {
         return "Appointment{" +
@@ -119,9 +136,11 @@ public class Appointment extends BaseModel{
                 ", staffId='" + staffId + '\'' +
                 ", technicianId='" + technicianId + '\'' +
                 ", serviceId='" + serviceId + '\'' +
-                ", date=" + date +
-                ", time=" + time +
-                ", statusService=" + statusService +
+                ", date=" + date + '\'' +
+                ", time=" + time + '\'' +
+                ", statusService=" + statusService + '\'' +
+                ", description=" + description + '\'' +
+                ", carId=" + carId + '\'' +
                 '}';
     }
 }
