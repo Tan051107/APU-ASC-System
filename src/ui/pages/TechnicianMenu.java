@@ -3,6 +3,7 @@ package ui.pages;
 import javax.swing.*;
 
 import models.Appointment;
+import models.CustomerCar;
 import models.User;
 import ui.controller.TechnicianMenuController;
 import ui.pages.TechnicianPanels.ViewAppointment;
@@ -260,8 +261,9 @@ public class TechnicianMenu extends JFrame {
                 if (selectedAppointment != null) {
                     User customer = controller.findCustomerById(selectedAppointment.getCustomerId());
                     User staff = controller.findStaffById(selectedAppointment.getStaffId()); 
+                    CustomerCar car = controller.findCarByID(selectedAppointment.getCarId());
                     
-                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff);
+                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff, car);
                     viewPopup.completeButton.addActionListener(event -> {
                         controller.completeAppointment(selectedAppointment, viewPopup);
                         if (refreshAppointmentsTask != null) {

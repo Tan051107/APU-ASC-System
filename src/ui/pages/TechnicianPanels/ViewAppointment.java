@@ -7,6 +7,7 @@ import enums.AppointmentStatus;
 import java.awt.*;
 import models.Appointment;
 import models.User;
+import models.CustomerCar;
 import ui.utils.UIUtils;
 
 public class ViewAppointment extends JDialog{
@@ -22,11 +23,13 @@ public class ViewAppointment extends JDialog{
     private Appointment appointment;
     private User customer;
     private User staff;
+    private CustomerCar car;
 
-    public ViewAppointment(Appointment appointment, User customer, User staff) {
+    public ViewAppointment(Appointment appointment, User customer, User staff, CustomerCar car) {
         this.appointment = appointment;
         this.customer = customer;
         this.staff = staff;
+        this.car = car;
 
         setModal(true);
         setAlwaysOnTop(true);
@@ -58,7 +61,7 @@ public class ViewAppointment extends JDialog{
         if (this.appointment != null && this.customer != null && this.staff != null) {
             appointmentIdField.setText(appointment.getId());
             customerField.setText(appointment.getCustomerId()+" | "+customer.getName());
-            carField.setText(appointment.getCarId()+" | ");
+            carField.setText(car.getCarPlate());
             staffField.setText(appointment.getStaffId()+" | "+staff.getName());
             datetimeField.setText(appointment.getDate().toString()+" "+appointment.getTime().toString());
             statusField.setText(appointment.getStatusService().getDisplayAppointmentStatus());

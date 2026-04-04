@@ -12,8 +12,10 @@ import enums.AppointmentStatus;
 import enums.UserType;
 import exceptions.FileCorruptedException;
 import mapper.AppointmentMapper;
+import mapper.CustomerCarMapper;
 import mapper.UserMapper;
 import models.Appointment;
+import models.CustomerCar;
 import models.User;
 import repositories.CrudRepository;
 
@@ -21,12 +23,14 @@ public class TechnicianMenuController {
     /* private final AppointmentRepository appointmentRepo; */
     private final CrudRepository<Appointment> appointmentRepo;
     private final CrudRepository<User> userRepo;
+    private final CrudRepository<CustomerCar> carRepo;
 
     private final String loggedInTechnicianId;
 
     public TechnicianMenuController(String technicianId) {
         this.appointmentRepo = new CrudRepository<>("txt_files/Appointment.txt", new AppointmentMapper());
         this.userRepo = new CrudRepository<>("txt_files/User.txt", new UserMapper());
+        this.carRepo = new CrudRepository<>("txt_files/CustomerCar.txt", new CustomerCarMapper());
         this.loggedInTechnicianId = technicianId;
     }
 
@@ -199,6 +203,21 @@ public class TechnicianMenuController {
         return null;
     }
 
+    public CustomerCar findCarByID(String id) throws FileCorruptedException {
+        if (id == null || id.trim().isEmpty()) {
+            return null;
+        }
+        
+        CustomerCar foundCar = carRepo.getOne(id);
+        
+        if (foundCar != null) {
+            return foundCar;
+        }
+        
+        return null;
+    }
+
+
     // View Appointment Controllers
     public void completeAppointment(Appointment appointmentToEdit, JDialog popupForm) {
         try {
@@ -225,7 +244,7 @@ public class TechnicianMenuController {
             JOptionPane.showMessageDialog(popupForm, 
                 "Failed to update appointment: " + e.getMessage(), 
                 "Update Error", 
-                JOptionPane.ERROR_MESSAGE);
+                JOptionPane.ERROR_MESSAGE); 
                 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(popupForm, 
