@@ -10,7 +10,9 @@ public class AddAppointmentForm extends JFrame {
     public JFormattedTextField dateField;
     public JFormattedTextField timeField;
     public JTextArea descriptionArea;
+    public JLabel carPlateLabel;
     public JComboBox<String> carPlateSelectionCombo;
+    public Component carPlateSpacing;
     public JButton createAppointmentBtn;
 
     public AddAppointmentForm() {
@@ -32,19 +34,21 @@ public class AddAppointmentForm extends JFrame {
 
         // --- Customer Selection ---
         mainPanel.add(UIUtils.createLabel("Select Customer *"));
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        String[] customerPlaceholders = {"Select a customer...", "John Tan", "Lisa Wong", "Ahmad Ali"}; // Placeholders
-        customerSelectionCombo = UIUtils.createJComboBox(customerPlaceholders);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));// Placeholders
+        String [] options = {"Select Customer"};
+        customerSelectionCombo = UIUtils.createJComboBox(options);
         mainPanel.add(customerSelectionCombo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // --- Car Plate Selection ---
-        mainPanel.add(UIUtils.createLabel("Select Car Plate *"));
+        carPlateLabel = UIUtils.createLabel("Select Car Plate *");
+        mainPanel.add(carPlateLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        String[] carPlatePlaceholders = {"Select a vehicle...", "WKL 1234", "BJK 5678", "WPJ 9012"}; // Placeholders
-        carPlateSelectionCombo = UIUtils.createJComboBox(carPlatePlaceholders);
+        String[] carPlateOptions = {}; // Placeholders
+        carPlateSelectionCombo = UIUtils.createJComboBox(carPlateOptions);
         mainPanel.add(carPlateSelectionCombo);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        carPlateSpacing = Box.createRigidArea(new Dimension(0, 20));
+        mainPanel.add(carPlateSpacing);
 
         // --- Service Type ---
         mainPanel.add(UIUtils.createLabel("Service Type *"));

@@ -10,23 +10,26 @@ public class Services extends BaseModel{
     private String serviceDetails;
     private LocalDate date;
     private LocalTime time;
+    private int serviceDuration;
 
     public Services() {
     }
 
-    public Services(String serviceName, double servicePrice, String serviceDetails) {
+    public Services(String serviceName, double servicePrice, String serviceDetails , int duration) {
         this.serviceName = serviceName;
         this.servicePrice = servicePrice;
         this.serviceDetails = serviceDetails;
+        this.serviceDuration = duration;
     }
 
-    public Services(String id, LocalDateTime createdAt, LocalDateTime updatedAt,String serviceId,String serviceName, double servicePrice, String serviceDetails, LocalDate date, LocalTime time) {
+    public Services(String id, LocalDateTime createdAt, LocalDateTime updatedAt,String serviceName, double servicePrice, String serviceDetails, int duration,LocalDate date, LocalTime time) {
         super(id, createdAt,updatedAt);
         this.serviceName = serviceName;
         this.servicePrice = servicePrice;
         this.serviceDetails = serviceDetails;
         this.date = date;
         this.time = time;
+        this.serviceDuration = duration;
     }
 
     // Getter and Setter
@@ -70,6 +73,14 @@ public class Services extends BaseModel{
         this.time = time;
     }
 
+    public int getServiceDuration() {
+        return serviceDuration;
+    }
+
+    public void setServiceDuration(int serviceDuration) {
+        this.serviceDuration = serviceDuration;
+    }
+
     @Override
     public String toString() {
         return "Services{" +
@@ -77,6 +88,7 @@ public class Services extends BaseModel{
                 ", serviceName='" + serviceName + '\'' +
                 ", servicePrice='" + servicePrice + '\'' +
                 ", serviceDetails='" + serviceDetails + '\'' +
+                ", serviceDuration='" + serviceDuration + '\'' +
                 ", date=" + date +
                 ", time=" + time +
                 '}';

@@ -1,15 +1,23 @@
 package ui.pages.CounterStaffPanels;
 
+import exceptions.GetEntityListException;
 import models.Appointment;
+import models.Services;
+import services.CustomerCarService;
+import services.ServicesService;
 import ui.utils.RoundedPanel;
 import ui.utils.UIUtils;
-import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
+import utils.DialogUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ManageAppointmentPanel extends JPanel {
-    private JPanel rowsContainer;
+    private final Logger logger = Logger.getLogger(ManageAppointmentPanel.class.getName());
+    private final JPanel rowsContainer;
     public JButton newAppointmentBtn;
     private List<Appointment> appointments;
 
@@ -30,9 +38,7 @@ public class ManageAppointmentPanel extends JPanel {
 
         newAppointmentBtn = UIUtils.createPrimaryButton("+ New Appointment");
         newAppointmentBtn.setPreferredSize(new Dimension(180, 40));
-        newAppointmentBtn.addActionListener(e -> {
-            new AddAppointmentForm().setVisible(true);
-        });
+
         topHeader.add(newAppointmentBtn, BorderLayout.EAST);
 
         add(topHeader, BorderLayout.NORTH);
@@ -80,6 +86,18 @@ public class ManageAppointmentPanel extends JPanel {
     }
 
     public void addAppointmentRow(Appointment appointment) {
+        ServicesService servicesService = new ServicesService();
+        CustomerCarService customerCarService =new CustomerCarService();
+        String serviceName = "Service";
+        String serviceDuration = "Service Duration";
+        try {
+            Services selectedService = servicesService.getServicesById(appointment.getServiceId());
+            serviceName = selectedService.getServiceName();
+            serviceDuration = String.valueOf(selectedService.getServiceDuration());
+        } catch (GetEntityListException e) {
+            DialogUtil.showErrorMessage("Encountered error" , "Failed to get service");
+            logger.log(Level.SEVERE , e.getMessage());
+        }
         JPanel row = new JPanel(new GridLayout(1, 10, 10, 0));
         row.setOpaque(false);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
@@ -101,17 +119,24 @@ public class ManageAppointmentPanel extends JPanel {
         row.add(custLbl);
 
         // Vehicle
-        row.add(createLabel("AJM1207"));
-        // Tech
+        try {
+            String carPlate = customerCarService.getCarById(appointment.getCarId()).getCarPlate();
+            row.add(createLabel(carPlate));
+        } catch (GetEntityListException e) {
+            DialogUtil.showErrorMessage("Encountered error" , "Failed to get car plate");
+            logger.log(Level.SEVERE , e.getMessage());
+        }
+
+        // Technician
         row.add(createLabel(appointment.getTechnicianId()));
-        // Type
-        row.add(createLabel(appointment.getServiceId()));
+        // Service Type
+        row.add(createLabel(serviceName));
         // Date
         row.add(createLabel(appointment.getDate().toString()));
         // Time
         row.add(createLabel(appointment.getTime().toString()));
         // Duration
-        row.add(createLabel("3 hrs"));
+        row.add(createLabel(serviceDuration));
 
         // Status Badge
         JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -140,23 +165,20 @@ public class ManageAppointmentPanel extends JPanel {
 
     private JPanel createStatusBadge(String status) {
         Color bg, fg;
-        switch (status) {
-            case "Completed":
+        fg = switch (status) {
+            case "Completed" -> {
                 bg = new Color(220, 252, 231);
-                fg = new Color(22, 101, 52);
-                break;
-            case "Assigned":
+                yield new Color(22, 101, 52);
+            }
+            case "Assigned" -> {
                 bg = new Color(219, 234, 254);
-                fg = new Color(30, 64, 175);
-                break;
-            case "In Progress":
-                bg = new Color(254, 243, 199);
-                fg = new Color(146, 64, 14);
-                break;
-            default:
+                yield new Color(30, 64, 175);
+            }
+            default -> {
                 bg = new Color(243, 244, 246);
-                fg = new Color(107, 114, 128);
-        }
+                yield new Color(107, 114, 128);
+            }
+        };
 
         RoundedPanel badge = new RoundedPanel(12);
         badge.setBackground(bg);
