@@ -43,8 +43,9 @@ public class CustomerService {
     }
 
     public List<Customer> getCustomersByNameOrEmail(String keyword) throws FileCorruptedException {
+        String lowerCaseKeyword = keyword.toLowerCase();
         return getCustomers().stream()
-                .filter(customer -> customer.getName().contains(keyword) || customer.getEmail().contains(keyword))
+                .filter(customer -> customer.getName().toLowerCase().contains(lowerCaseKeyword) || customer.getEmail().toLowerCase().contains(lowerCaseKeyword))
                 .toList();
     }
 

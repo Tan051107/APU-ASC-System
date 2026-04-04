@@ -10,19 +10,15 @@ import ui.pages.CounterStaffPanels.components.CustomerCard;
 import ui.pages.CounterStaffPanels.components.VehicleRow;
 import utils.CSVExporter;
 import utils.DialogUtil;
+import utils.exporters.CustomerCsvExporter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.time.format.DateTimeFormatter;
 
 public class CustomerManagementController {
 
@@ -40,7 +36,7 @@ public class CustomerManagementController {
     private void initListeners() {
         manageCustomerPanel.addCustomerBtn.addActionListener(e -> openAddCustomerForm(false, null));
         manageCustomerPanel.searchField.addActionListener(e->searchCustomers());
-        manageCustomerPanel.exportBtn.addActionListener(e -> exportUserData());
+        manageCustomerPanel.exportBtn.addActionListener(e -> exportCustomerData());
         resetAllCustomers();
     }
 
@@ -63,11 +59,13 @@ public class CustomerManagementController {
             manageCustomerPanel.setCustomers(customers);
             loadCustomers();
         } catch (FileCorruptedException e) {
-            DialogUtil.showErrorMessage("Failed to reset customers" , e.getMessage());
+            DialogUtil.showErrorMessage("Encountered Error" , "Failed to get customers");
+            logger.log(Level.SEVERE , e.getMessage());
         }
     }
 
-    private void generateCustomerCards(){
+    //Refresh customers
+    private void loadCustomers(){
         List<Customer> customers = manageCustomerPanel.getCustomers();
         manageCustomerPanel.cardContainer.removeAll();
         manageCustomerPanel.customerCountLabel.setText(customers.size() + (customers.size() > 1 ? " customers" : " customer"));
@@ -93,10 +91,6 @@ public class CustomerManagementController {
         manageCustomerPanel.cardContainer.repaint();
     }
 
-    //Refresh customers
-    private void loadCustomers() {
-        generateCustomerCards();
-    }
 
     private void deleteCustomer(Customer customer){
         boolean confirmDeleteCustomer = DialogUtil.showConfirmationMessage("Confirm Delete?" , String.format("Are you sure you want to delete %s?" , customer.getName()));
@@ -131,24 +125,11 @@ public class CustomerManagementController {
         }
     }
 
-    private void exportUserData(){
-        String userHome = System.getProperty("user.home");
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-        String currentDateTime = now.format(formatter);
-        String downloads = Paths.get(userHome,"Downloads", "customers_" + currentDateTime + ".csv").toString();
+    private void exportCustomerData(){
         List<Customer> customers = manageCustomerPanel.getCustomers();
-        try {
-            CSVExporter.exportCustomerData(customers,downloads);
-            File file = new File(downloads);
-            if(Desktop.isDesktopSupported()){
-                Desktop.getDesktop().open(file);
-            }
-            DialogUtil.showInfoMessage("Export Successful","Successfully exported customer data");
-        } catch (IOException | FileCorruptedException e) {
-            DialogUtil.showErrorMessage("Export error" , "Failed to export customer data");
-            logger.log(Level.SEVERE , e.getMessage());
-        }
+        CustomerCsvExporter customerCsvExporter = new CustomerCsvExporter();
+        CSVExporter<Customer> csvExporter = new CSVExporter<>();
+        csvExporter.exportData(customers,"customers" , customerCsvExporter);
     }
 
 }

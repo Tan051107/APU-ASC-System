@@ -1,40 +1,43 @@
 package utils;
 
 import exceptions.FileCorruptedException;
-import models.Customer;
-import services.CustomerCarService;
+import utils.exporters.interfaces.CsvExporter;
 
-import java.io.FileWriter;
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CSVExporter{
+public class CSVExporter<T>{
 
-    private static final Logger logger = Logger.getLogger(CSVExporter.class.getName());
+    private final Logger logger = Logger.getLogger(CSVExporter.class.getName());
 
-    public static void exportCustomerData(List<Customer> customers, String filePath) throws IOException, FileCorruptedException {
-        CustomerCarService customerCarService = new CustomerCarService();
-        try(FileWriter writer = new FileWriter(filePath)){
-            writer.append("User Id,Name,Email, Phone Number, Total Registered Cars\n");
-            for (Customer customer : customers){
-                int carsOwned = customerCarService.getCustomerCars(customer.getId()).size();
-                writer.append(String.valueOf(customer.getId())).append(",");
-                writer.append(escapeCSV(customer.getName())).append(",");
-                writer.append(escapeCSV(customer.getEmail())).append(",");
-                writer.append(escapeCSV(customer.getContactNumber())).append(",");
-                writer.append(escapeCSV(String.valueOf(carsOwned))).append("\n");
+    public void exportData(List <T> data, String fileName, CsvExporter<T> exporter) {
+        if(data.isEmpty()){
+            DialogUtil.showWarningMessage("No data" , "Data is empty");
+            return;
+        }
+        String userHome = System.getProperty("user.home");
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+        String currentDateTime = now.format(formatter);
+        String filePath = String.format("%s_%s.csv" , fileName,currentDateTime);
+        String downloads = Paths.get(userHome,"Downloads",filePath).toString();
+        try {
+            exporter.exportData(data,downloads);
+            File file = new File(downloads);
+            if(Desktop.isDesktopSupported()){
+                Desktop.getDesktop().open(file);
             }
-            logger.log(Level.INFO , "Successfully exported customer data");
+        } catch (FileCorruptedException | IOException e) {
+            logger.log(Level.SEVERE , e.getMessage());
         }
-    }
-
-    private static String escapeCSV(String value){
-        if(value.contains(",") || value.contains("\"")){
-            value = value.replace("\"", "\"\"");
-            value = "\"" + value + "\"";
-        }
-        return value;
+        logger.log(Level.INFO , "Successfully exported customer data");
+        DialogUtil.showInfoMessage("Export Successful","Successfully exported data");
     }
 }
