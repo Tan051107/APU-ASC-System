@@ -58,7 +58,7 @@ public class ViewAppointment extends JDialog{
         descriptionArea = addReadOnlyArea(mainPanel, "Description:");
 
         // Populate field
-        if (this.appointment != null && this.customer != null && this.staff != null) {
+        if (this.appointment != null && this.customer != null && this.staff != null && this.car != null) {
             appointmentIdField.setText(appointment.getId());
             customerField.setText(appointment.getCustomerId()+" | "+customer.getName());
             carField.setText(car.getCarPlate());
