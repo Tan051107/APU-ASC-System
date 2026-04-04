@@ -12,6 +12,7 @@ import ui.utils.UIUtils;
 public class ViewAppointment extends JDialog{
     public JTextField appointmentIdField;
     public JTextField customerField;
+    public JTextField carField;
     public JTextField staffField;
     public JTextField datetimeField;
     public JTextField statusField;
@@ -48,6 +49,7 @@ public class ViewAppointment extends JDialog{
         // Create all fields using the helper method
         appointmentIdField = addReadOnlyField(mainPanel, "Appointment ID:");
         customerField = addReadOnlyField(mainPanel, "Customer:");
+        carField = addReadOnlyField(mainPanel, "Car:");
         staffField = addReadOnlyField(mainPanel, "Counter Staff:");
         datetimeField = addReadOnlyField(mainPanel, "Date/Time:");
         statusField = addReadOnlyField(mainPanel, "Status:");
@@ -57,6 +59,7 @@ public class ViewAppointment extends JDialog{
         if (this.appointment != null) {
             appointmentIdField.setText(appointment.getId());
             customerField.setText(appointment.getCustomerId()+" | "+customer.getName());
+            carField.setText(appointment.getCarId()+" | ");
             staffField.setText(appointment.getStaffId()+" | "+staff.getName());
             datetimeField.setText(appointment.getDate().toString()+" "+appointment.getTime().toString());
             statusField.setText(appointment.getStatusService().getDisplayAppointmentStatus());

@@ -14,14 +14,14 @@ public class AppointmentMapper implements Mapper<Appointment>{
     public Appointment toObject(String row) throws FileCorruptedException {
         String[] data = row.split("\\|");
         
-        if (data.length != 11) {
+        if (data.length != 12) {
             throw new FileCorruptedException("Appointment file contains extra data or has missing data");
         }
 
         Appointment appt = new Appointment();
         appt.setId(data[0]);
-        appt.setCreatedAt(LocalDateTime.parse(data[9]));
-        appt.setUpdatedAt(LocalDateTime.parse(data[10]));
+        appt.setCreatedAt(LocalDateTime.parse(data[10]));
+        appt.setUpdatedAt(LocalDateTime.parse(data[11]));
         appt.setCustomerId(data[1]);
         appt.setStaffId(data[2]);
         appt.setTechnicianId(data[3]);
@@ -30,6 +30,7 @@ public class AppointmentMapper implements Mapper<Appointment>{
         appt.setTime(LocalTime.parse(data[6]));
         appt.setStatusService(AppointmentStatus.valueOf(data[7])); 
         appt.setDescription(data[8]);
+        appt.setCarId(data[9]);
 
         return appt;
     }
@@ -39,7 +40,7 @@ public class AppointmentMapper implements Mapper<Appointment>{
         return String.join("|", 
                 appt.getId(),appt.getCustomerId(), appt.getStaffId(), appt.getTechnicianId(),
                 appt.getServiceId(),appt.getDate().toString(), appt.getTime().toString(),appt.getStatusService().name(),
-                appt.getDescription(), appt.getCreatedAt().toString(), appt.getUpdatedAt().toString() 
+                appt.getDescription(), appt.getCarId(), appt.getCreatedAt().toString(), appt.getUpdatedAt().toString() 
         );
     }
 }
