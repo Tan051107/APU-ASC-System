@@ -3,12 +3,15 @@ package ui.pages;
 import javax.swing.*;
 
 import ui.controller.ManagerMenuController;
+import ui.controller.UserManagementController;
 
 import java.awt.*;
 
 public class ManagerMenu extends JFrame {
     
     // Panel that will hold all the different views
+    public JButton addUser; 
+    public JTable userTable;
     private JPanel contentPanel;
     private CardLayout cardLayout;
     private boolean isExpanded = true;
@@ -87,6 +90,10 @@ public class ManagerMenu extends JFrame {
         btnSetPrices.addActionListener(e -> cardLayout.show(contentPanel, "Service Pricing"));
         btnFeedback.addActionListener(e -> cardLayout.show(contentPanel, "View Feedback"));
         btnReports.addActionListener(e -> cardLayout.show(contentPanel, "Reporting"));
+
+        // Initialize the new external controller!
+        new UserManagementController(this); 
+    
     }
 
     private void toggleSidebar() {
@@ -137,16 +144,71 @@ public class ManagerMenu extends JFrame {
 
     private JPanel createManageUsersPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        JLabel title = displayMenuTitle("User Management (CRUD)");
-        panel.add(title, BorderLayout.NORTH);
-        
-        JTable table = new JTable();
-        table.setModel(controller.loadUserToTable());
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add some breathing room
 
-        // CRUD Action Buttons
+        JLabel title = displayMenuTitle("User Management (CRUD)");
+        topPanel.add(title, BorderLayout.WEST); 
+
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JLabel searchLabel = new JLabel("Search ID:");
+        searchLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        
+        JTextField searchField = new JTextField(15); // 15 columns wide
+        JButton searchButton = new JButton("Search");
+        
+        // Style the search button to match your theme
+        searchButton.setBackground(new Color(99, 110, 114));
+        searchButton.setForeground(Color.WHITE);
+        searchButton.setFocusPainted(false);
+
+        searchPanel.add(searchLabel);
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+        
+        topPanel.add(searchPanel, BorderLayout.EAST);
+        panel.add(topPanel, BorderLayout.NORTH); // Add the whole top section to the main panel
+        
+        // 3. Setup the Table
+        userTable = new JTable();
+        userTable.setModel(controller.loadUserToTable());
+        panel.add(new JScrollPane(userTable), BorderLayout.CENTER);
+
+        // 4. Implement the "Find and Highlight" Search Logic
+        searchButton.addActionListener(e -> {
+            String currenttext = searchField.getText().trim().toUpperCase();
+
+            if (currenttext.matches("TP\\d{6}")) {
+                boolean found = false;
+                
+                for (int i = 0; i < userTable.getRowCount(); i++) {
+                    Object cellValue = userTable.getValueAt(i, 0); 
+                    
+                    if (cellValue != null) {
+                        String searchid = cellValue.toString(); 
+                        if (searchid.equals(currenttext)) {
+                            userTable.setRowSelectionInterval(i, i); 
+                            userTable.scrollRectToVisible(userTable.getCellRect(i, 0, true)); 
+                            found = true;
+                            break; 
+                        }
+                    }
+                }
+                
+                if (!found) {
+                    JOptionPane.showMessageDialog(this, "No User Found with ID: " + currenttext, "Search Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid format. Please use TP followed by 6 digits (e.g., TP012345).", "Format Error", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        // Pro-Tip: Allow the manager to press "Enter" on their keyboard while typing to trigger the search!
+        searchField.addActionListener(e -> searchButton.doClick());
+
+        // 5. CRUD Action Buttons
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton addUser = createCRUDButton("Add User");
+        addUser = createCRUDButton("Add User");
         bottomPanel.add(addUser);
         JButton editUser = createCRUDButton("Edit User");
         bottomPanel.add(editUser);
@@ -316,6 +378,9 @@ public class ManagerMenu extends JFrame {
         return button;
     }
 
-    
-
+    public void refreshUserTable() {
+        if (userTable != null) {
+            userTable.setModel(controller.loadUserToTable());
+        }
+    }
 }
