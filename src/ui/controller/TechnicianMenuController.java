@@ -1,25 +1,42 @@
 package ui.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import enums.AppointmentStatus;
+import enums.UserType;
+import exceptions.FileCorruptedException;
+import mapper.AppointmentMapper;
+import mapper.UserMapper;
 import models.Appointment;
-import repositories.AppointmentRepository;
+import models.User;
+import repositories.CrudRepository;
 
 public class TechnicianMenuController {
-    private final AppointmentRepository appointmentRepo;
+    /* private final AppointmentRepository appointmentRepo; */
+    private final CrudRepository<Appointment> appointmentRepo;
+    private final CrudRepository<User> userRepo;
+
     private final String loggedInTechnicianId;
 
     public TechnicianMenuController(String technicianId) {
-        this.appointmentRepo = new AppointmentRepository();
+        this.appointmentRepo = new CrudRepository<>("txt_files/Appointment.txt", new AppointmentMapper());
+        this.userRepo = new CrudRepository<>("txt_files/User.txt", new UserMapper());
         this.loggedInTechnicianId = technicianId;
     }
 
     public DefaultTableModel getAppointmentsTableModel() {
-        List<Appointment> allAppointments = appointmentRepo.findAll();
+        List<Appointment> allAppointments = new ArrayList<>();
+        try {
+            allAppointments = appointmentRepo.getAll();
+        } catch (FileCorruptedException e) {
+            System.err.println("Error reading appointments: " + e.getMessage());
+        }
 
         String[] columns = {"Appt ID", "Date", "Time", "Status", "Customer ID"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
@@ -44,7 +61,12 @@ public class TechnicianMenuController {
     }
 
     public DefaultTableModel getAppointmentsTableModel(LocalDate filterDate, String searchQuery) {
-        List<Appointment> allAppointments = appointmentRepo.findAll();
+        List<Appointment> allAppointments = new ArrayList<>();
+        try {
+            allAppointments = appointmentRepo.getAll();
+        } catch (FileCorruptedException e) {
+            System.err.println("Error reading appointments: " + e.getMessage());
+        }
 
         String[] columns = {"Appt ID", "Date", "Time", "Status", "Customer ID"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
@@ -75,7 +97,12 @@ public class TechnicianMenuController {
     }
 
     public DefaultTableModel getHistoryAppointmentsTableModel() {
-        List<Appointment> allAppointments = appointmentRepo.findAll();
+        List<Appointment> allAppointments = new ArrayList<>();
+        try {
+            allAppointments = appointmentRepo.getAll();
+        } catch (FileCorruptedException e) {
+            System.err.println("Error reading appointments: " + e.getMessage());
+        }
 
         String[] columns = {"Appt ID", "Date", "Time", "Status", "Customer ID"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
@@ -100,7 +127,12 @@ public class TechnicianMenuController {
     }
 
     public DefaultTableModel getHistoryAppointmentsTableModel(String searchQuery) {
-        List<Appointment> allAppointments = appointmentRepo.findAll();
+        List<Appointment> allAppointments = new ArrayList<>();
+        try {
+            allAppointments = appointmentRepo.getAll();
+        } catch (FileCorruptedException e) {
+            System.err.println("Error reading appointments: " + e.getMessage());
+        }
 
         String[] columns = {"Appt ID", "Date", "Time", "Status", "Customer ID"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
@@ -129,5 +161,78 @@ public class TechnicianMenuController {
         }
 
         return tableModel;
+    }
+
+    public Appointment findAppointmentById(String id) {
+        try {
+            return appointmentRepo.getOne(id);
+        } catch (FileCorruptedException e) {
+            System.err.println("Error reading appointments: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public User findCustomerById(String id) throws FileCorruptedException {
+        if (id == null || id.trim().isEmpty()) {
+            return null;
+        }
+
+        User foundUser = userRepo.getOne(id);
+        if (foundUser != null && foundUser.getUserType() == UserType.CUSTOMER) {
+            return foundUser;
+        }
+        
+        return null; 
+    }
+
+    public User findStaffById(String id) throws FileCorruptedException {
+        if (id == null || id.trim().isEmpty()) {
+            return null;
+        }
+        
+        User foundUser = userRepo.getOne(id);
+        
+        if (foundUser != null && foundUser.getUserType() == UserType.COUNTER_STAFF) {
+            return foundUser;
+        }
+        
+        return null;
+    }
+
+    // View Appointment Controllers
+    public void completeAppointment(Appointment appointmentToEdit, JDialog popupForm) {
+        try {
+            if (appointmentToEdit.getStatusService() == AppointmentStatus.COMPLETED) {
+                JOptionPane.showMessageDialog(popupForm, 
+                    "This appointment is already marked as completed.", 
+                    "Already Completed", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            appointmentToEdit.setStatusService(AppointmentStatus.COMPLETED);
+
+            appointmentRepo.update(appointmentToEdit);
+
+            JOptionPane.showMessageDialog(popupForm, 
+                                        String.format("Successfully completed appointment %s.", appointmentToEdit.getId()),
+                                        "Updated Successfully", 
+                                        JOptionPane.INFORMATION_MESSAGE);
+
+            popupForm.dispose();
+
+        } catch (exceptions.NotFoundException | exceptions.FileCorruptedException e) {
+            JOptionPane.showMessageDialog(popupForm, 
+                "Failed to update appointment: " + e.getMessage(), 
+                "Update Error", 
+                JOptionPane.ERROR_MESSAGE);
+                
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(popupForm, 
+                "Encountered an unexpected error when updating the appointment.", 
+                "System Error", 
+                JOptionPane.ERROR_MESSAGE);
+            // logger.log(Level.SEVERE, e.getMessage()); // Keep this if you have a logger set up
+        }
     }
 }
