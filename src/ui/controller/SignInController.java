@@ -84,6 +84,7 @@ public class SignInController {
             case CUSTOMER:
                 // CustomerMenu customerMenu = new CustomerMenu(user.getId());
                 // customerMenu.setVisible(true);
+                break;
             case MANAGER:
                 ManagerMenu managerMenu = new ManagerMenu();
                 managerMenu.setVisible(true);
@@ -105,9 +106,6 @@ public class SignInController {
                 );
         }
         // Close window
-        Window loginWindow = SwingUtilities.getWindowAncestor(loginPage);
-        if (loginWindow != null) {
-            loginWindow.dispose();
-        }
+        loginPage.dispose();
     }
 }
