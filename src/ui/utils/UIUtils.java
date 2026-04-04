@@ -157,6 +157,42 @@ public class UIUtils {
         return btn;
     }
 
+    public static JFormattedTextField createDateField() {
+        try {
+            javax.swing.text.MaskFormatter dateMask = new javax.swing.text.MaskFormatter("####-##-##");
+            dateMask.setPlaceholderCharacter('_');
+            JFormattedTextField field = new JFormattedTextField(dateMask);
+            field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+            field.setAlignmentX(Component.LEFT_ALIGNMENT);
+            field.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                    BorderFactory.createEmptyBorder(12, 12, 12, 12)
+            ));
+            field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            return field;
+        } catch (java.text.ParseException e) {
+            return new JFormattedTextField();
+        }
+    }
+
+    public static JFormattedTextField createTimeField() {
+        try {
+            javax.swing.text.MaskFormatter timeMask = new javax.swing.text.MaskFormatter("##:##");
+            timeMask.setPlaceholderCharacter('_');
+            JFormattedTextField field = new JFormattedTextField(timeMask);
+            field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+            field.setAlignmentX(Component.LEFT_ALIGNMENT);
+            field.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                    BorderFactory.createEmptyBorder(12, 12, 12, 12)
+            ));
+            field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            return field;
+        } catch (java.text.ParseException e) {
+            return new JFormattedTextField();
+        }
+    }
+
     public static JPanel createBadge(String text) {
         RoundedPanel badge = new RoundedPanel(10);
         badge.setBackground(new Color(243, 244, 246));

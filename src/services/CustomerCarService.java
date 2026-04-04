@@ -61,6 +61,7 @@ public class CustomerCarService {
         customerCarCrudRepository.writeAll(cars);
     }
 
+    //TODO Don't allow update car when car is assigned to an appointment
     public void updateCar(CustomerCar carToUpdate) throws FileCorruptedException,UpdateException {
         boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar ->customerCar.getCarPlate().equalsIgnoreCase(carToUpdate.getCarPlate()) && !customerCar.getId().equalsIgnoreCase(carToUpdate.getId())).isEmpty();
         if(carPlateHasExisted){

@@ -5,12 +5,11 @@ import exceptions.FileCorruptedException;
 import models.Customer;
 import models.CustomerCar;
 import services.CustomerCarService;
+import ui.controller.CounterStaffControllers.FormController.AddVehicleFormController;
 import ui.pages.CounterStaffPanels.components.VehicleRow;
 import ui.pages.CounterStaffPanels.forms.AddVehicleForm;
 import utils.DialogUtil;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.logging.Level;

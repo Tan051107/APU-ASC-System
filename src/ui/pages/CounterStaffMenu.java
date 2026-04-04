@@ -1,5 +1,6 @@
 package ui.pages;
 
+import ui.controller.CounterStaffControllers.AppointmentManagementController;
 import ui.controller.CounterStaffControllers.CustomerManagementController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.ManageCustomerPanel;
@@ -76,7 +77,9 @@ public class CounterStaffMenu extends JFrame {
         ManageCustomerPanel manageCustomerPanel = new ManageCustomerPanel();
         new CustomerManagementController(manageCustomerPanel);
         contentPanel.add(manageCustomerPanel, "Manage Customer");
-        contentPanel.add(new ManageAppointmentPanel(), "Manage Appointment");
+        ManageAppointmentPanel manageAppointmentPanel = new ManageAppointmentPanel();
+        contentPanel.add(manageAppointmentPanel, "Manage Appointment");
+        new AppointmentManagementController(manageAppointmentPanel);
         contentPanel.add(new ManagePaymentPanel(), "Manage Payment");
 
         add(contentPanel, BorderLayout.CENTER);
