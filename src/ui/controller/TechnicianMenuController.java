@@ -42,23 +42,32 @@ public class TechnicianMenuController {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
-        String[] columns = {"Appt ID", "Date", "Time", "Status", "Customer ID"};
+        String[] columns = {"Appt ID","Plate Number", "Date", "Time", "Status"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 
         for (Appointment appt : allAppointments) {
             boolean isMyAppointment = appt.getTechnicianId().equals(loggedInTechnicianId);
             boolean isToday = (appt.getDate().equals(LocalDate.now()));
-            if (isMyAppointment && isToday){
+
+            if (!isMyAppointment || !isToday) {
+                continue;
+            }
+            try {
+                CustomerCar apptCar = findCarByID(appt.getCarId());
+                String plate = (apptCar != null && apptCar.getCarPlate() != null) ? apptCar.getCarPlate() : "N/A";
+
                 Object[] rowData = {
                     appt.getId(),
+                    plate,  
                     appt.getDate().toString(),
                     appt.getTime().toString(),
-                    appt.getStatusService().getDisplayAppointmentStatus(),
-                    appt.getCustomerId()
+                    appt.getStatusService().getDisplayAppointmentStatus()
                 };
                 tableModel.addRow(rowData);
+
+            } catch (Exception e) {
+                System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
             }
-            
         }
 
         return tableModel;
@@ -72,7 +81,7 @@ public class TechnicianMenuController {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
-        String[] columns = {"Appt ID", "Date", "Time", "Status", "Customer ID"};
+        String[] columns = {"Appt ID","Plate Number", "Date", "Time", "Status"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 
         String query = (searchQuery == null) ? "" : searchQuery.trim().toLowerCase();
@@ -80,20 +89,33 @@ public class TechnicianMenuController {
         for (Appointment appt : allAppointments) {
             boolean isMyAppointment = appt.getTechnicianId().equals(loggedInTechnicianId);
             boolean matchesDate = (filterDate == null) || appt.getDate().equals(filterDate);
-            boolean matchesSearch = query.isEmpty() || 
-                                    appt.getId().toLowerCase().contains(query) ||
-                                    appt.getStatusService().name().toLowerCase().contains(query) ||
-                                    appt.getCustomerId().toLowerCase().contains(query);
+            if (!isMyAppointment || !matchesDate) {
+                continue;
+            }
+            
+            try {
+                CustomerCar apptCar = findCarByID(appt.getCarId());
+                
+                String plate = (apptCar.getCarPlate() != null) ? apptCar.getCarPlate() : "";
 
-            if (isMyAppointment && matchesDate && matchesSearch) {
-                Object[] rowData = {
-                    appt.getId(),
-                    appt.getDate().toString(),
-                    appt.getTime().toString(),
-                    appt.getStatusService().getDisplayAppointmentStatus(),
-                    appt.getCustomerId()
-                };
-                tableModel.addRow(rowData);
+                boolean matchesSearch = query.isEmpty() || 
+                                        appt.getId().toLowerCase().contains(query) ||
+                                        appt.getStatusService().name().toLowerCase().contains(query) ||
+                                        plate.toLowerCase().contains(query); 
+
+                if (matchesSearch) {
+                    Object[] rowData = {
+                        appt.getId(),
+                        plate,  
+                        appt.getDate().toString(),
+                        appt.getTime().toString(),
+                        appt.getStatusService().getDisplayAppointmentStatus() 
+                    };
+                    tableModel.addRow(rowData);
+                }
+                
+            } catch (Exception e) {
+                System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
             }
         }
 
@@ -108,21 +130,30 @@ public class TechnicianMenuController {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
-        String[] columns = {"Appt ID", "Date", "Time", "Status", "Customer ID"};
+        String[] columns = {"Appt ID","Plate Number", "Date", "Time", "Status"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 
         for (Appointment appt : allAppointments) {
             boolean isMyAppointment = appt.getTechnicianId().equals(loggedInTechnicianId);
             boolean isCompleted = appt.getStatusService() == AppointmentStatus.COMPLETED;
-            if (isMyAppointment && isCompleted){
+            if (!isMyAppointment || !isCompleted) {
+                continue;
+            }
+            try {
+                CustomerCar apptCar = findCarByID(appt.getCarId());
+                String plate = (apptCar != null && apptCar.getCarPlate() != null) ? apptCar.getCarPlate() : "N/A";
+
                 Object[] rowData = {
                     appt.getId(),
+                    plate,  
                     appt.getDate().toString(),
                     appt.getTime().toString(),
-                    appt.getStatusService().getDisplayAppointmentStatus(),
-                    appt.getCustomerId()
+                    appt.getStatusService().getDisplayAppointmentStatus()
                 };
                 tableModel.addRow(rowData);
+
+            } catch (Exception e) {
+                System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
             }
             
         }
@@ -138,7 +169,7 @@ public class TechnicianMenuController {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
-        String[] columns = {"Appt ID", "Date", "Time", "Status", "Customer ID"};
+        String[] columns = {"Appt ID","Plate Number", "Date", "Time", "Status"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 
         String query = (searchQuery == null) ? "" : searchQuery.trim().toLowerCase();
@@ -146,25 +177,35 @@ public class TechnicianMenuController {
         for (Appointment appt : allAppointments) {
             boolean isMyAppointment = appt.getTechnicianId().equals(loggedInTechnicianId);
             boolean isCompleted = appt.getStatusService() == AppointmentStatus.COMPLETED;
-            boolean matchesSearch = query.isEmpty() || 
-                                    appt.getId().toLowerCase().contains(query) ||
-                                    appt.getDate().toString().contains(query)||
-                                    appt.getStatusService().name().toLowerCase().contains(query) ||
-                                    appt.getCustomerId().toLowerCase().contains(query);
+            if (!isMyAppointment || !isCompleted) {
+                continue;
+            }
+            try {
+                CustomerCar apptCar = findCarByID(appt.getCarId());
+                String plate = (apptCar.getCarPlate() != null) ? apptCar.getCarPlate() : "";
 
-            if (isMyAppointment && isCompleted && matchesSearch ) {
-                Object[] rowData = {
-                    appt.getId(),
-                    appt.getDate().toString(),
-                    appt.getTime().toString(),
-                    appt.getStatusService().getDisplayAppointmentStatus(),
-                    appt.getCustomerId()
-                };
-                tableModel.addRow(rowData);
+                boolean matchesSearch = query.isEmpty() || 
+                                        appt.getId().toLowerCase().contains(query) ||
+                                        appt.getStatusService().name().toLowerCase().contains(query) ||
+                                        plate.toLowerCase().contains(query);
+
+                if (matchesSearch) {
+                    Object[] rowData = {
+                        appt.getId(),
+                        plate,  
+                        appt.getDate().toString(),
+                        appt.getTime().toString(),
+                        appt.getStatusService().getDisplayAppointmentStatus() 
+                    };
+                    tableModel.addRow(rowData);
+                }
+                
+            } catch (Exception e) {
+                System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
             }
         }
 
-        return tableModel;
+        return tableModel; 
     }
 
     public Appointment findAppointmentById(String id) {

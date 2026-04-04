@@ -190,7 +190,7 @@ public class TechnicianMenu extends JFrame {
         nextDateBtn.setPreferredSize(rectangleSize);
         // Date Switcher:END
 
-        // Table reset event listener
+        // Refresh table runnable
         refreshAppointmentsTask = () -> {
             dateField.setText(currentDate[0].format(formatter));
             String currentSearch = searchField.getText();
@@ -216,11 +216,9 @@ public class TechnicianMenu extends JFrame {
 
         dateField.addActionListener(e -> {
             try {
-                // Try to parse what the user typed
                 currentDate[0] = LocalDate.parse(dateField.getText(), formatter);
                 refreshAppointmentsTask.run();
             } catch (DateTimeParseException ex) {
-                // If they type gibberish, show an error and revert to the last valid date
                 JOptionPane.showMessageDialog(panel, "Invalid date format. Please use YYYY-MM-DD", "Date Error", JOptionPane.ERROR_MESSAGE);
                 dateField.setText(currentDate[0].format(formatter));
             }
@@ -232,7 +230,6 @@ public class TechnicianMenu extends JFrame {
         controlsPanel.add(dateField);
         controlsPanel.add(nextDateBtn);
 
-        // Add the controls under the title, then put the whole thing in NORTH
         topContainer.add(controlsPanel);
         panel.add(topContainer, BorderLayout.NORTH);
 
@@ -318,7 +315,7 @@ public class TechnicianMenu extends JFrame {
 
         // Search Bar:END
 
-        // Table reset event listener
+        // Table reset runnable
         refreshHistoryTask = () -> {
             String currentSearch = searchField.getText();
             
