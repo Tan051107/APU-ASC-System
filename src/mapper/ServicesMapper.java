@@ -26,6 +26,7 @@ public class ServicesMapper implements Mapper<Services>{
 
     @Override
     public String toString(Services services){
-        return String.join("|" , services.getId(),services.getServiceName(),String.valueOf(services.getServicePrice()), services.getServiceDetails(), services.getCreatedAt().toString(),services.getUpdatedAt().toString());
+        String formattedPrice = String.format("%.2f", services.getServicePrice());
+        return String.join("|" , services.getId(),services.getServiceName(),formattedPrice, services.getServiceDetails(), services.getCreatedAt().toString(),services.getUpdatedAt().toString());
     }
 }

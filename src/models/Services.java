@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Services extends BaseModel{
-    private String serviceId;
     private String serviceName;
     private double servicePrice;
     private String serviceDetails;
@@ -13,22 +12,16 @@ public class Services extends BaseModel{
     private LocalTime time;
 
     public Services() {
-        super();
     }
 
-    public Services(String serviceId,String serviceName, double servicePrice, String serviceDetails, LocalDate date, LocalTime time) {
-        super();
-        this.serviceId = serviceId;
+    public Services(String serviceName, double servicePrice, String serviceDetails) {
         this.serviceName = serviceName;
         this.servicePrice = servicePrice;
         this.serviceDetails = serviceDetails;
-        this.date = date;
-        this.time = time;
     }
 
     public Services(String id, LocalDateTime createdAt, LocalDateTime updatedAt,String serviceId,String serviceName, double servicePrice, String serviceDetails, LocalDate date, LocalTime time) {
         super(id, createdAt,updatedAt);
-        this.serviceId = serviceId;
         this.serviceName = serviceName;
         this.servicePrice = servicePrice;
         this.serviceDetails = serviceDetails;
@@ -37,14 +30,6 @@ public class Services extends BaseModel{
     }
 
     // Getter and Setter
-
-    public String getServiceId(){
-        return serviceId;
-    }
-
-    public void setServiceId(String serviceId){
-        this.serviceId = serviceId;
-    }
 
     public String getServiceName(){
         return serviceName;
@@ -66,7 +51,7 @@ public class Services extends BaseModel{
     }
 
     public void setServiceDetails(String serviceDetails){
-        this.serviceId = serviceDetails;
+        this.serviceDetails = serviceDetails;
     }
 
     public LocalDate getDate() {

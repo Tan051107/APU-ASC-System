@@ -81,7 +81,7 @@ public class ServicesRepository<T extends BaseModel> implements BaseRepository<T
     public void create(T object) throws IOException {
         object.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")));
         object.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")));
-        try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))){
+        try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath,true)))){
             String row = mapper.toString(object);
             writer.println(row);
         }
