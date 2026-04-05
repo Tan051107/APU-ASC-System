@@ -1,6 +1,7 @@
 package ui.controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,35 +11,38 @@ import javax.swing.table.DefaultTableModel;
 
 import enums.AppointmentStatus;
 import enums.UserType;
-import exceptions.FileCorruptedException;
-import mapper.AppointmentMapper;
-import mapper.CustomerCarMapper;
-import mapper.UserMapper;
+
+import exceptions.GetEntityListException;
+
 import models.Appointment;
 import models.CustomerCar;
+import models.Feedback;
 import models.User;
-import repositories.CrudRepository;
+
+import services.AppointmentService;
+import services.CustomerCarService;
+import services.UserService;
+import services.FeedbackService;
+
 
 public class TechnicianMenuController {
-    /* private final AppointmentRepository appointmentRepo; */
-    private final CrudRepository<Appointment> appointmentRepo;
-    private final CrudRepository<User> userRepo;
-    private final CrudRepository<CustomerCar> carRepo;
+    private final AppointmentService appointmentService = new AppointmentService();
+    private final UserService userService = new UserService();
+    private final CustomerCarService carService = new CustomerCarService();
+    private final FeedbackService feedbackService = new FeedbackService();
+    
 
     private final String loggedInTechnicianId;
 
     public TechnicianMenuController(String technicianId) {
-        this.appointmentRepo = new CrudRepository<>("txt_files/Appointment.txt", new AppointmentMapper());
-        this.userRepo = new CrudRepository<>("txt_files/User.txt", new UserMapper());
-        this.carRepo = new CrudRepository<>("txt_files/CustomerCar.txt", new CustomerCarMapper());
         this.loggedInTechnicianId = technicianId;
     }
 
     public DefaultTableModel getAppointmentsTableModel() {
         List<Appointment> allAppointments = new ArrayList<>();
         try {
-            allAppointments = appointmentRepo.getAll();
-        } catch (FileCorruptedException e) {
+            allAppointments = appointmentService.getAllAppointments();
+        } catch (GetEntityListException e) {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
@@ -76,8 +80,8 @@ public class TechnicianMenuController {
     public DefaultTableModel getAppointmentsTableModel(LocalDate filterDate, String searchQuery) {
         List<Appointment> allAppointments = new ArrayList<>();
         try {
-            allAppointments = appointmentRepo.getAll();
-        } catch (FileCorruptedException e) {
+            allAppointments = appointmentService.getAllAppointments();
+        } catch (GetEntityListException e) {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
@@ -125,8 +129,8 @@ public class TechnicianMenuController {
     public DefaultTableModel getHistoryAppointmentsTableModel() {
         List<Appointment> allAppointments = new ArrayList<>();
         try {
-            allAppointments = appointmentRepo.getAll();
-        } catch (FileCorruptedException e) {
+            allAppointments = appointmentService.getAllAppointments();
+        } catch (GetEntityListException e) {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
@@ -164,8 +168,8 @@ public class TechnicianMenuController {
     public DefaultTableModel getHistoryAppointmentsTableModel(String searchQuery) {
         List<Appointment> allAppointments = new ArrayList<>();
         try {
-            allAppointments = appointmentRepo.getAll();
-        } catch (FileCorruptedException e) {
+            allAppointments = appointmentService.getAllAppointments();
+        } catch (GetEntityListException e) {
             System.err.println("Error reading appointments: " + e.getMessage());
         }
 
@@ -210,19 +214,19 @@ public class TechnicianMenuController {
 
     public Appointment findAppointmentById(String id) {
         try {
-            return appointmentRepo.getOne(id);
-        } catch (FileCorruptedException e) {
+            return appointmentService.getAppointmentById(id);
+        } catch (GetEntityListException e) {
             System.err.println("Error reading appointments: " + e.getMessage());
             return null;
         }
     }
 
-    public User findCustomerById(String id) throws FileCorruptedException {
+    public User findCustomerById(String id) throws GetEntityListException {
         if (id == null || id.trim().isEmpty()) {
             return null;
         }
 
-        User foundUser = userRepo.getOne(id);
+        User foundUser = userService.getUserById(id);
         if (foundUser != null && foundUser.getUserType() == UserType.CUSTOMER) {
             return foundUser;
         }
@@ -230,12 +234,12 @@ public class TechnicianMenuController {
         return null; 
     }
 
-    public User findStaffById(String id) throws FileCorruptedException {
+    public User findStaffById(String id) throws GetEntityListException {
         if (id == null || id.trim().isEmpty()) {
             return null;
         }
         
-        User foundUser = userRepo.getOne(id);
+        User foundUser = userService.getUserById(id);
         
         if (foundUser != null && foundUser.getUserType() == UserType.COUNTER_STAFF) {
             return foundUser;
@@ -244,12 +248,12 @@ public class TechnicianMenuController {
         return null;
     }
 
-    public CustomerCar findCarByID(String id) throws FileCorruptedException {
+    public CustomerCar findCarByID(String id) throws GetEntityListException {
         if (id == null || id.trim().isEmpty()) {
             return null;
         }
         
-        CustomerCar foundCar = carRepo.getOne(id);
+        CustomerCar foundCar = carService.getCarById(id);
         
         if (foundCar != null) {
             return foundCar;
@@ -258,9 +262,22 @@ public class TechnicianMenuController {
         return null;
     }
 
+    public Feedback findFeedbackByAppointmentID(String id) throws GetEntityListException {
+        if (id == null || id.trim().isEmpty()) {
+            return null;
+        }
+        
+        Feedback foundFeedback = feedbackService.getFeedbackByAppointmentId(id);
+        
+        if (foundFeedback != null) {
+            return foundFeedback;
+        }
+        
+        return null;
+    }
 
     // View Appointment Controllers
-    public void completeAppointment(Appointment appointmentToEdit, JDialog popupForm) {
+    public void completeAppointment(Appointment appointmentToEdit, JDialog popupForm, String technicianFeedback) {
         try {
             if (appointmentToEdit.getStatusService() == AppointmentStatus.COMPLETED) {
                 JOptionPane.showMessageDialog(popupForm, 
@@ -271,8 +288,14 @@ public class TechnicianMenuController {
             }
 
             appointmentToEdit.setStatusService(AppointmentStatus.COMPLETED);
-
-            appointmentRepo.update(appointmentToEdit);
+            Feedback newFeedback = new Feedback();
+            newFeedback.setAppointmentId(appointmentToEdit.getId());
+            newFeedback.setTechnicianFeedback(technicianFeedback);
+            newFeedback.setCreatedAt(LocalDateTime.now());
+            newFeedback.setUpdatedAt(LocalDateTime.now());
+            
+            feedbackService.createFeedback(newFeedback);
+            appointmentService.updateAppointment(appointmentToEdit);
 
             JOptionPane.showMessageDialog(popupForm, 
                                         String.format("Successfully completed appointment %s.", appointmentToEdit.getId()),

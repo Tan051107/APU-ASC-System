@@ -87,5 +87,17 @@ public class Validator {
         }
     }
 
+    public static void validateText(ValidationResult result, String fieldName, String value) {
+        if (value == null || value.trim().isEmpty()) {
+            String errorMessage = fieldName + " is required.";
+            result.addError(errorMessage);
+            return;
+        }
+        
+        if (value.contains("|")) {
+            result.addError(fieldName + " cannot contain the pipe character ('|').");
+        }
+    }
+
 
 }
