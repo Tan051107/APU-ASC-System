@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class CrudRepository<T extends BaseModel> implements BaseRepository<T> {
+public class ServicesRepository<T extends BaseModel> implements BaseRepository<T> {
     private final String filePath;
     private final Mapper<T> mapper;
 
-    public CrudRepository(String filePath, Mapper<T> mapper) {
+    public ServicesRepository(String filePath, Mapper<T> mapper) {
         this.filePath = filePath;
         this.mapper = mapper;
     }
@@ -64,7 +64,7 @@ public class CrudRepository<T extends BaseModel> implements BaseRepository<T> {
         boolean isExists = false;
         for(int i = 0 ; i< objects.size() ; i++){
             if(objects.get(i).getId().equalsIgnoreCase(objectToUpdate.getId())){
-                objectToUpdate.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")));
+                objects.get(i).setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")));
                 objects.set(i,objectToUpdate);
                 isExists = true;
             }
@@ -113,7 +113,7 @@ public class CrudRepository<T extends BaseModel> implements BaseRepository<T> {
         }
     }
 
-    public void writeAll(List<T> objects){
+    private void writeAll(List<T> objects){
         try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath)))) {
             for(T object:objects){
                 String row = mapper.toString(object);

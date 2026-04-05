@@ -1,10 +1,14 @@
 package ui.utils;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
+
 import java.awt.*;
 
 public class UIUtils {
-    public static JTextField createTextField(String placeholder) {
+    public static JTextField createTextField() {
         JTextField field = new JTextField();
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -13,29 +17,12 @@ public class UIUtils {
                 BorderFactory.createEmptyBorder(12, 12, 12, 12)
         ));
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        field.setText(placeholder);
-        field.setForeground(Color.GRAY);
-
-        field.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent e) {
-                if (field.getText().equals(placeholder)) {
-                    field.setText("");
-                    field.setForeground(Color.BLACK);
-                }
-            }
-
-            public void focusLost(java.awt.event.FocusEvent e) {
-                if (field.getText().isEmpty()) {
-                    field.setText(placeholder);
-                    field.setForeground(Color.GRAY);
-                }
-            }
-        });
+        field.setForeground(Color.BLACK);
 
         return field;
     }
 
-    public static JPasswordField createPasswordField(String placeholder) {
+    public static JPasswordField createPasswordField() {
         JPasswordField field = new JPasswordField();
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -44,27 +31,7 @@ public class UIUtils {
                 BorderFactory.createEmptyBorder(12, 12, 12, 12)
         ));
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        field.setText(placeholder);
-        field.setForeground(Color.GRAY);
-        field.setEchoChar((char) 0);
-
-        field.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent e) {
-                if (String.valueOf(field.getPassword()).equals(placeholder)) {
-                    field.setText("");
-                    field.setForeground(Color.BLACK);
-                    field.setEchoChar('•');
-                }
-            }
-
-            public void focusLost(java.awt.event.FocusEvent e) {
-                if (field.getPassword().length == 0) {
-                    field.setText(placeholder);
-                    field.setForeground(Color.GRAY);
-                    field.setEchoChar((char) 0);
-                }
-            }
-        });
+        field.setForeground(Color.BLACK);
 
         return field;
     }
@@ -125,7 +92,7 @@ public class UIUtils {
         return label;
     }
 
-    public static JComboBox<String> createJComboBox(String[] options, String placeholder) {
+    public static JComboBox<String> createJComboBox(String[] options) {
         JComboBox<String> comboBox = new JComboBox<>(options);
 
         comboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
@@ -139,44 +106,112 @@ public class UIUtils {
                 BorderFactory.createEmptyBorder(8, 10, 8, 10)
         ));
 
-        // Add placeholder-like behavior
-        comboBox.insertItemAt(placeholder, 0);
-        comboBox.setSelectedIndex(0);
-
-        comboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(
-                    JList<?> list, Object value, int index,
-                    boolean isSelected, boolean cellHasFocus) {
-
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-                if (value != null && value.equals(placeholder)) {
-                    setForeground(Color.GRAY);
-                } else {
-                    setForeground(Color.BLACK);
-                }
-
-                return this;
-            }
-        });
-
         return comboBox;
     }
 
-    public static String getActualText(JTextField field, String placeholder) {
-        String text = field.getText();
-        if (text.equals(placeholder)) {
-            return "";
-        }
-        return text;
+    public static JLabel createMenuTitle(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.BOLD, 16));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return label;
     }
 
-    public static String getActualPassword(JPasswordField field, String placeholder) {
-        String text = String.valueOf(field.getPassword());
-        if (text.equals(placeholder)) {
-            return "";
-        }
-        return text;
+    public static JButton createCRUDButton(String text) {
+        JButton button = new JButton(text);
+        Dimension buttonSize = new Dimension(150, 50);
+        button.setPreferredSize(buttonSize);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(99, 110, 114));
+        button.setForeground(Color.WHITE);
+        button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
+        return button;
+    }
+
+    public static JButton createIconButton(String icon, Color color) {
+        JButton btn = new JButton(icon);
+        btn.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 16));
+        btn.setForeground(new Color(150, 150, 150));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setToolTipText(icon.equals("✎") ? "Edit" : "Delete");
+        
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setForeground(color);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setForeground(new Color(150, 150, 150));
+            }
+        });
+        return btn;
+    }
+
+    public static JButton createLinkButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setForeground(new Color(37, 99, 235));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
+    public static JPanel createBadge(String text) {
+        RoundedPanel badge = new RoundedPanel(10);
+        badge.setBackground(new Color(243, 244, 246));
+        badge.setLayout(new FlowLayout(FlowLayout.CENTER, 8, 2));
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        label.setForeground(new Color(107, 114, 128));
+        badge.add(label);
+        return badge;
+    }
+
+    public static JTable createTable(TableModel model) {
+        JTable table = new JTable(model) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setFocusable(false);
+        table.setRowHeight(35);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setSelectionBackground(new Color(212, 230, 241));
+        table.setSelectionForeground(Color.BLACK);
+
+        // Header
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(new Color(37, 99, 235));
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        header.setPreferredSize(new Dimension(header.getWidth(), 40));
+
+        DefaultTableCellRenderer modernRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, 
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+                if (!isSelected) {
+                    setBackground(row % 2 == 0 ? Color.WHITE : new Color(244, 248, 251));
+                }
+                return this;
+            }
+        };
+
+        table.setDefaultRenderer(Object.class, modernRenderer);
+
+        return table;
     }
 }
