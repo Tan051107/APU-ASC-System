@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class Feedback extends BaseModel {
     private String appointmentId;
+    private String technicianFeedback;
     private Integer staffRating;
     private Integer technicianRating;
     private String comment;
@@ -12,18 +13,20 @@ public class Feedback extends BaseModel {
         super();
     }
 
-    public Feedback(String appointmentId,Integer staffRating, Integer technicianRating, String comment) {
+    public Feedback(String appointmentId, String technicianFeedback, Integer staffRating, Integer technicianRating, String comment) {
         super(); // Calls BaseModel's default constructor
         this.appointmentId = appointmentId;
+        this.technicianFeedback = technicianFeedback;
         this.staffRating = staffRating;                
         this.technicianRating = technicianRating;
         this.comment = comment;
     }
 
     public Feedback(String id, LocalDateTime createdAt, LocalDateTime updatedAt, 
-                       String appointmentId, Integer staffRating, Integer technicianRating, String comment) {
+                       String appointmentId, String technicianFeedback, Integer staffRating, Integer technicianRating, String comment) {
         super(id, createdAt, updatedAt); // Passes ID and timestamps up to BaseModel
         this.appointmentId = appointmentId;
+        this.technicianFeedback = technicianFeedback;
         this.staffRating = staffRating;
         this.technicianRating = technicianRating;
         this.comment = comment;
@@ -35,6 +38,14 @@ public class Feedback extends BaseModel {
 
     public void setAppointmentId(String appointmentId) {
         this.appointmentId = appointmentId;
+    }
+
+    public String getTechnicianFeedback() {
+        return technicianFeedback;
+    }
+
+    public void setTechnicianFeedback(String technicianFeedback) {
+        this.technicianFeedback = technicianFeedback;
     }
 
     public Integer getStaffRating() {
