@@ -4,10 +4,13 @@ import javax.swing.*;
 
 import models.Appointment;
 import models.CustomerCar;
+import models.Feedback;
 import models.User;
 import ui.controller.TechnicianMenuController;
 import ui.pages.TechnicianPanels.ViewAppointment;
 import ui.utils.UIUtils;
+import utils.validators.ValidationResult;
+import utils.validators.Validator;
 
 import java.awt.*;
 import java.time.LocalDate;
@@ -190,7 +193,7 @@ public class TechnicianMenu extends JFrame {
         nextDateBtn.setPreferredSize(rectangleSize);
         // Date Switcher:END
 
-        // Table reset event listener
+        // Refresh table runnable
         refreshAppointmentsTask = () -> {
             dateField.setText(currentDate[0].format(formatter));
             String currentSearch = searchField.getText();
@@ -216,11 +219,9 @@ public class TechnicianMenu extends JFrame {
 
         dateField.addActionListener(e -> {
             try {
-                // Try to parse what the user typed
                 currentDate[0] = LocalDate.parse(dateField.getText(), formatter);
                 refreshAppointmentsTask.run();
             } catch (DateTimeParseException ex) {
-                // If they type gibberish, show an error and revert to the last valid date
                 JOptionPane.showMessageDialog(panel, "Invalid date format. Please use YYYY-MM-DD", "Date Error", JOptionPane.ERROR_MESSAGE);
                 dateField.setText(currentDate[0].format(formatter));
             }
@@ -232,7 +233,6 @@ public class TechnicianMenu extends JFrame {
         controlsPanel.add(dateField);
         controlsPanel.add(nextDateBtn);
 
-        // Add the controls under the title, then put the whole thing in NORTH
         topContainer.add(controlsPanel);
         panel.add(topContainer, BorderLayout.NORTH);
 
@@ -262,10 +262,23 @@ public class TechnicianMenu extends JFrame {
                     User customer = controller.findCustomerById(selectedAppointment.getCustomerId());
                     User staff = controller.findStaffById(selectedAppointment.getStaffId()); 
                     CustomerCar car = controller.findCarByID(selectedAppointment.getCarId());
+                    Feedback feedback = controller.findFeedbackByAppointmentID(selectedAppointment.getId());
                     
-                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff, car);
+                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff, car, feedback);
                     viewPopup.completeButton.addActionListener(event -> {
-                        controller.completeAppointment(selectedAppointment, viewPopup);
+                        String feedbackText = viewPopup.feedbackArea.getText().trim();
+                        ValidationResult result = new ValidationResult();
+                        Validator.validateText(result, "Technician Feedback", feedbackText);
+                        if (result.hasError()) {
+                            JOptionPane.showMessageDialog(viewPopup, 
+                                result.getErrors(), 
+                                "Validation Error", 
+                                JOptionPane.WARNING_MESSAGE);
+                                
+                            return;
+                        }
+
+                        controller.completeAppointment(selectedAppointment, viewPopup, feedbackText);
                         if (refreshAppointmentsTask != null) {
                             refreshAppointmentsTask.run();
                         } 
@@ -279,7 +292,6 @@ public class TechnicianMenu extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
-                // Catch FileCorruptedException or general exceptions from reading the files
                 JOptionPane.showMessageDialog(null, 
                     "Error reading data: " + ex.getMessage(), 
                     "Data Error", 
@@ -318,7 +330,7 @@ public class TechnicianMenu extends JFrame {
 
         // Search Bar:END
 
-        // Table reset event listener
+        // Table reset runnable
         refreshHistoryTask = () -> {
             String currentSearch = searchField.getText();
             
@@ -342,6 +354,48 @@ public class TechnicianMenu extends JFrame {
         // Action Buttons
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton viewBtn = createCRUDButton("View");
+
+        // Action Button Listeners
+        viewBtn.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(null, 
+                    "Please select an appointment from the table first.", 
+                    "No Selection", 
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String selectedId = table.getValueAt(selectedRow, 0).toString();
+
+            try {
+                Appointment selectedAppointment = controller.findAppointmentById(selectedId);
+                
+                if (selectedAppointment != null) {
+                    User customer = controller.findCustomerById(selectedAppointment.getCustomerId());
+                    User staff = controller.findStaffById(selectedAppointment.getStaffId()); 
+                    CustomerCar car = controller.findCarByID(selectedAppointment.getCarId());
+                    Feedback feedback = controller.findFeedbackByAppointmentID(selectedAppointment.getId());
+                    
+                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff, car, feedback);
+
+                    viewPopup.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, 
+                        "Error: Could not find appointment details.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, 
+                    "Error reading data: " + ex.getMessage(), 
+                    "Data Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+
+
+        });
+
         bottomPanel.add(viewBtn);
         panel.add(bottomPanel, BorderLayout.SOUTH);
 
