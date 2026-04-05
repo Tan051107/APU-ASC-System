@@ -37,8 +37,8 @@ public class CustomerMenu extends JFrame {
     private JComboBox<String> appointmentComboBox;
     private JTextField staffField;
     private JTextField technicianField;
-    private JComboBox<String> staffRatingComboBox;
-    private JComboBox<String> technicianRatingComboBox;
+    private JSlider staffRatingSlider;
+    private JSlider technicianRatingSlider;
     private JTextArea commentTextArea;
 
     private JTextField profileNameField;
@@ -302,17 +302,13 @@ public class CustomerMenu extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Staff Rating *"));
-        staffRatingComboBox = new JComboBox<>(new String[]{"1", "2", "3", "4", "5"});
-        staffRatingComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        staffRatingComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(staffRatingComboBox);
+        staffRatingSlider = createRatingSlider();
+        mainPanel.add(staffRatingSlider);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Technician Rating *"));
-        technicianRatingComboBox = new JComboBox<>(new String[]{"1", "2", "3", "4", "5"});
-        technicianRatingComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        technicianRatingComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(technicianRatingComboBox);
+        technicianRatingSlider = createRatingSlider();
+        mainPanel.add(technicianRatingSlider);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Comment (Optional)"));
@@ -398,11 +394,11 @@ public class CustomerMenu extends JFrame {
     private void refreshFeedbackAppointmentDropdown() {
         appointmentComboBox.setModel(controller.getCompletedAppointmentComboModel());
         commentTextArea.setText("");
-        if (staffRatingComboBox.getItemCount() > 0) {
-            staffRatingComboBox.setSelectedIndex(0);
+        if (staffRatingSlider != null) {
+            staffRatingSlider.setValue(3);
         }
-        if (technicianRatingComboBox.getItemCount() > 0) {
-            technicianRatingComboBox.setSelectedIndex(0);
+        if (technicianRatingSlider != null) {
+            technicianRatingSlider.setValue(3);
         }
         updateSelectedAppointmentPeople();
     }
@@ -446,12 +442,24 @@ public class CustomerMenu extends JFrame {
 
         controller.submitFeedback(
                 appointmentComboBox.getSelectedItem().toString(),
-                staffRatingComboBox.getSelectedItem().toString(),
-                technicianRatingComboBox.getSelectedItem().toString(),
+                String.valueOf(staffRatingSlider.getValue()),
+                String.valueOf(technicianRatingSlider.getValue()),
                 commentTextArea.getText()
         );
 
         refreshFeedback();
         refreshFeedbackAppointmentDropdown();
+    }
+    
+    private JSlider createRatingSlider() {
+        JSlider slider = new JSlider(1, 5, 3);
+        slider.setMajorTickSpacing(1);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        slider.setSnapToTicks(true);
+        slider.setAlignmentX(Component.LEFT_ALIGNMENT);
+        slider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        slider.setBackground(Color.WHITE);
+        return slider;
     }
 }
