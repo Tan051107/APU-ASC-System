@@ -86,7 +86,7 @@ public class CustomerMenu extends JFrame {
         sidebar.add(btnComment);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnProfile);
-        sidebar.add(Box.createVerticalGlue());
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnLogout);
 
         add(sidebar, BorderLayout.WEST);
