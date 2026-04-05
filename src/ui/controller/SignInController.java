@@ -6,6 +6,7 @@ import ui.pages.Login;
 import ui.pages.CounterStaffMenu;
 import ui.pages.TechnicianMenu;
 import ui.pages.ManagerMenu;
+import ui.pages.CustomerMenu;
 import utils.validators.ValidationResult;
 import utils.validators.Validator;
 
@@ -82,8 +83,8 @@ public class SignInController {
     private void routeUser(User user) {
         switch (user.getUserType()){
             case CUSTOMER:
-                // CustomerMenu customerMenu = new CustomerMenu(user.getId());
-                // customerMenu.setVisible(true);
+                loginPage.dispose();
+                new CustomerMenu(user.getId()).setVisible(true);
                 break;
             case MANAGER:
                 ManagerMenu managerMenu = new ManagerMenu();
