@@ -3,9 +3,14 @@ package ui.pages;
 import javax.swing.*;
 
 import models.Appointment;
+import models.CustomerCar;
+import models.Feedback;
 import models.User;
 import ui.controller.TechnicianMenuController;
 import ui.pages.TechnicianPanels.ViewAppointment;
+import ui.utils.UIUtils;
+import utils.validators.ValidationResult;
+import utils.validators.Validator;
 
 import java.awt.*;
 import java.time.LocalDate;
@@ -29,7 +34,7 @@ public class TechnicianMenu extends JFrame {
     public TechnicianMenu(User user) {
         this.controller = new TechnicianMenuController(user.getId());
         setTitle("APU-ASC Technnician Dashboard");
-        setSize(900, 600);
+        setSize(1100, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -157,37 +162,38 @@ public class TechnicianMenu extends JFrame {
         JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         // Data
-        JTable table = new JTable(){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; 
-            }
-        };
+        JTable table = UIUtils.createTable(controller.getAppointmentsTableModel());
         table.setModel(controller.getAppointmentsTableModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getTableHeader().setReorderingAllowed(false);
 
         // Search Bar:START
-        controlsPanel.add(new JLabel("Search:"));
-        JTextField searchField = new JTextField(20);
+        controlsPanel.add(UIUtils.createLabel("Search: "));
+        JTextField searchField = UIUtils.createTextField();
+        searchField.setColumns(20);
         // Search Bar:END
 
         // Date Switcher:START
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        final LocalDate[] currentDate = { LocalDate.now() }; // Array used so it can be updated inside lambdas
+        final LocalDate[] currentDate = { LocalDate.now() }; 
+        Dimension rectangleSize = new Dimension(30, 42);
 
-        JButton prevDateBtn = new JButton("<");
+        JButton prevDateBtn = UIUtils.createPrimaryButton("<");
         prevDateBtn.setFocusPainted(false);
+        prevDateBtn.setPreferredSize(rectangleSize);
 
-        JTextField dateField = new JTextField(currentDate[0].format(formatter), 10);
+        JTextField dateField = UIUtils.createTextField();
+        dateField.setText(currentDate[0].format(formatter));
+        dateField.setColumns(10);
         dateField.setHorizontalAlignment(JTextField.CENTER);
         dateField.setFont(new Font("Arial", Font.BOLD, 14));
         
-        JButton nextDateBtn = new JButton(">");
+        JButton nextDateBtn = UIUtils.createPrimaryButton(">");
         nextDateBtn.setFocusPainted(false);
+        nextDateBtn.setPreferredSize(rectangleSize);
         // Date Switcher:END
 
-        // Table reset event listener
+        // Refresh table runnable
         refreshAppointmentsTask = () -> {
             dateField.setText(currentDate[0].format(formatter));
             String currentSearch = searchField.getText();
@@ -213,11 +219,9 @@ public class TechnicianMenu extends JFrame {
 
         dateField.addActionListener(e -> {
             try {
-                // Try to parse what the user typed
                 currentDate[0] = LocalDate.parse(dateField.getText(), formatter);
                 refreshAppointmentsTask.run();
             } catch (DateTimeParseException ex) {
-                // If they type gibberish, show an error and revert to the last valid date
                 JOptionPane.showMessageDialog(panel, "Invalid date format. Please use YYYY-MM-DD", "Date Error", JOptionPane.ERROR_MESSAGE);
                 dateField.setText(currentDate[0].format(formatter));
             }
@@ -229,7 +233,6 @@ public class TechnicianMenu extends JFrame {
         controlsPanel.add(dateField);
         controlsPanel.add(nextDateBtn);
 
-        // Add the controls under the title, then put the whole thing in NORTH
         topContainer.add(controlsPanel);
         panel.add(topContainer, BorderLayout.NORTH);
 
@@ -258,11 +261,27 @@ public class TechnicianMenu extends JFrame {
                 if (selectedAppointment != null) {
                     User customer = controller.findCustomerById(selectedAppointment.getCustomerId());
                     User staff = controller.findStaffById(selectedAppointment.getStaffId()); 
+                    CustomerCar car = controller.findCarByID(selectedAppointment.getCarId());
+                    Feedback feedback = controller.findFeedbackByAppointmentID(selectedAppointment.getId());
                     
-                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff);
+                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff, car, feedback);
                     viewPopup.completeButton.addActionListener(event -> {
-                        controller.completeAppointment(selectedAppointment, viewPopup);
-                        table.setModel(controller.getAppointmentsTableModel()); 
+                        String feedbackText = viewPopup.feedbackArea.getText().trim();
+                        ValidationResult result = new ValidationResult();
+                        Validator.validateText(result, "Technician Feedback", feedbackText);
+                        if (result.hasError()) {
+                            JOptionPane.showMessageDialog(viewPopup, 
+                                result.getErrors(), 
+                                "Validation Error", 
+                                JOptionPane.WARNING_MESSAGE);
+                                
+                            return;
+                        }
+
+                        controller.completeAppointment(selectedAppointment, viewPopup, feedbackText);
+                        if (refreshAppointmentsTask != null) {
+                            refreshAppointmentsTask.run();
+                        } 
                     });
 
                     viewPopup.setVisible(true);
@@ -273,7 +292,6 @@ public class TechnicianMenu extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
-                // Catch FileCorruptedException or general exceptions from reading the files
                 JOptionPane.showMessageDialog(null, 
                     "Error reading data: " + ex.getMessage(), 
                     "Data Error", 
@@ -300,22 +318,19 @@ public class TechnicianMenu extends JFrame {
         JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         // Data
-        JTable table = new JTable(){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; 
-            }
-        };
+        JTable table = UIUtils.createTable(controller.getHistoryAppointmentsTableModel());
         table.setModel(controller.getHistoryAppointmentsTableModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getTableHeader().setReorderingAllowed(false);
 
         // Search Bar:START
-        controlsPanel.add(new JLabel("Search:"));
-        JTextField searchField = new JTextField(20);
+        controlsPanel.add(UIUtils.createLabel("Search: "));
+        JTextField searchField = UIUtils.createTextField();
+        searchField.setColumns(30);
+
         // Search Bar:END
 
-        // Table reset event listener
+        // Table reset runnable
         refreshHistoryTask = () -> {
             String currentSearch = searchField.getText();
             
@@ -339,6 +354,48 @@ public class TechnicianMenu extends JFrame {
         // Action Buttons
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton viewBtn = createCRUDButton("View");
+
+        // Action Button Listeners
+        viewBtn.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(null, 
+                    "Please select an appointment from the table first.", 
+                    "No Selection", 
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String selectedId = table.getValueAt(selectedRow, 0).toString();
+
+            try {
+                Appointment selectedAppointment = controller.findAppointmentById(selectedId);
+                
+                if (selectedAppointment != null) {
+                    User customer = controller.findCustomerById(selectedAppointment.getCustomerId());
+                    User staff = controller.findStaffById(selectedAppointment.getStaffId()); 
+                    CustomerCar car = controller.findCarByID(selectedAppointment.getCarId());
+                    Feedback feedback = controller.findFeedbackByAppointmentID(selectedAppointment.getId());
+                    
+                    ViewAppointment viewPopup = new ViewAppointment(selectedAppointment, customer, staff, car, feedback);
+
+                    viewPopup.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, 
+                        "Error: Could not find appointment details.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, 
+                    "Error reading data: " + ex.getMessage(), 
+                    "Data Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+
+
+        });
+
         bottomPanel.add(viewBtn);
         panel.add(bottomPanel, BorderLayout.SOUTH);
 
