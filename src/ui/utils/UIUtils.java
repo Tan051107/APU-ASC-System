@@ -1,6 +1,10 @@
 package ui.utils;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
+
 import java.awt.*;
 
 public class UIUtils {
@@ -166,5 +170,48 @@ public class UIUtils {
         label.setForeground(new Color(107, 114, 128));
         badge.add(label);
         return badge;
+    }
+
+    public static JTable createTable(TableModel model) {
+        JTable table = new JTable(model) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setFocusable(false);
+        table.setRowHeight(35);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setSelectionBackground(new Color(212, 230, 241));
+        table.setSelectionForeground(Color.BLACK);
+
+        // Header
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(new Color(37, 99, 235));
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        header.setPreferredSize(new Dimension(header.getWidth(), 40));
+
+        DefaultTableCellRenderer modernRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, 
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+                if (!isSelected) {
+                    setBackground(row % 2 == 0 ? Color.WHITE : new Color(244, 248, 251));
+                }
+                return this;
+            }
+        };
+
+        table.setDefaultRenderer(Object.class, modernRenderer);
+
+        return table;
     }
 }
