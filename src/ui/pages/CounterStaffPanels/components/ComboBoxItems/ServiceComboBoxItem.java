@@ -1,4 +1,4 @@
-package ui.ComboBoxItems;
+package ui.pages.CounterStaffPanels.components.ComboBoxItems;
 
 public class ServiceComboBoxItem {
     private String id;
@@ -30,4 +30,15 @@ public class ServiceComboBoxItem {
         return serviceName;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if(this == object)return true;
+        if(!(object instanceof ServiceComboBoxItem))return false;
+        return this.id.equals(((ServiceComboBoxItem) object).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

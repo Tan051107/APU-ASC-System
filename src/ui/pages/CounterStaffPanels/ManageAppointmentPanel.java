@@ -3,6 +3,7 @@ package ui.pages.CounterStaffPanels;
 import exceptions.GetEntityListException;
 import models.Appointment;
 import models.Services;
+import models.User;
 import services.CustomerCarService;
 import services.ServicesService;
 import ui.utils.RoundedPanel;
@@ -12,6 +13,7 @@ import utils.DialogUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,8 +22,10 @@ public class ManageAppointmentPanel extends JPanel {
     private final JPanel rowsContainer;
     public JButton newAppointmentBtn;
     private List<Appointment> appointments;
+    private final User loginStaff;
 
-    public ManageAppointmentPanel() {
+    public ManageAppointmentPanel(User loginStaff) {
+        this.loginStaff = loginStaff;
         setLayout(new BorderLayout());
         setBackground(new Color(249, 250, 251)); // Very light gray background
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
@@ -85,7 +89,7 @@ public class ManageAppointmentPanel extends JPanel {
         return header;
     }
 
-    public void addAppointmentRow(Appointment appointment) {
+    public void addAppointmentRow(Appointment appointment, Consumer<Appointment> onEdit, Consumer<Appointment> onDelete , boolean showActionButtons) {
         ServicesService servicesService = new ServicesService();
         CustomerCarService customerCarService =new CustomerCarService();
         String serviceName = "Service";
@@ -148,7 +152,13 @@ public class ManageAppointmentPanel extends JPanel {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         actions.setOpaque(false);
         JButton editBtn = UIUtils.createIconButton("✎", new Color(37, 99, 235));
-        JButton deleteBtn = UIUtils.createIconButton("🗑", new Color(239, 68, 68));
+        JButton deleteBtn = UIUtils.createIconButton("\uD83D\uDEAB", new Color(239, 68, 68));
+        editBtn.setVisible(showActionButtons);
+        deleteBtn.setVisible(showActionButtons);
+        
+        editBtn.addActionListener(e -> onEdit.accept(appointment));
+        deleteBtn.addActionListener(e -> onDelete.accept(appointment));
+        
         actions.add(editBtn);
         actions.add(deleteBtn);
         row.add(actions);
@@ -174,6 +184,10 @@ public class ManageAppointmentPanel extends JPanel {
                 bg = new Color(219, 234, 254);
                 yield new Color(30, 64, 175);
             }
+            case "Cancelled"->{
+                bg = new Color(254, 242, 242);
+                yield new Color(185, 28, 28);
+            }
             default -> {
                 bg = new Color(243, 244, 246);
                 yield new Color(107, 114, 128);
@@ -196,5 +210,16 @@ public class ManageAppointmentPanel extends JPanel {
 
     public void setAppointments(List<Appointment> appointments) {
         this.appointments = appointments;
+        clearAppointments();
+    }
+
+    public void clearAppointments() {
+        rowsContainer.removeAll();
+        rowsContainer.revalidate();
+        rowsContainer.repaint();
+    }
+
+    public User getLoginStaff() {
+        return loginStaff;
     }
 }

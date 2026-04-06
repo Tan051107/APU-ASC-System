@@ -91,7 +91,7 @@ public class SignInController {
                 break;
             case COUNTER_STAFF:
                 loginPage.dispose();
-                new CounterStaffMenu().setVisible(true);
+                new CounterStaffMenu(user).setVisible(true);
                 break;
             case TECHNICIAN:
                 TechnicianMenu techMenu = new TechnicianMenu(user);

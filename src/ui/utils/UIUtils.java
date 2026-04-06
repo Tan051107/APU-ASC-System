@@ -152,7 +152,7 @@ public class UIUtils {
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setToolTipText(icon.equals("✎") ? "Edit" : "Delete");
+        btn.setToolTipText(icon.equals("✎") ? "Edit" : "Cancel");
         
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {

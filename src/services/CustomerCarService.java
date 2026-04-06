@@ -9,6 +9,7 @@ import utils.RandomIdGenerator;
 import java.io.*;
 import java.time.Year;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class CustomerCarService {
 
@@ -23,6 +24,10 @@ public class CustomerCarService {
 
     public List<CustomerCar> getCustomerCars(String customerId) throws FileCorruptedException {
         return customerCarCrudRepository.getAll(customerCar -> customerCar.getCustomerId().equalsIgnoreCase(customerId));
+    }
+
+    public CustomerCar getCarByCarPlate(String carPlate) throws FileCorruptedException {
+        return customerCarCrudRepository.getAll(customerCar -> customerCar.getCarPlate().equalsIgnoreCase(carPlate)).getFirst();
     }
 
     public CustomerCar getCarById(String id) throws GetEntityListException {

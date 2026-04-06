@@ -42,6 +42,10 @@ public class CustomerService {
         return customerCrudRepository.getAll(customer -> customer.getUserType().equals(UserType.CUSTOMER));
     }
 
+    public Customer findOne(String customerId) throws FileCorruptedException {
+        return customerCrudRepository.getOne(customerId);
+    }
+
     public List<Customer> getCustomersByNameOrEmail(String keyword) throws FileCorruptedException {
         String lowerCaseKeyword = keyword.toLowerCase();
         return getCustomers().stream()

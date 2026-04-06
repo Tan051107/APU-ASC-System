@@ -16,4 +16,8 @@ public class TechnicianService {
     public List<Technician> getTechnicians() throws FileCorruptedException {
         return technicianCrudRepository.getAll(technician -> technician.getUserType().equals(UserType.TECHNICIAN));
     }
+
+    public Technician findOne(String technicianId) throws FileCorruptedException {
+        return technicianCrudRepository.getOne(technicianId);
+    }
 }

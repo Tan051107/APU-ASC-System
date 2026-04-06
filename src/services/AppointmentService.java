@@ -2,6 +2,7 @@ package services;
 
 import java.util.List;
 
+import enums.AppointmentStatus;
 import exceptions.*;
 import mapper.AppointmentMapper;
 import models.Appointment;
@@ -36,7 +37,8 @@ public class AppointmentService {
         }
     }
 
-    //TODO If car got appointment within the date and time, don't allow add appointment
+
+    //TODO Need to create a payment record
     public void createAppointment(Appointment appointmentToAdd) throws Exception {
         try {
             // Generate a unique ID and assign it before saving
@@ -46,7 +48,7 @@ public class AppointmentService {
             if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
                 throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
             }
-            if(carHasClashAppointment(appointmentToAdd)){
+            if(carHasClashAppointment(appointmentToAdd, "")){
                 throw new BusinessRuleException("Car already has an appointment during the date and time chosen");
             }
 
@@ -56,8 +58,20 @@ public class AppointmentService {
         }
     }
 
-    public void updateAppointment(Appointment appointmentToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, UpdateException {
+    public void updateAppointment(Appointment appointmentToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException {
+        LocalDateTime chosenAppointmentDateTime = LocalDateTime.of(appointmentToUpdate.getDate(),appointmentToUpdate.getTime());
+        if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
+            throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
+        }
+        if(carHasClashAppointment(appointmentToUpdate, appointmentToUpdate.getId())){
+            throw new BusinessRuleException("Car already has an appointment during the date and time chosen");
+        }
         appointmentRepository.update(appointmentToUpdate);
+    }
+
+    public void cancelAppointment(Appointment appointmentToCancel) throws FileCorruptedException, NotFoundException {
+        appointmentToCancel.setStatusService(AppointmentStatus.CANCELLED);
+        appointmentRepository.update(appointmentToCancel);
     }
 
     public List<Appointment> getAppointments() throws FileCorruptedException {
@@ -68,7 +82,7 @@ public class AppointmentService {
         return appointmentRepository.getAll(appointment -> appointment.getTechnicianId().equalsIgnoreCase(technicianId));
     }
 
-    public List<Technician> getAvailableTechnicians(LocalDateTime appointmentDateTime ,int durationInHour) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException {
+    public List<Technician> getAvailableTechnicians(LocalDateTime appointmentDateTime ,int durationInHour, String appointmentToIgnore) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException {
         if(isNotValidAppointmentDateTime(appointmentDateTime)){
             throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
         }
@@ -80,7 +94,9 @@ public class AppointmentService {
         }
         for(Technician technician : technicians){
             String technicianId = technician.getId();
-            List<Appointment> assignedAppointments = getAppointmentsByTechnician(technicianId);
+            List<Appointment> assignedAppointments = getAppointmentsByTechnician(technicianId).stream()
+                    .filter(appointment -> !appointment.getId().equalsIgnoreCase(appointmentToIgnore))
+                    .toList(); //Remove appointment to ignore from checking
             if(assignedAppointments.isEmpty()){
                 availableTechnicians.add(technician);
                 continue;
@@ -98,6 +114,9 @@ public class AppointmentService {
 
     private boolean technicianIsFree(List<Appointment> assignedAppointments , LocalDateTime newAppointmentDateTime , int newAppointmentDurationInHour) throws GetEntityListException {
         for(Appointment assignedAppointment : assignedAppointments){
+            if(!assignedAppointment.getStatusService().equals(AppointmentStatus.ASSIGNED)){
+                continue;
+            } //Skip appointments that are cancelled/completed - No need check
             LocalTime assignedAppointmentStartTime = assignedAppointment.getTime();
             int appointmentDuration = servicesService.getServicesById(assignedAppointment.getServiceId()).getServiceDuration();
             LocalTime assignedAppointmentEndTime = assignedAppointmentStartTime.plusHours(appointmentDuration);
@@ -140,9 +159,9 @@ public class AppointmentService {
         return chosenAppointmentDateTime.isBefore(currentDateTime) || chosenAppointmentDateTime.isAfter(maxAllowedAppointmentDateTime);
     }
 
-    private boolean carHasClashAppointment(Appointment newAppointment) throws FileCorruptedException, GetEntityListException {
+    private boolean carHasClashAppointment(Appointment newAppointment , String appointmentToIgnore) throws FileCorruptedException, GetEntityListException {
         String appointmentCar = newAppointment.getCarId();
-        List<Appointment> carAppointments = appointmentRepository.getAll(appointment -> appointment.getCarId().equalsIgnoreCase(appointmentCar));
+        List<Appointment> carAppointments = appointmentRepository.getAll(appointment -> appointment.getCarId().equalsIgnoreCase(appointmentCar) && !appointment.getId().equalsIgnoreCase(appointmentToIgnore)); //Remove appointment to ignore from checking
         if(carAppointments.isEmpty()){
             return false;
         }
@@ -151,9 +170,9 @@ public class AppointmentService {
         LocalDateTime newAppointmentStartDateTime = LocalDateTime.of(newAppointment.getDate(),newAppointment.getTime());
         LocalDateTime newAppointmentEndDateTime = newAppointmentStartDateTime.plusHours(newAppointmentDuration);
         for(Appointment appointment : carAppointments){
-            int existingAppointmentDuration = servicesService.getServicesById(newAppointment.getServiceId()).getServiceDuration();
+            int existingAppointmentDuration = servicesService.getServicesById(appointment.getServiceId()).getServiceDuration();
             LocalDateTime existingAppointmentStartDateTime = LocalDateTime.of(appointment.getDate(),appointment.getTime());
-            LocalDateTime existingAppointmentEndDateTime = newAppointmentStartDateTime.plusHours(existingAppointmentDuration);
+            LocalDateTime existingAppointmentEndDateTime = existingAppointmentStartDateTime.plusHours(existingAppointmentDuration);
             if(newAppointmentEndDateTime.isAfter(existingAppointmentStartDateTime) && newAppointmentStartDateTime.isBefore(existingAppointmentEndDateTime)){
                 return true;
             }

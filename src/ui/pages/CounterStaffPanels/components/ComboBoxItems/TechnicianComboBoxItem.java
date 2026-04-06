@@ -1,4 +1,4 @@
-package ui.ComboBoxItems;
+package ui.pages.CounterStaffPanels.components.ComboBoxItems;
 
 public class TechnicianComboBoxItem {
     private String technicianId;
@@ -28,5 +28,17 @@ public class TechnicianComboBoxItem {
     @Override
     public String toString() {
         return technicianId + technicianName;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if(this == object)return true;
+        if(!(object instanceof TechnicianComboBoxItem))return false;
+        return this.technicianId.equals(((TechnicianComboBoxItem) object).technicianId);
+    }
+
+    @Override
+    public int hashCode() {
+        return technicianId.hashCode();
     }
 }

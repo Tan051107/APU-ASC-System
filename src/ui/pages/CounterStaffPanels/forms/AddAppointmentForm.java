@@ -1,8 +1,10 @@
 package ui.pages.CounterStaffPanels.forms;
 
-import ui.ComboBoxItems.CustomerComboBoxItem;
-import ui.ComboBoxItems.ServiceComboBoxItem;
-import ui.ComboBoxItems.TechnicianComboBoxItem;
+import models.Appointment;
+import models.User;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomerComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.TechnicianComboBoxItem;
 import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
@@ -20,8 +22,14 @@ public class AddAppointmentForm extends JFrame {
     public JComboBox<TechnicianComboBoxItem> technicianSelectionCombo;
     public Component technicianSpacing;
     public JButton createAppointmentBtn;
+    private Appointment appointmentToEdit;
+    private boolean isEdit;
+    private final User loginStaff;
 
-    public AddAppointmentForm() {
+    public AddAppointmentForm(boolean isEdit , Appointment appointmentToEdit, User loginStaff) {
+        this.loginStaff =loginStaff;
+        this.appointmentToEdit = appointmentToEdit;
+        this.isEdit  = isEdit;
         setTitle("Create New Appointment");
         setSize(500, 750);
         setLocationRelativeTo(null);
@@ -107,7 +115,7 @@ public class AddAppointmentForm extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 
         // --- Submit Button ---
-        createAppointmentBtn = UIUtils.createPrimaryButton("Create Appointment");
+        createAppointmentBtn = UIUtils.createPrimaryButton(isEdit ? "Update Appointment" : "Create Appointment");
         createAppointmentBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         mainPanel.add(createAppointmentBtn);
 
@@ -115,5 +123,25 @@ public class AddAppointmentForm extends JFrame {
         mainScroll.setBorder(null);
         mainScroll.getVerticalScrollBar().setUnitIncrement(16);
         add(mainScroll);
+    }
+
+    public Appointment getAppointmentToEdit() {
+        return appointmentToEdit;
+    }
+
+    public void setAppointmentToEdit(Appointment appointmentToEdit) {
+        this.appointmentToEdit = appointmentToEdit;
+    }
+
+    public boolean isEdit() {
+        return isEdit;
+    }
+
+    public void setEdit(boolean edit) {
+        isEdit = edit;
+    }
+
+    public User getLoginStaff() {
+        return loginStaff;
     }
 }
