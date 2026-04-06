@@ -1,12 +1,14 @@
 package ui.pages.CounterStaffPanels.forms;
 
+import ui.ComboBoxItems.CustomerComboBoxItem;
 import ui.ComboBoxItems.ServiceComboBoxItem;
+import ui.ComboBoxItems.TechnicianComboBoxItem;
 import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
 public class AddAppointmentForm extends JFrame {
-    public JComboBox<String> customerSelectionCombo;
+    public JComboBox<CustomerComboBoxItem> customerSelectionCombo;
     public JComboBox<ServiceComboBoxItem> serviceTypeCombo;
     public JFormattedTextField dateField;
     public JFormattedTextField timeField;
@@ -15,7 +17,7 @@ public class AddAppointmentForm extends JFrame {
     public JComboBox<String> carPlateSelectionCombo;
     public Component carPlateSpacing;
     public JLabel technicianLabel;
-    public JComboBox<String> technicianSelectionCombo;
+    public JComboBox<TechnicianComboBoxItem> technicianSelectionCombo;
     public Component technicianSpacing;
     public JButton createAppointmentBtn;
 
@@ -39,7 +41,7 @@ public class AddAppointmentForm extends JFrame {
         // --- Customer Selection ---
         mainPanel.add(UIUtils.createLabel("Select Customer *"));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));// Placeholders
-        String [] options = {"Select Customer"};
+        CustomerComboBoxItem[] options = {new CustomerComboBoxItem("" , "Select a customer")};
         customerSelectionCombo = UIUtils.createJComboBox(options);
         mainPanel.add(customerSelectionCombo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -80,7 +82,7 @@ public class AddAppointmentForm extends JFrame {
         technicianLabel = UIUtils.createLabel("Select Available Technician *");
         mainPanel.add(technicianLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        String[] technicianOptions = {}; // Placeholders
+        TechnicianComboBoxItem[] technicianOptions = {new TechnicianComboBoxItem("" , "Select a technician")}; // Placeholders
         technicianSelectionCombo = UIUtils.createJComboBox(technicianOptions);
         mainPanel.add(technicianSelectionCombo);
         technicianSpacing = Box.createRigidArea(new Dimension(0, 20));

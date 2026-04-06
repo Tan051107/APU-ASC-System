@@ -1,14 +1,14 @@
 package ui.controller.CounterStaffControllers.FormController;
 
+import exceptions.BusinessRuleException;
 import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import exceptions.NotFoundException;
-import models.Customer;
-import models.CustomerCar;
-import models.Services;
-import models.Technician;
+import models.*;
 import services.*;
+import ui.ComboBoxItems.CustomerComboBoxItem;
 import ui.ComboBoxItems.ServiceComboBoxItem;
+import ui.ComboBoxItems.TechnicianComboBoxItem;
 import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
 import utils.DialogUtil;
 
@@ -79,7 +79,8 @@ public class AddAppointmentFormController {
             }
             else{
                 for(Customer customer : customers){
-                    addAppointmentForm.customerSelectionCombo.addItem(customer.getId());
+                    CustomerComboBoxItem customerComboBoxItem= new CustomerComboBoxItem(customer.getId() , " | " + customer.getName());
+                    addAppointmentForm.customerSelectionCombo.addItem(customerComboBoxItem);
                 }
             }
         } catch (FileCorruptedException e) {
@@ -111,6 +112,43 @@ public class AddAppointmentFormController {
         }
     }
 
+
+    private void getAvailableTechnicians(){
+        addAppointmentForm.technicianSelectionCombo.removeAllItems();
+        String selectedAppointmentDate = addAppointmentForm.dateField.getText();
+        String selectedAppointmentTime = addAppointmentForm.timeField.getText();
+        ServiceComboBoxItem serviceSelected = (ServiceComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
+        if(!selectedAppointmentTime.isEmpty() && !selectedAppointmentDate.isEmpty() && !(serviceSelected == null)){
+            String serviceSelectedId = serviceSelected.getId();
+            try {
+                int selectedServiceDuration = servicesService.getServicesById(serviceSelectedId).getServiceDuration();
+                String appointmentDateTimeString = selectedAppointmentDate+" "+selectedAppointmentTime;
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                LocalDateTime appointmentDateTime = LocalDateTime.parse(appointmentDateTimeString, formatter);
+                AppointmentService appointmentService = new AppointmentService();
+                List<Technician> availableTechnicians = appointmentService.getAvailableTechnicians(appointmentDateTime,selectedServiceDuration);
+                if(!availableTechnicians.isEmpty()){
+                    for(Technician availableTechnician : availableTechnicians){
+                        TechnicianComboBoxItem technicianComboBoxItem = new TechnicianComboBoxItem(availableTechnician.getId(), " | "+availableTechnician.getName());
+                        addAppointmentForm.technicianSelectionCombo.addItem(technicianComboBoxItem);
+                    }
+                    showTechnicianField();
+                }
+            } catch (GetEntityListException | NotFoundException | BusinessRuleException e) {
+                DialogUtil.showErrorMessage("Failed to get available technician" , e.getMessage());
+            }
+            catch (DateTimeParseException e){
+                DialogUtil.showErrorMessage("Failed to get available technician" , "Please fill in appointment date and time");
+                logger.log(Level.SEVERE , e.getMessage());
+            } catch (FileCorruptedException e) {
+                logger.log(Level.SEVERE , e.getMessage());
+            }
+        }
+    }
+
+//    private Appointment fieldToAppointment(){
+//    }
+
     private void hideCarPlateField(){
         addAppointmentForm.carPlateLabel.setVisible(false);
         addAppointmentForm.carPlateSelectionCombo.setVisible(false);
@@ -133,37 +171,5 @@ public class AddAppointmentFormController {
         addAppointmentForm.technicianLabel.setVisible(true);
         addAppointmentForm.technicianSelectionCombo.setVisible(true);
         addAppointmentForm.technicianSpacing.setVisible(true);
-    }
-
-    private void getAvailableTechnicians(){
-        addAppointmentForm.technicianSelectionCombo.removeAllItems();
-        String selectedAppointmentDate = addAppointmentForm.dateField.getText();
-        String selectedAppointmentTime = addAppointmentForm.timeField.getText();
-        ServiceComboBoxItem serviceSelected = (ServiceComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
-        if(!selectedAppointmentTime.isEmpty() && !selectedAppointmentDate.isEmpty() && !(serviceSelected == null)){
-            String serviceSelectedId = serviceSelected.getId();
-            try {
-                int selectedServiceDuration = servicesService.getServicesById(serviceSelectedId).getServiceDuration();
-                String appointmentDateTimeString = selectedAppointmentDate+" "+selectedAppointmentTime;
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                LocalDateTime appointmentDateTime = LocalDateTime.parse(appointmentDateTimeString, formatter);
-                AppointmentService appointmentService = new AppointmentService();
-                List<Technician> availableTechnicians = appointmentService.getAvailableTechnicians(appointmentDateTime,selectedServiceDuration);
-                if(!availableTechnicians.isEmpty()){
-                    for(Technician availableTechnician : availableTechnicians){
-                        addAppointmentForm.technicianSelectionCombo.addItem(availableTechnician.getId());
-                    }
-                    showTechnicianField();
-                }
-            } catch (GetEntityListException | NotFoundException e) {
-                DialogUtil.showErrorMessage("Failed to get available technician" , e.getMessage());
-            }
-            catch (DateTimeParseException e){
-                DialogUtil.showErrorMessage("Failed to get available technician" , "Please fill in appointment date and time");
-                logger.log(Level.SEVERE , e.getMessage());
-            } catch (FileCorruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 }
