@@ -41,25 +41,7 @@ public class ManageCustomerPanel extends JPanel {
         searchField.setPreferredSize(new Dimension(250, 45));
         searchField.setMaximumSize(new Dimension(250, 45));
         searchField.setAlignmentX(Component.LEFT_ALIGNMENT);
-        //Search field placeholder
-        searchField.setText("Search by name or email");
-        searchField.setForeground(Color.GRAY);
-        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-            public void focusGained(java.awt.event.FocusEvent e) {
-                if (searchField.getText().equals("Search by name or email")) {
-                    searchField.setText("");
-                    searchField.setForeground(Color.BLACK);
-                }
-            }
-            @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
-                if (searchField.getText().isEmpty()) {
-                    searchField.setText("Search by name or email...");
-                    searchField.setForeground(Color.GRAY);
-                }
-            }
-        });
+        searchField.setToolTipText("Search by name or email");
         leftHeader.add(searchField);
 
         topHeader.add(leftHeader, BorderLayout.WEST);

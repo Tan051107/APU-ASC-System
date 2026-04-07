@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -84,9 +83,9 @@ public class AddAppointmentFormController {
             try {
 
                 String carPlate = customerCarService.getCarById(appointmentToEdit.getCarId()).getCarPlate();
-                String customerName = customerService.findOne(customerId).getName();
+                String customerName = customerService.getCustomerById(customerId).getName();
                 String serviceName = servicesService.findOne(serviceId).getServiceName();
-                String technicianName = technicianService.findOne(technicianId).getName();
+                String technicianName = technicianService.getTechnicianById(technicianId).getName();
                 addAppointmentForm.customerSelectionCombo.setSelectedItem(new CustomerComboBoxItem(customerId , " | " + customerName));
                 addAppointmentForm.serviceTypeCombo.setSelectedItem(new ServiceComboBoxItem(serviceId , " | " + serviceName));
                 addAppointmentForm.timeField.setText(appointmentTime);

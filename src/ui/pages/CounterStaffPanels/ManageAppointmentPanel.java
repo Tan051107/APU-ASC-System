@@ -1,11 +1,13 @@
 package ui.pages.CounterStaffPanels;
 
+import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
-import models.Appointment;
-import models.Services;
-import models.User;
+import models.*;
 import services.CustomerCarService;
+import services.CustomerService;
 import services.ServicesService;
+import services.TechnicianService;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
 import ui.utils.RoundedPanel;
 import ui.utils.UIUtils;
 import utils.DialogUtil;
@@ -21,6 +23,10 @@ public class ManageAppointmentPanel extends JPanel {
     private final Logger logger = Logger.getLogger(ManageAppointmentPanel.class.getName());
     private final JPanel rowsContainer;
     public JButton newAppointmentBtn;
+    public JButton exportBtn;
+    public JTextField searchField;
+    public JComboBox<ServiceComboBoxItem> serviceTypeFilterCombo;
+    public JComboBox<String> statusFilterCombo;
     private List<Appointment> appointments;
     private final User loginStaff;
 
@@ -31,21 +37,73 @@ public class ManageAppointmentPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
         // --- TOP HEADER ---
-        JPanel topHeader = new JPanel(new BorderLayout());
-        topHeader.setOpaque(false);
-        topHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        JPanel headerContainer = new JPanel();
+        headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.Y_AXIS));
+        headerContainer.setOpaque(false);
+        headerContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+
+        // Row 1: Title and Buttons
+        JPanel titleAndButtonsPanel = new JPanel(new BorderLayout());
+        titleAndButtonsPanel.setOpaque(false);
 
         JLabel title = new JLabel("Appointments");
         title.setFont(new Font("Segoe UI", Font.BOLD, 22));
         title.setForeground(new Color(31, 41, 55));
-        topHeader.add(title, BorderLayout.WEST);
+        titleAndButtonsPanel.add(title, BorderLayout.WEST);
+
+        // Right Header: Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        buttonPanel.setOpaque(false);
+
+        exportBtn = UIUtils.createSecondaryButton("Export Appointments");
+        exportBtn.setPreferredSize(new Dimension(180, 40));
+        buttonPanel.add(exportBtn);
 
         newAppointmentBtn = UIUtils.createPrimaryButton("+ New Appointment");
         newAppointmentBtn.setPreferredSize(new Dimension(180, 40));
+        buttonPanel.add(newAppointmentBtn);
 
-        topHeader.add(newAppointmentBtn, BorderLayout.EAST);
+        titleAndButtonsPanel.add(buttonPanel, BorderLayout.EAST);
+        headerContainer.add(titleAndButtonsPanel);
 
-        add(topHeader, BorderLayout.NORTH);
+        // Row 2: Spacing and Search Field
+        headerContainer.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
+        searchPanel.setOpaque(false);
+
+        searchField = UIUtils.createTextField();
+        searchField.setPreferredSize(new Dimension(300, 45));
+        searchField.setMaximumSize(new Dimension(300, 45));
+        searchField.setToolTipText("Search by ID, Technician, Customer, or Vehicle");
+        searchPanel.add(searchField);
+
+        // --- Service Type Filter ---
+        JPanel serviceTypeFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        serviceTypeFilterPanel.setOpaque(false);
+        JLabel serviceLabel = UIUtils.createLabel("Service Type:");
+        serviceTypeFilterPanel.add(serviceLabel);
+        ServiceComboBoxItem serviceComboBoxItem = new ServiceComboBoxItem("" , "All");
+        ServiceComboBoxItem[] serviceOptions = {serviceComboBoxItem};
+        serviceTypeFilterCombo = UIUtils.createJComboBox(serviceOptions);
+        serviceTypeFilterCombo.setPreferredSize(new Dimension(180, 45));
+        serviceTypeFilterPanel.add(serviceTypeFilterCombo);
+        searchPanel.add(serviceTypeFilterPanel);
+
+        // --- Status Filter ---
+        JPanel statusFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        statusFilterPanel.setOpaque(false);
+        JLabel statusLabel = UIUtils.createLabel("Status:");
+        statusFilterPanel.add(statusLabel);
+        String[] statusOptions = {"All", "Assigned", "Completed", "Cancelled"};
+        statusFilterCombo = UIUtils.createJComboBox(statusOptions);
+        statusFilterCombo.setPreferredSize(new Dimension(150, 45));
+        statusFilterPanel.add(statusFilterCombo);
+        searchPanel.add(statusFilterPanel);
+
+        headerContainer.add(searchPanel);
+
+        add(headerContainer, BorderLayout.NORTH);
 
         // --- TABLE CONTAINER ---
         RoundedPanel tableCard = new RoundedPanel(15);
@@ -79,7 +137,7 @@ public class ManageAppointmentPanel extends JPanel {
                 BorderFactory.createEmptyBorder(12, 15, 12, 15)
         ));
 
-        String[] cols = {"ID", "Customer", "Vehicle", "Technician", "Type", "Date", "Time", "Duration", "Status", "Actions"};
+        String[] cols = {"ID", "Customer", "Car Plate", "Technician", "Service", "Date", "Time", "Duration (hr)", "Status", "Actions"};
         for (String col : cols) {
             JLabel label = new JLabel(col);
             label.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -92,16 +150,33 @@ public class ManageAppointmentPanel extends JPanel {
     public void addAppointmentRow(Appointment appointment, Consumer<Appointment> onEdit, Consumer<Appointment> onDelete , boolean showActionButtons) {
         ServicesService servicesService = new ServicesService();
         CustomerCarService customerCarService =new CustomerCarService();
+        CustomerService customerService = new CustomerService();
+        TechnicianService technicianService = new TechnicianService();
         String serviceName = "Service";
-        String serviceDuration = "Service Duration";
+        String serviceDuration = "0";
+        String customerName = "Unknown";
+        String technicianName = "Unassigned";
         try {
             Services selectedService = servicesService.getServicesById(appointment.getServiceId());
-            serviceName = selectedService.getServiceName();
-            serviceDuration = String.valueOf(selectedService.getServiceDuration());
-        } catch (GetEntityListException e) {
-            DialogUtil.showErrorMessage("Encountered error" , "Failed to get service");
+            if (selectedService != null) {
+                serviceName = selectedService.getServiceName();
+                serviceDuration = String.valueOf(selectedService.getServiceDuration());
+            }
+            
+            Customer customer = customerService.getCustomerById(appointment.getCustomerId());
+            if (customer != null) {
+                customerName = customer.getName();
+            }
+
+            Technician technician = technicianService.getTechnicianById(appointment.getTechnicianId());
+            if (technician != null) {
+                technicianName = technician.getName();
+            }
+        } catch (GetEntityListException | FileCorruptedException e) {
+            DialogUtil.showErrorMessage("Encountered error" , "Failed to fetch appointment details");
             logger.log(Level.SEVERE , e.getMessage());
         }
+        
         JPanel row = new JPanel(new GridLayout(1, 10, 10, 0));
         row.setOpaque(false);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
@@ -117,28 +192,32 @@ public class ManageAppointmentPanel extends JPanel {
         row.add(idLbl);
 
         // Customer
-        JLabel custLbl = new JLabel(appointment.getCustomerId());
-        custLbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        custLbl.setForeground(new Color(31, 41, 55));
-        row.add(custLbl);
+        JLabel customerLbl = new JLabel(customerName);
+        customerLbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        customerLbl.setForeground(new Color(31, 41, 55));
+        row.add(customerLbl);
 
-        // Vehicle
+        // Car Plate
         try {
-            String carPlate = customerCarService.getCarById(appointment.getCarId()).getCarPlate();
+            CustomerCar car = customerCarService.getCarById(appointment.getCarId());
+            String carPlate = (car != null) ? car.getCarPlate() : "Unknown";
             row.add(createLabel(carPlate));
         } catch (GetEntityListException e) {
-            DialogUtil.showErrorMessage("Encountered error" , "Failed to get car plate");
-            logger.log(Level.SEVERE , e.getMessage());
+            row.add(createLabel("Unknown"));
         }
 
         // Technician
-        row.add(createLabel(appointment.getTechnicianId()));
-        // Service Type
+        row.add(createLabel(technicianName));
+
+        // Service
         row.add(createLabel(serviceName));
+
         // Date
         row.add(createLabel(appointment.getDate().toString()));
+
         // Time
         row.add(createLabel(appointment.getTime().toString()));
+
         // Duration
         row.add(createLabel(serviceDuration));
 

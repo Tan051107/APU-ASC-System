@@ -16,7 +16,7 @@ public class UserService {
     private final String USER_FILE = "txt_files/User.txt";
     private final UserMapper userMapper = new UserMapper();
     private final CrudRepository<User> userRepository = new CrudRepository<>(USER_FILE , userMapper);
-    private final Logger logger = Logger.getLogger(UserService.class.getName());
+//    private final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public List<User> getUsers() throws GetEntityListException {
         try{

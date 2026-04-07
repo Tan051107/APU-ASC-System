@@ -7,6 +7,7 @@ import models.Technician;
 import repositories.CrudRepository;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class TechnicianService {
     private final String USER_FILE = "txt_files/User.txt";
@@ -17,7 +18,11 @@ public class TechnicianService {
         return technicianCrudRepository.getAll(technician -> technician.getUserType().equals(UserType.TECHNICIAN));
     }
 
-    public Technician findOne(String technicianId) throws FileCorruptedException {
+    public List<Technician> getTechnicians(Predicate<Technician> filter) throws FileCorruptedException {
+        return technicianCrudRepository.getAll(filter);
+    }
+
+    public Technician getTechnicianById(String technicianId) throws FileCorruptedException {
         return technicianCrudRepository.getOne(technicianId);
     }
 }

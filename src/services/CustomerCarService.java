@@ -38,6 +38,10 @@ public class CustomerCarService {
         }
     }
 
+    public List<CustomerCar>customerCars(Predicate<CustomerCar> filter) throws FileCorruptedException {
+        return customerCarCrudRepository.getAll(filter);
+    }
+
     public void addCar(CustomerCar carToAdd) throws AddException, IOException, FileCorruptedException {
         boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate())).isEmpty();
         final int maxCarAllowed = 3;

@@ -8,25 +8,24 @@ public class PaymentRecord extends BaseModel {
     private LocalDateTime paymentDateTime;
     private String paymentMethod;  //TODO Need??
     private boolean hasPaid;
-    private String issuedBy;
 
-    public PaymentRecord(String appointmentId, double amount, LocalDateTime paymentDateTime, String paymentMethod, boolean hasPaid, String issuedBy) {
+    public PaymentRecord(){}
+
+    public PaymentRecord(String appointmentId, double amount, LocalDateTime paymentDateTime, String paymentMethod, boolean hasPaid) {
         this.appointmentId = appointmentId;
         this.amount = amount;
         this.paymentDateTime = paymentDateTime;
         this.paymentMethod = paymentMethod;
         this.hasPaid = hasPaid;
-        this.issuedBy = issuedBy;
     }
 
-    public PaymentRecord(String id, LocalDateTime createdAt, LocalDateTime updatedAt, String appointmentId, double amount, LocalDateTime paymentDateTime, String paymentMethod, boolean hasPaid, String issuedBy) {
+    public PaymentRecord(String id, LocalDateTime createdAt, LocalDateTime updatedAt, String appointmentId, double amount, LocalDateTime paymentDateTime, String paymentMethod, boolean hasPaid) {
         super(id, createdAt, updatedAt);
         this.appointmentId = appointmentId;
         this.amount = amount;
         this.paymentDateTime = paymentDateTime;
         this.paymentMethod = paymentMethod;
         this.hasPaid = hasPaid;
-        this.issuedBy = issuedBy;
     }
 
     public String getAppointmentId() {
@@ -67,13 +66,5 @@ public class PaymentRecord extends BaseModel {
 
     public void setHasPaid(boolean hasPaid) {
         this.hasPaid = hasPaid;
-    }
-
-    public String getIssuedBy() {
-        return issuedBy;
-    }
-
-    public void setIssuedBy(String issuedBy) {
-        this.issuedBy = issuedBy;
     }
 }
