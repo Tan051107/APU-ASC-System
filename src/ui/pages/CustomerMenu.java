@@ -295,15 +295,15 @@ public class CustomerMenu extends JFrame {
         mainPanel.add(staffField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
+        mainPanel.add(UIUtils.createLabel("Counter Staff Rating *"));
+        staffRatingSlider = createRatingSlider();
+        mainPanel.add(staffRatingSlider);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
         mainPanel.add(UIUtils.createLabel("Technician"));
         technicianField = UIUtils.createTextField();
         technicianField.setEditable(false);
         mainPanel.add(technicianField);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        mainPanel.add(UIUtils.createLabel("Staff Rating *"));
-        staffRatingSlider = createRatingSlider();
-        mainPanel.add(staffRatingSlider);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Technician Rating *"));
@@ -460,6 +460,53 @@ public class CustomerMenu extends JFrame {
         slider.setAlignmentX(Component.LEFT_ALIGNMENT);
         slider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
         slider.setBackground(Color.WHITE);
+        slider.setFont(new Font("Segoe UI", Font.BOLD, 13));
+
+        slider.setUI(new javax.swing.plaf.basic.BasicSliderUI(slider) {
+            @Override
+            protected Dimension getThumbSize() {
+                return new Dimension(14, 20); 
+            }
+
+            @Override
+            public void paintTrack(Graphics g) {
+                Rectangle trackBounds = trackRect;
+                int trackHeight = 4; 
+                int trackY = trackBounds.y + (trackBounds.height - trackHeight) / 2;
+
+                g.setColor(new Color(220, 220, 220)); 
+                g.fillRect(trackBounds.x, trackY, trackBounds.width, trackHeight);
+
+                int thumbX = thumbRect.x + thumbRect.width / 2;
+                int filledWidth = thumbX - trackBounds.x;
+                
+                if (filledWidth > 0) {
+                    g.setColor(new Color(37, 99, 235)); 
+                    g.fillRect(trackBounds.x, trackY, filledWidth, trackHeight);
+                }
+            }
+
+            @Override
+            public void paintThumb(Graphics g) {
+                int x = thumbRect.x;
+                int y = thumbRect.y;
+                int w = thumbRect.width;
+                int h = thumbRect.height;
+
+                int[] xPoints = {x, x + w - 1, x + w - 1, x + w / 2, x};
+                int[] yPoints = {y, y, y + h - 6, y + h - 1, y + h - 6};
+
+                g.setColor(new Color(245, 245, 245));
+                g.fillPolygon(xPoints, yPoints, 5);
+
+                g.setColor(new Color(150, 150, 150));
+                g.drawPolygon(xPoints, yPoints, 5);
+            }
+            @Override
+            public void paintFocus(Graphics g) {}
+
+        });
+
         return slider;
     }
 }
