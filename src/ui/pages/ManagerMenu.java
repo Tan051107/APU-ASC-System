@@ -2,13 +2,23 @@ package ui.pages;
 
 import javax.swing.*;
 
+import models.User;
+
 import ui.controller.ManagerMenuController;
+import ui.controller.UserManagementController;
+import ui.utils.UIUtils;
 
 import java.awt.*;
 
 public class ManagerMenu extends JFrame {
     
     // Panel that will hold all the different views
+    public JButton addUser; 
+    public JButton editUser;
+    public JButton deleteUser;
+    public JTable userTable;
+    public JTable feedbackTable;
+    public JButton viewFeedback;
     private JPanel contentPanel;
     private CardLayout cardLayout;
     private boolean isExpanded = true;
@@ -18,14 +28,15 @@ public class ManagerMenu extends JFrame {
     private final JButton btnSetPrices;
     private final JButton btnFeedback;
     private final JButton btnReports;
-    private final JButton btnLogOut;
-    private final ManagerMenuController controller = new ManagerMenuController();
+    public final JButton btnLogOut;
+    private final ManagerMenuController controller;
 
-    public ManagerMenu() {
+    public ManagerMenu(User user) {
+        controller = new ManagerMenuController(this);
         setTitle("APU-ASC Manager Dashboard");
-        setSize(900, 600);
+        setSize(1100, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center the window
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         // 1. Create the Sidebar Navigation
@@ -61,10 +72,7 @@ public class ManagerMenu extends JFrame {
         sidebar.add(btnFeedback);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnReports);
-        
-        // 1. Add this "glue" to push everything below it to the bottom
-        sidebar.add(Box.createVerticalGlue()); 
-        
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnLogOut);
 
         add(sidebar, BorderLayout.WEST);
@@ -87,6 +95,10 @@ public class ManagerMenu extends JFrame {
         btnSetPrices.addActionListener(e -> cardLayout.show(contentPanel, "Service Pricing"));
         btnFeedback.addActionListener(e -> cardLayout.show(contentPanel, "View Feedback"));
         btnReports.addActionListener(e -> cardLayout.show(contentPanel, "Reporting"));
+        
+        controller.initListeners();
+        new UserManagementController(this); 
+    
     }
 
     private void toggleSidebar() {
@@ -137,20 +149,77 @@ public class ManagerMenu extends JFrame {
 
     private JPanel createManageUsersPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        JLabel title = displayMenuTitle("User Management (CRUD)");
-        panel.add(title, BorderLayout.NORTH);
-        
-        JTable table = new JTable();
-        table.setModel(controller.loadUserToTable());
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 
-        // CRUD Action Buttons
+        JLabel title = displayMenuTitle("User Management (CRUD)");
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        topPanel.add(title); 
+
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        searchPanel.add(UIUtils.createLabel("Search ID: "));
+        JTextField searchField = UIUtils.createTextField(); 
+        searchField.setColumns(15);
+        JButton searchButton = new JButton("Search");
+        
+        // Style the search button to match your theme
+        searchButton.setBackground(new Color(99, 110, 114));
+        searchButton.setForeground(Color.WHITE);
+        searchButton.setFocusPainted(false);
+
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+
+        
+        topPanel.add(searchPanel);
+        panel.add(topPanel, BorderLayout.NORTH); // Add the whole top section to the main panel
+        
+        // 3. Setup the Table
+        userTable = UIUtils.createTable(controller.loadUserToTable());;
+        userTable.setModel(controller.loadUserToTable());
+        userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        userTable.getTableHeader().setReorderingAllowed(false);
+        panel.add(new JScrollPane(userTable), BorderLayout.CENTER);
+
+        // 4. Implement the "Find and Highlight" Search Logic
+        searchButton.addActionListener(e -> {
+            String currenttext = searchField.getText().trim().toUpperCase();
+
+            if (currenttext.matches("TP\\d{6}")) {
+                boolean found = false;
+                
+                for (int i = 0; i < userTable.getRowCount(); i++) {
+                    Object cellValue = userTable.getValueAt(i, 0); 
+                    
+                    if (cellValue != null) {
+                        String searchid = cellValue.toString(); 
+                        if (searchid.equals(currenttext)) {
+                            userTable.setRowSelectionInterval(i, i); 
+                            userTable.scrollRectToVisible(userTable.getCellRect(i, 0, true)); 
+                            found = true;
+                            break; 
+                        }
+                    }
+                }
+                
+                if (!found) {
+                    JOptionPane.showMessageDialog(this, "No User Found with ID: " + currenttext, "Search Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid format. Please use TP followed by 6 digits (e.g., TP012345).", "Format Error", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        // Pro-Tip: Allow the manager to press "Enter" on their keyboard while typing to trigger the search!
+        searchField.addActionListener(e -> searchButton.doClick());
+
+        // 5. CRUD Action Buttons
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton addUser = createCRUDButton("Add User");
+        addUser = createCRUDButton("Add User");
         bottomPanel.add(addUser);
-        JButton editUser = createCRUDButton("Edit User");
+        editUser = createCRUDButton("Edit User");
         bottomPanel.add(editUser);
-        JButton deleteUser = createCRUDButton("Delete User");
+        deleteUser = createCRUDButton("Delete User");
         bottomPanel.add(deleteUser);
         panel.add(bottomPanel, BorderLayout.SOUTH);
         
@@ -261,21 +330,14 @@ public class ManagerMenu extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel title = displayMenuTitle("Customer Feedback & Reviews");
         panel.add(title, BorderLayout.NORTH);
-        
-        /* JTextArea feedbackArea = new JTextArea("Review ID 101: Great service on my car, highly recommended!\n\nReview ID 102: Waiting time was a bit longer than expected.");
-        feedbackArea.setEditable(false);
-        feedbackArea.setMargin(new Insets(10, 10, 10, 10));
-        panel.add(new JScrollPane(feedbackArea), BorderLayout.CENTER); */
 
-        // Placeholder for JTable
-        String[][] data = {{"F001", "John Doe", "Car Kaput"}, {"F002", "Jane Smith", "HP increase"}};
-        String[] columns = {"Feedback ID", "Customer Name", "Feedback Type"};
-        JTable table = new JTable(data, columns);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        feedbackTable = new JTable();
+        feedbackTable.setModel(controller.loadFeedbackToTable());
+        panel.add(new JScrollPane(feedbackTable), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton viewDetails = createCRUDButton("View Details");
-        bottomPanel.add(viewDetails);
+        viewFeedback = createCRUDButton("View Details");
+        bottomPanel.add(viewFeedback);
         panel.add(bottomPanel, BorderLayout.SOUTH);
         
         return panel;
@@ -316,6 +378,9 @@ public class ManagerMenu extends JFrame {
         return button;
     }
 
-    
-
+    public void refreshUserTable() {
+        if (userTable != null) {
+            userTable.setModel(controller.loadUserToTable());
+        }
+    }
 }
