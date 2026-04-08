@@ -12,7 +12,10 @@ import ui.controller.CounterStaffControllers.FormController.AddAppointmentFormCo
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
 import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
+import utils.CSVExporter;
 import utils.DialogUtil;
+import utils.exporters.CsvExporters.AppointmentCsvExporter;
+import utils.exporters.interfaces.CsvExporter;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -112,6 +115,13 @@ public class AppointmentManagementController {
         }
     }
 
+    private void exportAppointment(){
+        List<Appointment> appointmentsToExport = manageAppointmentPanel.getAppointments();
+        CSVExporter<Appointment> CSVExporter = new CSVExporter<>();
+        AppointmentCsvExporter appointmentCsvExporter = new AppointmentCsvExporter();
+        CSVExporter.exportData(appointmentsToExport, "Appointments" , appointmentCsvExporter);
+    }
+
     private void initServiceTypeComboBox() {
         ServicesService servicesService = new ServicesService();
         try {
@@ -133,5 +143,6 @@ public class AppointmentManagementController {
         manageAppointmentPanel.searchField.addActionListener(e->searchAppointment());
         manageAppointmentPanel.serviceTypeFilterCombo.addActionListener(e->searchAppointment());
         manageAppointmentPanel.statusFilterCombo.addActionListener(e->searchAppointment());
+        manageAppointmentPanel.exportBtn.addActionListener(e->exportAppointment());
     }
 }

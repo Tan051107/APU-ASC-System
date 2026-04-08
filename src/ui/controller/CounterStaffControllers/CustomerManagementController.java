@@ -130,7 +130,7 @@ public class CustomerManagementController {
         List<Customer> customers = manageCustomerPanel.getCustomers();
         CustomerCsvExporter customerCsvExporter = new CustomerCsvExporter();
         CSVExporter<Customer> csvExporter = new CSVExporter<>();
-        csvExporter.exportData(customers,"customers" , customerCsvExporter);
+        csvExporter.exportData(customers,"Customers" , customerCsvExporter);
     }
 
 }
