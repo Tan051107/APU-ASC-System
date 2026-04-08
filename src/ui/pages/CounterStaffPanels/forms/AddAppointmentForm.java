@@ -9,7 +9,7 @@ import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
-public class AddAppointmentForm extends JFrame {
+public class AddAppointmentForm extends JDialog {
     public JComboBox<CustomerComboBoxItem> customerSelectionCombo;
     public JComboBox<ServiceComboBoxItem> serviceTypeCombo;
     public JFormattedTextField dateField;
@@ -26,14 +26,14 @@ public class AddAppointmentForm extends JFrame {
     private boolean isEdit;
     private final User loginStaff;
 
-    public AddAppointmentForm(boolean isEdit , Appointment appointmentToEdit, User loginStaff) {
+    public AddAppointmentForm(Frame owner, boolean isEdit , Appointment appointmentToEdit, User loginStaff) {
+        super(owner, "Create New Appointment", true);
         this.loginStaff =loginStaff;
         this.appointmentToEdit = appointmentToEdit;
         this.isEdit  = isEdit;
-        setTitle("Create New Appointment");
         setSize(500, 750);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(owner);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));

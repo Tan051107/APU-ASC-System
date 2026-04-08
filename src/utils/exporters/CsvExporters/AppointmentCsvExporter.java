@@ -18,19 +18,14 @@ public class AppointmentCsvExporter implements CsvExporter<Appointment> {
 
     @Override
     public void exportData(List<Appointment> data, String filePath) throws FileCorruptedException, IOException {
-        AppointmentService appointmentService = new AppointmentService();
-        CustomerService customerService = new CustomerService();
-        TechnicianService technicianService = new TechnicianService();
-        CustomerCarService customerCarService = new CustomerCarService();
-        ServicesService servicesService = new ServicesService();
         try(FileWriter writer = new FileWriter(filePath)){
             writer.append("Appointment Id, Customer Name , Car Plate , Technician Name , Service Type, Appointment Date , Appointment Time , Duration, Status , Description\n");
             for(Appointment appointment : data){
                 String appointmentId = appointment.getId();
-                String customerName = customerService.getCustomerById(appointment.getCustomerId()).getName();
-                String carPlate = customerCarService.getCarById(appointment.getCarId()).getCarPlate();
-                String technicianName = technicianService.getTechnicianById(appointment.getTechnicianId()).getName();
-                Services serviceChosen = servicesService.getServicesById(appointment.getServiceId());
+                String customerName = appointment.getCustomer().getName();
+                String carPlate =appointment.getCar().getCarPlate();
+                String technicianName = appointment.getTechnician().getName();
+                Services serviceChosen = appointment.getService();
                 String serviceName = serviceChosen.getServiceName();
                 String serviceDuration = String.valueOf(serviceChosen.getServiceDuration());
                 String appointmentDate = appointment.getDate().toString();

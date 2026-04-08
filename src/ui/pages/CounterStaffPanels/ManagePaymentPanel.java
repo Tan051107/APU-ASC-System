@@ -136,56 +136,55 @@ public class ManagePaymentPanel extends JPanel {
         return header;
     }
 
-    public void addPaymentRecordRow(PaymentRecord record, Consumer<PaymentRecord> onCollect, Consumer<PaymentRecord> onViewReceipt, boolean showCollectBtn, boolean showReceiptBtn) {
+    public void addPaymentRecordRow(PaymentRecord paymentRecord, Consumer<PaymentRecord> onCollect, Consumer<PaymentRecord> onViewReceipt) {
+        boolean hasMadePayment = paymentRecord.isHasPaid();
+
         JPanel row = new JPanel(new GridLayout(1, 6, 10, 0));
         row.setOpaque(false);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 55));
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
         row.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(243, 244, 246)),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                BorderFactory.createEmptyBorder(12, 15, 12, 15)
         ));
 
         // Record ID
-        JLabel idLbl = new JLabel(record.getId());
+        JLabel idLbl = new JLabel(paymentRecord.getId());
         idLbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         idLbl.setForeground(new Color(107, 114, 128));
         row.add(idLbl);
 
         // Appointment ID
-        JLabel appointmentIdLbl = new JLabel(record.getAppointmentId());
+        JLabel appointmentIdLbl = new JLabel(paymentRecord.getAppointmentId());
         appointmentIdLbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
         appointmentIdLbl.setForeground(new Color(31, 41, 55));
         row.add(appointmentIdLbl);
 
         // Amount
-        row.add(createLabel(String.format("RM %.2f", record.getAmount())));
+        row.add(createLabel(String.format("RM %.2f", paymentRecord.getAmount())));
 
         // Payment Method
-        String method = record.getPaymentMethod();
+        String method = paymentRecord.getPaymentMethod();
         row.add(createLabel(method == null || method.isEmpty() ? "-" : method));
 
         // Payment Status Badge
-        JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         statusPanel.setOpaque(false);
-        statusPanel.add(createStatusBadge(record.isHasPaid() ? "Paid" : "Unpaid"));
+        statusPanel.add(createStatusBadge(hasMadePayment ? "Paid" : "Unpaid"));
         row.add(statusPanel);
 
         // Actions
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         actions.setOpaque(false);
-        
-        if (showCollectBtn) {
-            JButton collectBtn = UIUtils.createIconButton("$\uD83D\uDCB3", new Color(16, 185, 129)); // Credit card icon
-            collectBtn.setToolTipText("Collect Payment");
-            collectBtn.addActionListener(e -> onCollect.accept(record));
-            actions.add(collectBtn);
-        }
 
-        if (showReceiptBtn) {
-            JButton receiptBtn = UIUtils.createIconButton("\uD83D\uDCC4", new Color(37, 99, 235)); // Document icon
-            receiptBtn.setToolTipText("View Receipt");
-            receiptBtn.addActionListener(e -> onViewReceipt.accept(record));
+        if (hasMadePayment) {
+            JButton receiptBtn = UIUtils.createActionIconButton("Receipt", new Color(37, 99, 235));
+            receiptBtn.addActionListener(e -> onViewReceipt.accept(paymentRecord));
             actions.add(receiptBtn);
+        }
+        else{
+            JButton collectBtn = UIUtils.createActionIconButton("Collect Payment",  new Color(16, 185, 129));
+            collectBtn.addActionListener(e -> onCollect.accept(paymentRecord));
+            actions.add(collectBtn);
         }
         
         row.add(actions);

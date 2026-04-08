@@ -82,10 +82,10 @@ public class AddAppointmentFormController {
             String description = appointmentToEdit.getDescription();
             try {
 
-                String carPlate = customerCarService.getCarById(appointmentToEdit.getCarId()).getCarPlate();
-                String customerName = customerService.getCustomerById(customerId).getName();
-                String serviceName = servicesService.findOne(serviceId).getServiceName();
-                String technicianName = technicianService.getTechnicianById(technicianId).getName();
+                String carPlate = appointmentToEdit.getCar().getCarPlate();
+                String customerName = appointmentToEdit.getCustomer().getName();
+                String serviceName = appointmentToEdit.getService().getServiceName();
+                String technicianName = appointmentToEdit.getTechnician().getName();
                 addAppointmentForm.customerSelectionCombo.setSelectedItem(new CustomerComboBoxItem(customerId , " | " + customerName));
                 addAppointmentForm.serviceTypeCombo.setSelectedItem(new ServiceComboBoxItem(serviceId , " | " + serviceName));
                 addAppointmentForm.timeField.setText(appointmentTime);

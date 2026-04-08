@@ -3,6 +3,7 @@ package ui.pages;
 import models.User;
 import ui.controller.CounterStaffControllers.AppointmentManagementController;
 import ui.controller.CounterStaffControllers.CustomerManagementController;
+import ui.controller.CounterStaffControllers.PaymentRecordManagementController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.ManageCustomerPanel;
 import ui.pages.CounterStaffPanels.ManagePaymentPanel;
@@ -82,8 +83,10 @@ public class CounterStaffMenu extends JFrame {
         contentPanel.add(manageCustomerPanel, "Manage Customer");
         ManageAppointmentPanel manageAppointmentPanel = new ManageAppointmentPanel(loginStaff);
         contentPanel.add(manageAppointmentPanel, "Manage Appointment");
-        new AppointmentManagementController(manageAppointmentPanel);
-        contentPanel.add(new ManagePaymentPanel(loginStaff), "Manage Payment");
+        ManagePaymentPanel managePaymentPanel = new ManagePaymentPanel(loginStaff);
+        contentPanel.add(managePaymentPanel, "Manage Payment");
+        new AppointmentManagementController(manageAppointmentPanel , managePaymentPanel);
+        new PaymentRecordManagementController(managePaymentPanel);
 
         add(contentPanel, BorderLayout.CENTER);
 

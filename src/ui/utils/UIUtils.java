@@ -165,6 +165,34 @@ public class UIUtils {
         return btn;
     }
 
+    public static JButton createActionIconButton(String text, Color baseColor) {
+        JButton btn = new JButton(text);
+        Color hoverColor = baseColor.darker();
+
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(baseColor);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Custom padding and rounded-like appearance through border
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(baseColor, 1),
+                BorderFactory.createEmptyBorder(8, 15, 8, 15)
+        ));
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setBackground(hoverColor);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setBackground(baseColor);
+            }
+        });
+
+        return btn;
+    }
+
     public static JButton createLinkButton(String text) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
