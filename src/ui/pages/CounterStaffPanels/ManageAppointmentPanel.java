@@ -131,7 +131,7 @@ public class ManageAppointmentPanel extends JPanel {
 
     private JPanel createTableHeader() {
         JPanel header = new JPanel(new GridLayout(1, 10, 10, 0));
-        header.setBackground(new Color(249, 250, 251));
+        header.setBackground(new Color(37, 99, 235));
         header.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(229, 231, 235)),
                 BorderFactory.createEmptyBorder(12, 15, 12, 15)
@@ -141,7 +141,7 @@ public class ManageAppointmentPanel extends JPanel {
         for (String col : cols) {
             JLabel label = new JLabel(col);
             label.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            label.setForeground(new Color(107, 114, 128));
+            label.setForeground(new Color(255, 255, 255));
             header.add(label);
         }
         return header;
