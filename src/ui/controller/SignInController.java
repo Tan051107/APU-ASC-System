@@ -86,7 +86,7 @@ public class SignInController {
                 // customerMenu.setVisible(true);
                 break;
             case MANAGER:
-                ManagerMenu managerMenu = new ManagerMenu();
+                ManagerMenu managerMenu = new ManagerMenu(user);
                 managerMenu.setVisible(true);
                 break;
             case COUNTER_STAFF:
