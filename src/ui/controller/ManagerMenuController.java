@@ -1,9 +1,13 @@
 package ui.controller;
 import services.UserService;
+import ui.pages.Login;
+import ui.pages.ManagerMenu;
+import ui.pages.Manager.ViewFeedbackPanel;
+import utils.DialogUtil;
 import services.ServicesService;
+import services.FeedbackService;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
@@ -15,10 +19,43 @@ import exceptions.NotFoundException;
 import exceptions.UpdateException;
 import models.User;
 import models.Services;
+import models.Feedback;
 
 public class ManagerMenuController {
     private final UserService userService = new UserService();
     private final ServicesService servicesService = new ServicesService();
+    private final FeedbackService feedbackService = new FeedbackService();
+    private final ManagerMenu managerMenu;
+    
+
+    public ManagerMenuController(ManagerMenu managerMenu) {
+        this.managerMenu = managerMenu;
+    }
+
+    public void initListeners(){
+        managerMenu.viewFeedback.addActionListener(e -> {
+            int selectedRow = managerMenu.feedbackTable.getSelectedRow();
+            
+            if (selectedRow == -1) {
+                DialogUtil.showWarningMessage("No Selection", "Please select a feedback record to view.");
+                return;
+            }
+
+            // Grab the Feedback ID from Column 0
+            String feedbackId = managerMenu.feedbackTable.getValueAt(selectedRow, 0).toString();
+
+            // Open the UI and let the Controller fetch the data
+            ViewFeedbackPanel viewPanel = new ViewFeedbackPanel();
+            new ViewFeedbackController(viewPanel, feedbackId);
+            viewPanel.setVisible(true);
+        });
+
+        managerMenu.btnLogOut.addActionListener(e -> {
+            managerMenu.dispose();
+            new Login().createUI();
+        });
+    }
+
     public DefaultTableModel loadUserToTable() {
         String[] columns = {"User ID", "Name", "Role"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
@@ -140,5 +177,32 @@ public class ManagerMenuController {
             );
             return false; // Update failed
         }
+    }
+
+    public DefaultTableModel loadFeedbackToTable() {
+        String[] columns = {"Feedback ID", "Feedback Details", "Appointment ID"};
+        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+        
+        try {
+            List<Feedback> feedbacksData = feedbackService.getFeedbacks();
+            
+            for (Feedback feedbacks : feedbacksData) {
+                Object[] rowData = {
+                    feedbacks.getId(),
+                    feedbacks.getComment(),
+                    feedbacks.getAppointmentId()
+                };
+                tableModel.addRow(rowData);
+            }
+            
+        } catch (GetEntityListException e) {
+            JOptionPane.showMessageDialog(
+                null, 
+                "Failed to load feedback data: " + e.getMessage(), 
+                "Data Load Error", 
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+        return tableModel;
     }
 }
