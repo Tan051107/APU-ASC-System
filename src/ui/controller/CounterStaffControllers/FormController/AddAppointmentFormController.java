@@ -95,7 +95,6 @@ public class AddAppointmentFormController {
                 getAvailableTechnicians(); //Get available technicians based on the time and date in the created appointment
                 addAppointmentForm.carPlateSelectionCombo.setSelectedItem(carPlate);
                 addAppointmentForm.technicianSelectionCombo.setSelectedItem(new TechnicianComboBoxItem(technicianId, " | " + technicianName));
-                addAppointmentForm.customerSelectionCombo.setEnabled(false); //Don't allow change name
 
             } catch (FileCorruptedException | GetEntityListException e) {
                 logger.log(Level.SEVERE,e.getMessage());
@@ -164,7 +163,10 @@ public class AddAppointmentFormController {
         Validator.required(validationResult,"Technician" , technicianIdSelected);
         Validator.required(validationResult,"Appointment description" , description);
         Validator.required(validationResult,"Car" , carId);
+        if(validationResult.hasError()){
+            throw new ValidationException(validationResult.getErrors());
 
+        }
         Appointment appointment = new Appointment();
         try{
             LocalDate appointmentDate = LocalDate.parse(appointmentDateString);
@@ -211,6 +213,7 @@ public class AddAppointmentFormController {
         } catch (ValidationException |BusinessRuleException | NotFoundException e) {
             DialogUtil.showWarningMessage("Error Updating Appointment" , e.getMessage());;
         } catch (Exception e) {
+            logger.log(Level.SEVERE,e.getMessage());
             DialogUtil.showWarningMessage("Error Updating Appointment" , "Failed to update appointment");
         }
     }
@@ -279,6 +282,7 @@ public class AddAppointmentFormController {
                 DialogUtil.showErrorMessage("Failed to get available technician" , "Please fill in appointment date and time");
                 logger.log(Level.SEVERE , e.getMessage());
             } catch (FileCorruptedException e) {
+                DialogUtil.showErrorMessage("Failed to get available technician" , "Encountered error when getting available technicians");
                 logger.log(Level.SEVERE , e.getMessage());
             }
         }
