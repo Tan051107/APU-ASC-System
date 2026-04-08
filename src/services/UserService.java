@@ -16,7 +16,7 @@ public class UserService {
     private final String USER_FILE = "txt_files/User.txt";
     private final UserMapper userMapper = new UserMapper();
     private final CrudRepository<User> userRepository = new CrudRepository<>(USER_FILE , userMapper);
-    private final Logger logger = Logger.getLogger(UserService.class.getName());
+//    private final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public List<User> getUsers() throws GetEntityListException {
         try{
@@ -62,7 +62,7 @@ public class UserService {
         }
     }
 
-    public void updateUser(User userToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, UpdateException {
+    public void updateUser(User userToUpdate) throws FileCorruptedException, NotFoundException,UpdateException {
         boolean userHasExisted = !userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(userToUpdate.getEmail()) && !user.getId().equalsIgnoreCase(userToUpdate.getId())).isEmpty();
         if(userHasExisted){
             throw new UpdateException("Email is taken. Please select another email");

@@ -1,5 +1,7 @@
 package ui.pages;
 
+import models.User;
+import ui.controller.CounterStaffControllers.AppointmentManagementController;
 import ui.controller.CounterStaffControllers.CustomerManagementController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.ManageCustomerPanel;
@@ -21,8 +23,10 @@ public class CounterStaffMenu extends JFrame {
     private final JButton managePaymentBtn;
     private final JButton myProfileBtn;
     public final JButton logOutBtn;
+    private final User loginStaff;
 
-    public CounterStaffMenu() {
+    public CounterStaffMenu(User loginStaff) {
+        this.loginStaff = loginStaff;
         setTitle("APU-ASC Counter Staff Dashboard");
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -76,7 +80,9 @@ public class CounterStaffMenu extends JFrame {
         ManageCustomerPanel manageCustomerPanel = new ManageCustomerPanel();
         new CustomerManagementController(manageCustomerPanel);
         contentPanel.add(manageCustomerPanel, "Manage Customer");
-        contentPanel.add(new ManageAppointmentPanel(), "Manage Appointment");
+        ManageAppointmentPanel manageAppointmentPanel = new ManageAppointmentPanel(loginStaff);
+        contentPanel.add(manageAppointmentPanel, "Manage Appointment");
+        new AppointmentManagementController(manageAppointmentPanel);
         contentPanel.add(new ManagePaymentPanel(), "Manage Payment");
 
         add(contentPanel, BorderLayout.CENTER);
@@ -137,4 +143,7 @@ public class CounterStaffMenu extends JFrame {
         new Login().createUI();
     }
 
+    public User getLoginStaff() {
+        return loginStaff;
+    }
 }

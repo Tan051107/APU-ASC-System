@@ -6,6 +6,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 
 import java.awt.*;
+import java.util.Vector;
 
 public class UIUtils {
     public static JTextField createTextField() {
@@ -92,9 +93,23 @@ public class UIUtils {
         return label;
     }
 
-    public static JComboBox<String> createJComboBox(String[] options) {
-        JComboBox<String> comboBox = new JComboBox<>(options);
+    public static <T> JComboBox<T> createJComboBox(T[] options) {
+        return styleJComboBox(new JComboBox<>(options));
+    }
 
+    public static <T> JComboBox<T> createJComboBox() {
+        return styleJComboBox(new JComboBox<>());
+    }
+
+    public static <T> JComboBox<T> createJComboBox(ComboBoxModel<T> model) {
+        return styleJComboBox(new JComboBox<>(model));
+    }
+
+    public static <T> JComboBox<T> createJComboBox(Vector<T> options) {
+        return styleJComboBox(new JComboBox<>(options));
+    }
+
+    private static <T> JComboBox<T> styleJComboBox(JComboBox<T> comboBox) {
         comboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         comboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -137,7 +152,7 @@ public class UIUtils {
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setToolTipText(icon.equals("✎") ? "Edit" : "Delete");
+        btn.setToolTipText(icon.equals("✎") ? "Edit" : "Cancel");
         
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -159,6 +174,42 @@ public class UIUtils {
         btn.setContentAreaFilled(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
+    }
+
+    public static JFormattedTextField createDateField() {
+        try {
+            javax.swing.text.MaskFormatter dateMask = new javax.swing.text.MaskFormatter("####-##-##");
+            dateMask.setPlaceholderCharacter('_');
+            JFormattedTextField field = new JFormattedTextField(dateMask);
+            field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+            field.setAlignmentX(Component.LEFT_ALIGNMENT);
+            field.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                    BorderFactory.createEmptyBorder(12, 12, 12, 12)
+            ));
+            field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            return field;
+        } catch (java.text.ParseException e) {
+            return new JFormattedTextField();
+        }
+    }
+
+    public static JFormattedTextField createTimeField() {
+        try {
+            javax.swing.text.MaskFormatter timeMask = new javax.swing.text.MaskFormatter("##:##");
+            timeMask.setPlaceholderCharacter('_');
+            JFormattedTextField field = new JFormattedTextField(timeMask);
+            field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+            field.setAlignmentX(Component.LEFT_ALIGNMENT);
+            field.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                    BorderFactory.createEmptyBorder(12, 12, 12, 12)
+            ));
+            field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            return field;
+        } catch (java.text.ParseException e) {
+            return new JFormattedTextField();
+        }
     }
 
     public static JPanel createBadge(String text) {

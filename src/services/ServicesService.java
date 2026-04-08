@@ -45,4 +45,8 @@ public class ServicesService {
     public void updateService(Services serviceToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, UpdateException {
         servicesRepository.update(serviceToUpdate);
     }
+
+    public Services findOne(String serviceId) throws FileCorruptedException {
+        return servicesRepository.getOne(serviceId);
+    }
 }

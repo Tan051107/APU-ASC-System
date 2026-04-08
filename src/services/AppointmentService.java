@@ -2,19 +2,26 @@ package services;
 
 import java.util.List;
 
-import exceptions.FileCorruptedException;
-import exceptions.GetEntityListException;
-import exceptions.NotFoundException;
-import exceptions.UpdateException;
+import enums.AppointmentStatus;
+import exceptions.*;
 import mapper.AppointmentMapper;
-import models.Appointment;
+import models.*;
 import repositories.CrudRepository;
 import utils.RandomIdGenerator;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public class AppointmentService {
     private final String APPOINTMENT_FILE = "txt_files/Appointment.txt";
     private final AppointmentMapper appointmentMapper = new AppointmentMapper();
-    private final CrudRepository<Appointment> appointmentRepository = new CrudRepository<>(APPOINTMENT_FILE , appointmentMapper);
+    private final CrudRepository<Appointment> appointmentRepository = new CrudRepository<>(APPOINTMENT_FILE, appointmentMapper);
+    private final ServicesService servicesService = new ServicesService();
+    private final CustomerCarService customerCarService = new CustomerCarService();
+    private final TechnicianService technicianService = new TechnicianService();
 
     public List<Appointment> getAllAppointments() throws GetEntityListException {
         try {
@@ -22,6 +29,10 @@ public class AppointmentService {
         } catch (FileCorruptedException e) {
             throw new GetEntityListException(e.getMessage());
         }
+    }
+
+    public List<Appointment> getAppointments(Predicate<Appointment> filter) throws FileCorruptedException {
+        return appointmentRepository.getAll(filter);
     }
 
     public Appointment getAppointmentById(String id) throws GetEntityListException {
@@ -32,25 +43,149 @@ public class AppointmentService {
         }
     }
 
+
+    //TODO Don't allow create appointment if the car already has an assigned appointment that not completed yet
     public void createAppointment(Appointment appointmentToAdd) throws Exception {
+        PaymentRecordService paymentRecordService = new PaymentRecordService();
         try {
             // Generate a unique ID and assign it before saving
             String appointmentId = generateId();
             appointmentToAdd.setId(appointmentId);
-            
+            LocalDateTime chosenAppointmentDateTime = LocalDateTime.of(appointmentToAdd.getDate(),appointmentToAdd.getTime());
+            if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
+                throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
+            }
+            if(carHasClashAppointment(appointmentToAdd, "")){
+                throw new BusinessRuleException("Car already has an appointment during the date and time chosen");
+            }
+            if(carHasNotCompletedAppointment(appointmentToAdd, "")){
+                throw new BusinessRuleException("Car already has an upcoming appointment");
+            }
+            PaymentRecord paymentRecordToCreate = createPaymentRecordForAppointment(appointmentToAdd);
             appointmentRepository.create(appointmentToAdd);
+            paymentRecordService.addPaymentRecord(paymentRecordToCreate);
         } catch (Exception e) {
             throw new Exception("Failed to create appointment: " + e.getMessage());
         }
     }
 
-    public void updateAppointment(Appointment appointmentToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, UpdateException {
+    public void updateAppointment(Appointment appointmentToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException {
+        LocalDateTime chosenAppointmentDateTime = LocalDateTime.of(appointmentToUpdate.getDate(),appointmentToUpdate.getTime());
+        String appointmentToUpdateId = appointmentToUpdate.getId();
+        if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
+            throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
+        }
+        if(carHasClashAppointment(appointmentToUpdate, appointmentToUpdateId)){
+            throw new BusinessRuleException("Car already has an appointment during the date and time chosen");
+        }
+        if(carHasNotCompletedAppointment(appointmentToUpdate,appointmentToUpdateId)){
+            throw new BusinessRuleException("Car already has an upcoming appointment");
+        }
         appointmentRepository.update(appointmentToUpdate);
     }
 
+    public void cancelAppointment(Appointment appointmentToCancel) throws FileCorruptedException, NotFoundException {
+        appointmentToCancel.setStatusService(AppointmentStatus.CANCELLED);
+        appointmentRepository.update(appointmentToCancel);
+    }
+
+    public List<Appointment> getAppointments() throws FileCorruptedException {
+        return appointmentRepository.getAll();
+    }
+
+    public List<Appointment> getAppointmentsByTechnician(String technicianId) throws FileCorruptedException {
+        return appointmentRepository.getAll(appointment -> appointment.getTechnicianId().equalsIgnoreCase(technicianId));
+    }
+
+    public List<Appointment> searchAppointment(String keyword , AppointmentStatus appointmentStatus , String serviceTypeSelectionFilter) throws FileCorruptedException {
+        Predicate<Appointment> appointmentPredicate = appointment -> true;
+        if(!keyword.isEmpty()){
+            String keywordLowerCase = keyword.toLowerCase();
+            CustomerService customerService = new CustomerService();
+            List<String> customerIdsFound = customerService.getCustomers(customer -> customer.getName().toLowerCase().contains(keywordLowerCase)).stream().map(Customer::getId).toList();
+            List<String> carIdsFound = customerCarService.customerCars(customerCar->customerCar.getCarPlate().toLowerCase().contains(keywordLowerCase)).stream().map(CustomerCar::getId).toList();
+            List<String> technicianIdsFound = technicianService.getTechnicians(technician -> technician.getName().toLowerCase().contains(keywordLowerCase)).stream().map(Technician::getId).toList();
+            Predicate<Appointment> keywordPredicate = appointment -> appointment.getId().toLowerCase().contains(keywordLowerCase);
+            if(!customerIdsFound.isEmpty()){
+                keywordPredicate = keywordPredicate.or(appointment -> customerIdsFound.contains(appointment.getCustomerId()));
+            }
+            if(!carIdsFound.isEmpty()){
+                keywordPredicate =  keywordPredicate.or(appointment -> carIdsFound.contains(appointment.getCarId()));
+            }
+            if(!technicianIdsFound.isEmpty()){
+                keywordPredicate = keywordPredicate.or(appointment -> technicianIdsFound.contains(appointment.getTechnicianId()));
+            }
+            appointmentPredicate = appointmentPredicate.and(keywordPredicate);
+        }
+        if(appointmentStatus !=null){
+            appointmentPredicate = appointmentPredicate.and(appointment -> appointment.getStatusService().equals(appointmentStatus));
+        }
+        if(!serviceTypeSelectionFilter.isEmpty()){
+            appointmentPredicate = appointmentPredicate.and(appointment -> appointment.getServiceId().equalsIgnoreCase(serviceTypeSelectionFilter));
+        }
+        return getAppointments(appointmentPredicate);
+    }
+
+    public List<Technician> getAvailableTechnicians(LocalDateTime appointmentDateTime ,int durationInHour, String appointmentToIgnore) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException {
+        if(isNotValidAppointmentDateTime(appointmentDateTime)){
+            throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
+        }
+        List<Technician> availableTechnicians = new ArrayList<>();
+        TechnicianService technicianService = new TechnicianService();
+        List<Technician> technicians = technicianService.getTechnicians();
+        if(technicians.isEmpty()){
+            throw new NotFoundException("Technician list is empty");
+        }
+        for(Technician technician : technicians){
+            String technicianId = technician.getId();
+            List<Appointment> assignedAppointments = getAppointmentsByTechnician(technicianId).stream()
+                    .filter(appointment -> !appointment.getId().equalsIgnoreCase(appointmentToIgnore))
+                    .toList(); //Remove appointment to ignore from checking
+            if(assignedAppointments.isEmpty()){
+                availableTechnicians.add(technician);
+                continue;
+            }
+            if(technicianIsFree(assignedAppointments,appointmentDateTime,durationInHour)){
+                availableTechnicians.add(technician);
+            }
+        }
+        if(availableTechnicians.isEmpty()){
+            throw new NotFoundException("No available technician");
+        }
+        return availableTechnicians;
+
+    }
+
+    private boolean technicianIsFree(List<Appointment> assignedAppointments , LocalDateTime newAppointmentDateTime , int newAppointmentDurationInHour) throws GetEntityListException {
+        for(Appointment assignedAppointment : assignedAppointments){
+            if(!assignedAppointment.getStatusService().equals(AppointmentStatus.ASSIGNED)){
+                continue;
+            } //Skip appointments that are cancelled/completed - No need check
+            LocalTime assignedAppointmentStartTime = assignedAppointment.getTime();
+            int appointmentDuration = servicesService.getServicesById(assignedAppointment.getServiceId()).getServiceDuration();
+            LocalTime assignedAppointmentEndTime = assignedAppointmentStartTime.plusHours(appointmentDuration);
+
+            LocalDate newAppointmentDate = newAppointmentDateTime.toLocalDate();
+            LocalDate assignedAppointmentDate = assignedAppointment.getDate();
+
+            if(!assignedAppointmentDate.equals(newAppointmentDate)){
+                continue;
+            }
+
+            LocalTime newAppointmentStartTime = newAppointmentDateTime.toLocalTime();
+            LocalTime newAppointmentEndTime = newAppointmentStartTime.plusHours(newAppointmentDurationInHour);
+            if(newAppointmentStartTime.isBefore(assignedAppointmentEndTime) &&
+                    newAppointmentEndTime.isAfter(assignedAppointmentStartTime)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     private String generateId() {
         while (true) {
-            String appointmentId = RandomIdGenerator.generateId("APP-", 5); 
+            String appointmentId = RandomIdGenerator.generateId("APP-", 5);
             try {
                 if (getAppointmentById(appointmentId) == null) {
                     return appointmentId;
@@ -59,6 +194,60 @@ public class AppointmentService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    //Validate appointment must be within 14 days from now
+    private boolean isNotValidAppointmentDateTime(LocalDateTime chosenAppointmentDateTime){
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalDateTime maxAllowedAppointmentDateTime = currentDateTime.plusWeeks(2);
+        return chosenAppointmentDateTime.isBefore(currentDateTime) || chosenAppointmentDateTime.isAfter(maxAllowedAppointmentDateTime);
+    }
+
+    private boolean carHasClashAppointment(Appointment newAppointment , String appointmentToIgnore) throws FileCorruptedException, GetEntityListException {
+        String appointmentCar = newAppointment.getCarId();
+        List<Appointment> carAppointments = appointmentRepository.getAll(appointment -> appointment.getCarId().equalsIgnoreCase(appointmentCar) && !appointment.getId().equalsIgnoreCase(appointmentToIgnore) && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED)); //Remove appointment to ignore from checking
+        if(carAppointments.isEmpty()){
+            return false;
+        }
+
+        int newAppointmentDuration = servicesService.getServicesById(newAppointment.getServiceId()).getServiceDuration();
+        LocalDateTime newAppointmentStartDateTime = LocalDateTime.of(newAppointment.getDate(),newAppointment.getTime());
+        LocalDateTime newAppointmentEndDateTime = newAppointmentStartDateTime.plusHours(newAppointmentDuration);
+        for(Appointment appointment : carAppointments){
+            int existingAppointmentDuration = servicesService.getServicesById(appointment.getServiceId()).getServiceDuration();
+            LocalDateTime existingAppointmentStartDateTime = LocalDateTime.of(appointment.getDate(),appointment.getTime());
+            LocalDateTime existingAppointmentEndDateTime = existingAppointmentStartDateTime.plusHours(existingAppointmentDuration);
+            if(newAppointmentEndDateTime.isAfter(existingAppointmentStartDateTime) && newAppointmentStartDateTime.isBefore(existingAppointmentEndDateTime)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean carHasNotCompletedAppointment(Appointment appointmentToSave, String appointmentToIgnore) throws FileCorruptedException, GetEntityListException {
+        List<Appointment> appointments = getAppointments(appointment -> appointment.getCarId().equalsIgnoreCase(appointmentToSave.getCarId()) && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED) && !appointment.getId().equalsIgnoreCase(appointmentToIgnore));
+        if(appointments.isEmpty()){
+            return false;
+        }
+        int appointmentToSaveDuration = servicesService.getServicesById(appointmentToSave.getServiceId()).getServiceDuration();
+        LocalDateTime appointmentToSaveEndTime = LocalDateTime.of(appointmentToSave.getDate(),appointmentToSave.getTime()).plusHours(appointmentToSaveDuration);
+        for(Appointment appointment :appointments){
+            int existingAppointmentDuration = servicesService.getServicesById(appointment.getServiceId()).getServiceDuration();
+            LocalDateTime existingAppointmentEndTime = LocalDateTime.of(appointment.getDate(),appointment.getTime()).plusHours(existingAppointmentDuration);
+            if(existingAppointmentEndTime.isAfter(appointmentToSaveEndTime)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private PaymentRecord createPaymentRecordForAppointment(Appointment appointment) throws GetEntityListException {
+        PaymentRecord paymentRecord = new PaymentRecord();
+        paymentRecord.setAppointmentId(appointment.getId());
+        Services serviceChosen = servicesService.getServicesById(appointment.getServiceId());
+        double servicePrice = serviceChosen.getServicePrice();
+        paymentRecord.setAmount(servicePrice);
+        return paymentRecord;
     }
 
 }

@@ -1,4 +1,4 @@
-package ui.controller.CounterStaffControllers;
+package ui.controller.CounterStaffControllers.FormController;
 
 import enums.FuelType;
 import exceptions.AddException;

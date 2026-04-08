@@ -9,6 +9,7 @@ import utils.RandomIdGenerator;
 import java.io.*;
 import java.time.Year;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class CustomerCarService {
 
@@ -22,9 +23,11 @@ public class CustomerCarService {
     }
 
     public List<CustomerCar> getCustomerCars(String customerId) throws FileCorruptedException {
-        File file = new File(CUSTOMER_CAR_FILE);
-        System.out.println(file.getAbsolutePath());
         return customerCarCrudRepository.getAll(customerCar -> customerCar.getCustomerId().equalsIgnoreCase(customerId));
+    }
+
+    public CustomerCar getCarByCarPlate(String carPlate) throws FileCorruptedException {
+        return customerCarCrudRepository.getAll(customerCar -> customerCar.getCarPlate().equalsIgnoreCase(carPlate)).getFirst();
     }
 
     public CustomerCar getCarById(String id) throws GetEntityListException {
@@ -33,6 +36,10 @@ public class CustomerCarService {
         } catch (FileCorruptedException e) {
             throw new GetEntityListException(e.getMessage());
         }
+    }
+
+    public List<CustomerCar>customerCars(Predicate<CustomerCar> filter) throws FileCorruptedException {
+        return customerCarCrudRepository.getAll(filter);
     }
 
     public void addCar(CustomerCar carToAdd) throws AddException, IOException, FileCorruptedException {
@@ -63,6 +70,7 @@ public class CustomerCarService {
         customerCarCrudRepository.writeAll(cars);
     }
 
+    //TODO Don't allow update car when car is assigned to an appointment
     public void updateCar(CustomerCar carToUpdate) throws FileCorruptedException,UpdateException {
         boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar ->customerCar.getCarPlate().equalsIgnoreCase(carToUpdate.getCarPlate()) && !customerCar.getId().equalsIgnoreCase(carToUpdate.getId())).isEmpty();
         if(carPlateHasExisted){
