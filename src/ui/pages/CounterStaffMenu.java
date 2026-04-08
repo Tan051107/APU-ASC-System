@@ -83,7 +83,7 @@ public class CounterStaffMenu extends JFrame {
         ManageAppointmentPanel manageAppointmentPanel = new ManageAppointmentPanel(loginStaff);
         contentPanel.add(manageAppointmentPanel, "Manage Appointment");
         new AppointmentManagementController(manageAppointmentPanel);
-        contentPanel.add(new ManagePaymentPanel(), "Manage Payment");
+        contentPanel.add(new ManagePaymentPanel(loginStaff), "Manage Payment");
 
         add(contentPanel, BorderLayout.CENTER);
 
