@@ -61,6 +61,9 @@ public class AppointmentService {
             if(carHasNotCompletedAppointment(appointmentToAdd, "")){
                 throw new BusinessRuleException("Car already has an upcoming appointment");
             }
+            if(isNotOperationHour(appointmentToAdd)){
+                throw new BusinessRuleException("Operating hours are from 9 AM to 6 PM, Monday to Friday");
+            }
             PaymentRecord paymentRecordToCreate = createPaymentRecordForAppointment(appointmentToAdd);
             appointmentRepository.create(appointmentToAdd);
             paymentRecordService.addPaymentRecord(paymentRecordToCreate);

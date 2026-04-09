@@ -36,4 +36,8 @@ public class CustomComboBoxItem {
     public int hashCode() {
         return id.hashCode();
     }
+
+    public String toString(){
+        return id + name;
+    }
 }

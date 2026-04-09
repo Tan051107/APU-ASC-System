@@ -3,13 +3,14 @@ package ui.pages.CounterStaffPanels.forms;
 import models.Appointment;
 import models.User;
 import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
 import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
 public class AddAppointmentForm extends JDialog {
     public JComboBox<CustomComboBoxItem> customerSelectionCombo;
-    public JComboBox<CustomComboBoxItem> serviceTypeCombo;
+    public JComboBox<ServiceComboBoxItem> serviceTypeCombo;
     public JFormattedTextField dateField;
     public JFormattedTextField timeField;
     public JTextArea descriptionArea;
@@ -65,7 +66,7 @@ public class AddAppointmentForm extends JDialog {
         // --- Service Type ---
         mainPanel.add(UIUtils.createLabel("Service Type *"));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        CustomComboBoxItem[] serviceTypes = {};
+        ServiceComboBoxItem[] serviceTypes = {};
         serviceTypeCombo = UIUtils.createJComboBox(serviceTypes);
         mainPanel.add(serviceTypeCombo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));

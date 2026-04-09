@@ -1,6 +1,7 @@
 package ui.pages;
 
 import ui.controller.CustomerController;
+import ui.controller.ProfilePanelController;
 import ui.utils.UIUtils;
 
 import javax.swing.*;
@@ -41,8 +42,8 @@ public class CustomerMenu extends JFrame {
     private JSlider technicianRatingSlider;
     private JTextArea commentTextArea;
 
-    private JTextField profileNameField;
-    private JTextField profilePhoneField;
+    private ProfilePanel profilePanel;
+    private ProfilePanelController profilePanelController;
 
     public CustomerMenu(String customerId) {
         this.controller = new CustomerController(customerId);
@@ -120,7 +121,7 @@ public class CustomerMenu extends JFrame {
         });
 
         btnProfile.addActionListener(e -> {
-            loadProfileData();
+            profilePanelController.initProfile();
             cardLayout.show(contentPanel, "PROFILE");
         });
 
@@ -133,7 +134,6 @@ public class CustomerMenu extends JFrame {
         refreshPaymentHistory();
         refreshFeedback();
         refreshFeedbackAppointmentDropdown();
-        loadProfileData();
         cardLayout.show(contentPanel, "SERVICE_HISTORY");
     }
 
@@ -334,34 +334,9 @@ public class CustomerMenu extends JFrame {
     }
 
     private JPanel createProfilePanel() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JLabel title = new JLabel("My Profile");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        mainPanel.add(title);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        mainPanel.add(UIUtils.createLabel("Current Name"));
-        profileNameField = UIUtils.createTextField();
-        mainPanel.add(profileNameField);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        mainPanel.add(UIUtils.createLabel("Current Phone Number"));
-        profilePhoneField = UIUtils.createTextField();
-        mainPanel.add(profilePhoneField);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        JButton updateButton = UIUtils.createPrimaryButton("Update Profile");
-        updateButton.addActionListener(e -> updateProfile());
-        mainPanel.add(updateButton);
-
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.add(mainPanel, BorderLayout.NORTH);
-        return wrapper;
+        profilePanel = new ProfilePanel();
+        profilePanelController = new ProfilePanelController(profilePanel, controller.getCustomerUser());
+        return profilePanel;
     }
 
     private void refreshServiceHistory() {
@@ -424,14 +399,6 @@ public class CustomerMenu extends JFrame {
             staffField.setText("");
             technicianField.setText("");
         }
-    }
-
-    private void loadProfileData() {
-        controller.loadProfileIntoFields(profileNameField, profilePhoneField);
-    }
-
-    private void updateProfile() {
-        controller.updateProfile(profileNameField.getText(), profilePhoneField.getText());
     }
 
     private void submitComment() {

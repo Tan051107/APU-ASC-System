@@ -333,43 +333,11 @@ public class CustomerController {
         }
     }
 
-    public void loadProfileIntoFields(JTextField nameField, JTextField phoneField) {
+    public User getCustomerUser() {
         try {
-            User user = userRepo.getOne(customerId);
-            if (user != null) {
-                nameField.setText(user.getName());
-                phoneField.setText(user.getContactNumber());
-            }
+            return userRepo.getOne(customerId);
         } catch (Exception e) {
-            DialogUtil.showErrorMessage("Load Error", "Failed to load profile");
-        }
-    }
-
-    public void updateProfile(String name, String phoneNumber) {
-        try {
-            ValidationResult validationResult = new ValidationResult();
-
-            Validator.required(validationResult, "Name", name);
-            Validator.validatePhone(validationResult, phoneNumber);
-
-            if (validationResult.hasError()) {
-                DialogUtil.showWarningMessage("Validation Error", validationResult.getErrors());
-                return;
-            }
-
-            User user = userRepo.getOne(customerId);
-            if (user == null) {
-                DialogUtil.showErrorMessage("Error", "User not found");
-                return;
-            }
-
-            user.setName(name);
-            user.setContactNumber(phoneNumber);
-            userRepo.update(user);
-
-            DialogUtil.showInfoMessage("Success", "Profile updated successfully");
-        } catch (Exception e) {
-            DialogUtil.showErrorMessage("Error", "Failed to update profile");
+            return null;
         }
     }
 

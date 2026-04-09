@@ -6,6 +6,7 @@ import models.Appointment;
 import models.CustomerCar;
 import models.Feedback;
 import models.User;
+import ui.controller.ProfilePanelController;
 import ui.controller.TechnicianMenuController;
 import ui.pages.TechnicianPanels.ViewAppointment;
 import ui.utils.UIUtils;
@@ -79,6 +80,9 @@ public class TechnicianMenu extends JFrame {
 
         contentPanel.add(createAppointmentsPanel(), "Appointments");
         contentPanel.add(createHistoryPanel(), "History");
+        ProfilePanel profilePanel = new ProfilePanel();
+        contentPanel.add(profilePanel,"My Profile");
+        new ProfilePanelController(profilePanel,user);
         /* contentPanel.add(createReportsPanel(), "Reporting"); */
 
         add(contentPanel, BorderLayout.CENTER);
@@ -97,6 +101,8 @@ public class TechnicianMenu extends JFrame {
             }
             cardLayout.show(contentPanel, "History");
         });
+
+        myProfileBtn.addActionListener(e->cardLayout.show(contentPanel, "My Profile"));
 
         logOutBtn.addActionListener(e -> {
             this.dispose();

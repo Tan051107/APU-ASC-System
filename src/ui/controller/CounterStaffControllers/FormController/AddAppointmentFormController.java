@@ -5,6 +5,7 @@ import exceptions.*;
 import models.*;
 import services.*;
 import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
 import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
 import utils.DialogUtil;
 import utils.validators.ValidationResult;
@@ -83,7 +84,7 @@ public class AddAppointmentFormController {
                 String serviceName = appointmentToEdit.getService().getServiceName();
                 String technicianName = appointmentToEdit.getTechnician().getName();
                 addAppointmentForm.customerSelectionCombo.setSelectedItem(new CustomComboBoxItem(customerId , " | " + customerName));
-                addAppointmentForm.serviceTypeCombo.setSelectedItem(new CustomComboBoxItem(serviceId , " | " + serviceName));
+                addAppointmentForm.serviceTypeCombo.setSelectedItem(new ServiceComboBoxItem(serviceId , " | " + serviceName));
                 addAppointmentForm.timeField.setText(appointmentTime);
                 addAppointmentForm.dateField.setText(appointmentDate);
                 addAppointmentForm.descriptionArea.setText(description);
@@ -106,7 +107,7 @@ public class AddAppointmentFormController {
                 DialogUtil.showWarningMessage("No service available" , "No service available for appointment assignment");
             }
             for(Services service : services){
-                addAppointmentForm.serviceTypeCombo.addItem(new CustomComboBoxItem(service.getId() ,service.getServiceName()));
+                addAppointmentForm.serviceTypeCombo.addItem(new ServiceComboBoxItem(service.getId() ,service.getServiceName()));
             }
         } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Init Form Failed" , "Failed to initialize form");
@@ -135,7 +136,7 @@ public class AddAppointmentFormController {
 
     private Appointment fieldToAppointment() throws ValidationException {
         CustomComboBoxItem customerSelected = (CustomComboBoxItem) addAppointmentForm.customerSelectionCombo.getSelectedItem();
-        CustomComboBoxItem serviceSelected = (CustomComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
+        ServiceComboBoxItem serviceSelected = (ServiceComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
         CustomComboBoxItem technicianSelected = (CustomComboBoxItem)addAppointmentForm.technicianSelectionCombo.getSelectedItem();
         String description = addAppointmentForm.descriptionArea.getText();
         String carSelected = Objects.requireNonNull(addAppointmentForm.carPlateSelectionCombo.getSelectedItem()).toString();
@@ -249,7 +250,7 @@ public class AddAppointmentFormController {
     private void getAvailableTechnicians(){
         String selectedAppointmentDate = addAppointmentForm.dateField.getText();
         String selectedAppointmentTime = addAppointmentForm.timeField.getText();
-        CustomComboBoxItem serviceSelected = (CustomComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
+        ServiceComboBoxItem serviceSelected = (ServiceComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
         if(!selectedAppointmentTime.isEmpty() && !selectedAppointmentDate.isEmpty() && !(serviceSelected == null)){
             String serviceSelectedId = serviceSelected.getId();
             try {
