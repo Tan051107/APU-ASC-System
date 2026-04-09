@@ -15,6 +15,7 @@ public class ManagePaymentPanel extends JPanel {
     public JButton exportBtn;
     public JTextField searchField;
     public JComboBox<String> statusFilterCombo;
+    public JComboBox<String> paymentMethodFilterCombo;
     private List<PaymentRecord> paymentRecords;
     private final User loginStaff;
 
@@ -55,28 +56,12 @@ public class ManagePaymentPanel extends JPanel {
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
         searchPanel.setOpaque(false);
-
+        JLabel searchLabel = UIUtils.createLabel("Search:");
+        searchPanel.add(searchLabel);
         searchField = UIUtils.createTextField();
         searchField.setPreferredSize(new Dimension(300, 45));
         searchField.setMaximumSize(new Dimension(300, 45));
-        searchField.setText("Search by Record ID or Appointment ID");
-        searchField.setForeground(Color.GRAY);
-        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-            public void focusGained(java.awt.event.FocusEvent e) {
-                if (searchField.getText().equals("Search by Record ID or Appointment ID")) {
-                    searchField.setText("");
-                    searchField.setForeground(Color.BLACK);
-                }
-            }
-            @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
-                if (searchField.getText().isEmpty()) {
-                    searchField.setText("Search by Record ID or Appointment ID");
-                    searchField.setForeground(Color.GRAY);
-                }
-            }
-        });
+        searchField.setToolTipText("Search by Record Id and Appointment Id");
         searchPanel.add(searchField);
 
         // --- Status Filter ---
@@ -88,6 +73,17 @@ public class ManagePaymentPanel extends JPanel {
         statusFilterCombo = UIUtils.createJComboBox(statusOptions);
         statusFilterCombo.setPreferredSize(new Dimension(150, 45));
         statusFilterPanel.add(statusFilterCombo);
+        searchPanel.add(statusFilterPanel);
+
+        // --- Payment Method Filter ---
+        JPanel paymentMethodPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        statusFilterPanel.setOpaque(false);
+        JLabel paymentMethodLabel = UIUtils.createLabel("Payment Method");
+        statusFilterPanel.add(paymentMethodLabel);
+        String[] methods = {"All","Cash", "Credit Card", "Debit Card", "Online Transfer", "E-Wallet"};
+        paymentMethodFilterCombo = UIUtils.createJComboBox(methods);
+        paymentMethodFilterCombo.setPreferredSize(new Dimension(150, 45));
+        statusFilterPanel.add(paymentMethodFilterCombo);
         searchPanel.add(statusFilterPanel);
 
         headerContainer.add(searchPanel);
@@ -136,7 +132,7 @@ public class ManagePaymentPanel extends JPanel {
         return header;
     }
 
-    public void addPaymentRecordRow(PaymentRecord paymentRecord, Consumer<PaymentRecord> onCollect, Consumer<PaymentRecord> onViewReceipt) {
+    public void addPaymentRecordRow(PaymentRecord paymentRecord, Consumer<PaymentRecord> onCollect, Consumer<PaymentRecord> onViewReceipt , boolean showActionButton) {
         boolean hasMadePayment = paymentRecord.isHasPaid();
 
         JPanel row = new JPanel(new GridLayout(1, 6, 10, 0));
@@ -176,15 +172,23 @@ public class ManagePaymentPanel extends JPanel {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         actions.setOpaque(false);
 
-        if (hasMadePayment) {
-            JButton receiptBtn = UIUtils.createActionIconButton("Receipt", new Color(37, 99, 235));
-            receiptBtn.addActionListener(e -> onViewReceipt.accept(paymentRecord));
-            actions.add(receiptBtn);
+        if(!showActionButton){
+            JLabel appointmentNotCompletedMessage = new JLabel("Appointment not completed yet.");
+            appointmentNotCompletedMessage.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+            appointmentNotCompletedMessage.setForeground(Color.GRAY);
+            actions.add(appointmentNotCompletedMessage);
         }
         else{
-            JButton collectBtn = UIUtils.createActionIconButton("Collect Payment",  new Color(16, 185, 129));
-            collectBtn.addActionListener(e -> onCollect.accept(paymentRecord));
-            actions.add(collectBtn);
+            if (hasMadePayment) {
+                JButton receiptBtn = UIUtils.createActionIconButton("Receipt", new Color(37, 99, 235));
+                receiptBtn.addActionListener(e -> onViewReceipt.accept(paymentRecord));
+                actions.add(receiptBtn);
+            }
+            else{
+                JButton collectBtn = UIUtils.createActionIconButton("Collect Payment",  new Color(16, 185, 129));
+                collectBtn.addActionListener(e -> onCollect.accept(paymentRecord));
+                actions.add(collectBtn);
+            }
         }
         
         row.add(actions);

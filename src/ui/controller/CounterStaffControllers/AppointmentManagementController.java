@@ -9,12 +9,11 @@ import services.ServicesService;
 import ui.controller.CounterStaffControllers.FormController.AddAppointmentFormController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.ManagePaymentPanel;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomComboBoxItem;
 import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
 import utils.CSVExporter;
 import utils.DialogUtil;
 import utils.exporters.CsvExporters.AppointmentCsvExporter;
-import utils.exporters.interfaces.CsvExporter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,7 +76,7 @@ public class AppointmentManagementController {
         String keyword = manageAppointmentPanel.searchField.getText();
         String statusFilterSelection = Objects.requireNonNull(manageAppointmentPanel.statusFilterCombo.getSelectedItem()).toString();
         AppointmentStatus appointmentStatusFilterSelected = statusFilterSelection.equalsIgnoreCase("All") ? null :AppointmentStatus.fromString(statusFilterSelection);
-        ServiceComboBoxItem serviceTypeSelection = (ServiceComboBoxItem) manageAppointmentPanel.serviceTypeFilterCombo.getSelectedItem();
+        CustomComboBoxItem serviceTypeSelection = (CustomComboBoxItem) manageAppointmentPanel.serviceTypeFilterCombo.getSelectedItem();
         String serviceTypeId;
         if(serviceTypeSelection == null){
             serviceTypeId = "";
@@ -133,7 +132,7 @@ public class AppointmentManagementController {
         try {
             List<Services> services = servicesService.getServices();
             for(Services service : services){
-                manageAppointmentPanel.serviceTypeFilterCombo.addItem(new ServiceComboBoxItem(service.getId() , service.getServiceName()));
+                manageAppointmentPanel.serviceTypeFilterCombo.addItem(new CustomComboBoxItem(service.getId() , service.getServiceName()));
             }
         } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Encountered Error" , "Failed to get service types");

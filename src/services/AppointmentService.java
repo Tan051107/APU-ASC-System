@@ -1,5 +1,6 @@
 package services;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
 import enums.AppointmentStatus;
@@ -203,6 +204,21 @@ public class AppointmentService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         LocalDateTime maxAllowedAppointmentDateTime = currentDateTime.plusWeeks(2);
         return chosenAppointmentDateTime.isBefore(currentDateTime) || chosenAppointmentDateTime.isAfter(maxAllowedAppointmentDateTime);
+    }
+
+    //Validate whether the appointment date time is within operation hour
+    private boolean isNotOperationHour(Appointment appointment) throws GetEntityListException {
+        final LocalTime operationStartTime = LocalTime.of(9,0);
+        final LocalTime operationEndTime = LocalTime.of(18,0);
+        LocalDate appointmentDate = appointment.getDate();
+        LocalTime appointmentStartTime = appointment.getTime();
+        int appointmentDuration = appointment.getService().getServiceDuration();
+        LocalTime appointmentEndTime = appointmentStartTime.plusHours(appointmentDuration);
+        DayOfWeek appointmentDay = appointmentDate.getDayOfWeek();
+        if(appointmentDay == DayOfWeek.SATURDAY || appointmentDay == DayOfWeek.SUNDAY){
+            return true;
+        }
+        return appointmentStartTime.isBefore(operationStartTime) || !appointmentEndTime.isAfter(operationEndTime);
     }
 
     private boolean carHasClashAppointment(Appointment newAppointment , String appointmentToIgnore) throws FileCorruptedException, GetEntityListException {

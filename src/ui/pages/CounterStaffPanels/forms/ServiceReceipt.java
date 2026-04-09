@@ -1,17 +1,29 @@
 package ui.pages.CounterStaffPanels.forms;
 
+import exceptions.GetEntityListException;
 import models.*;
 import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServiceReceipt extends JDialog {
 
-    public ServiceReceipt(Frame owner, PaymentRecord record, Customer customer, CustomerCar car, Services services , User loginStaff) {
+    Logger logger = Logger.getLogger(ServiceReceipt.class.getName());
+
+    public ServiceReceipt(Frame owner, PaymentRecord record, Customer customer, CustomerCar car, Services services){
         super(owner, "Official Receipt", true);
-        
-        setSize(500, 800);
+        String paymentCollectedBy = "";
+        try {
+            paymentCollectedBy = record.getStaffCollectPayment().getName();
+        } catch (GetEntityListException e) {
+            logger.log(Level.SEVERE,e.getMessage());
+        }
+
+        setSize(500, 850);
         setLocationRelativeTo(owner);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -21,17 +33,28 @@ public class ServiceReceipt extends JDialog {
         mainPanel.setBackground(Color.WHITE);
 
         // --- Header / Logo ---
+        try {
+            ImageIcon logoIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/logo.png")));
+            Image img = logoIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+            JLabel logo = new JLabel(new ImageIcon(img));
+            logo.setAlignmentX(Component.CENTER_ALIGNMENT);
+            mainPanel.add(logo);
+            mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        } catch (Exception e) {
+            // Logo fallback if not found
+        }
+
         JLabel receiptTitle = new JLabel("OFFICIAL RECEIPT");
         receiptTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
         receiptTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(receiptTitle);
-        
+
         JLabel companyName = new JLabel("APU Automotive Service Centre");
         companyName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         companyName.setForeground(Color.GRAY);
         companyName.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(companyName);
-        
+
         mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
         mainPanel.add(new JSeparator());
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -42,7 +65,7 @@ public class ServiceReceipt extends JDialog {
         basicInfo.add(createDetailItem("Receipt ID:", record.getId()));
         basicInfo.add(createDetailItem("Appointment ID:", record.getAppointmentId()));
         mainPanel.add(basicInfo);
-        
+
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // --- Customer Section ---
@@ -50,7 +73,7 @@ public class ServiceReceipt extends JDialog {
         mainPanel.add(createDetailRow("Name:", customer.getName()));
         mainPanel.add(createDetailRow("Email:", customer.getEmail()));
         mainPanel.add(createDetailRow("Contact:", customer.getContactNumber()));
-        
+
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // --- Vehicle Section ---
@@ -58,13 +81,13 @@ public class ServiceReceipt extends JDialog {
         mainPanel.add(createDetailRow("Plate Number:", car.getCarPlate()));
         mainPanel.add(createDetailRow("Brand / Model:", car.getCarBrand() + " " + car.getCarModel()));
         mainPanel.add(createDetailRow("Current Mileage:", String.format("%.0f km", car.getMileage())));
-        
+
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // --- Service Section ---
         mainPanel.add(createSectionHeader("SERVICE RENDERED"));
         mainPanel.add(createDetailRow("Service Type:", services.getServiceName()));
-        
+
         mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
         mainPanel.add(new JSeparator());
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -74,9 +97,12 @@ public class ServiceReceipt extends JDialog {
         mainPanel.add(createDetailRow("Payment Method:", record.getPaymentMethod()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         mainPanel.add(createDetailRow("Payment Date:", record.getUpdatedAt().format(formatter)));
-        
+        if(!paymentCollectedBy.isEmpty()){
+            mainPanel.add(createDetailRow("Payment Made By:",paymentCollectedBy));
+        }
+
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        
+
         JPanel totalPanel = new JPanel(new BorderLayout());
         totalPanel.setOpaque(false);
         JLabel totalLabel = new JLabel("TOTAL PAID:");
@@ -84,20 +110,20 @@ public class ServiceReceipt extends JDialog {
         JLabel totalAmount = new JLabel(String.format("RM %.2f", record.getAmount()));
         totalAmount.setFont(new Font("Segoe UI", Font.BOLD, 22));
         totalAmount.setForeground(new Color(22, 101, 52)); // Dark green
-        
+
         totalPanel.add(totalLabel, BorderLayout.WEST);
         totalPanel.add(totalAmount, BorderLayout.EAST);
         mainPanel.add(totalPanel);
 
         mainPanel.add(Box.createVerticalGlue());
-        
+
         // --- Footer ---
         JLabel footerMsg = new JLabel("Thank you for choosing APU-ASC!");
         footerMsg.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         footerMsg.setForeground(Color.GRAY);
         footerMsg.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(footerMsg);
-        
+
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         JButton closeBtn = UIUtils.createPrimaryButton("CLOSE");
         closeBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -124,15 +150,15 @@ public class ServiceReceipt extends JDialog {
         JPanel row = new JPanel(new BorderLayout());
         row.setOpaque(false);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        
+
         JLabel lbl = new JLabel(label);
         lbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lbl.setForeground(new Color(75, 85, 99)); // Gray-600
-        
+
         JLabel val = new JLabel(value);
         val.setFont(new Font("Segoe UI", Font.BOLD, 13));
         val.setForeground(new Color(31, 41, 55)); // Gray-900
-        
+
         row.add(lbl, BorderLayout.WEST);
         row.add(val, BorderLayout.EAST);
         return row;
@@ -142,14 +168,14 @@ public class ServiceReceipt extends JDialog {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setOpaque(false);
-        
+
         JLabel lbl = new JLabel(label);
         lbl.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lbl.setForeground(Color.GRAY);
-        
+
         JLabel val = new JLabel(value);
         val.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        
+
         p.add(lbl);
         p.add(val);
         return p;

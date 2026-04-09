@@ -10,6 +10,7 @@ import utils.RandomIdGenerator;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class PaymentRecordService {
     private final String PAYMENT_RECORD_FILE = "txt_files/PaymentRecord.txt";
@@ -48,12 +49,29 @@ public class PaymentRecordService {
     }
 
     public void makePayment(PaymentRecord paymentRecordToMakePayment) throws GetEntityListException, BusinessRuleException, FileCorruptedException, NotFoundException {
-//        Appointment appointment = appointmentService.getAppointmentById(paymentRecordToMakePayment.getAppointmentId());
-//        if(!appointment.getStatusService().equals(AppointmentStatus.COMPLETED)){
-//            throw new BusinessRuleException("Payment can only be made for completed appointments");
-//        }
+        Appointment appointment = appointmentService.getAppointmentById(paymentRecordToMakePayment.getAppointmentId());
+        if(!appointment.getStatusService().equals(AppointmentStatus.COMPLETED)){
+            throw new BusinessRuleException("Payment can only be made for completed appointments");
+        }
         paymentRecordToMakePayment.setHasPaid(true);
         paymentRecordCrudRepository.update(paymentRecordToMakePayment);
+    }
+
+    public List<PaymentRecord> searchPaymentRecord(String keyword , String paymentStatus , String paymentMethod) throws FileCorruptedException {
+        Predicate<PaymentRecord> paymentRecordPredicate =paymentRecord -> true;
+        if(!keyword.isEmpty()){
+            String keywordLowerCase = keyword.toLowerCase();
+            paymentRecordPredicate = paymentRecordPredicate.and(paymentRecord -> paymentRecord.getAppointmentId().toLowerCase().contains(keywordLowerCase) || paymentRecord.getId().toLowerCase().contains(keywordLowerCase));
+        }
+        if(!paymentStatus.isEmpty()){
+            boolean hasPaid = paymentStatus.equalsIgnoreCase("paid");
+            paymentRecordPredicate = paymentRecordPredicate.and(paymentRecord -> paymentRecord.isHasPaid() == hasPaid);
+        }
+        if(!paymentMethod.isEmpty()){
+            paymentRecordPredicate = paymentRecordPredicate.and(paymentRecord -> paymentRecord.getPaymentMethod() != null && paymentRecord.getPaymentMethod().equalsIgnoreCase(paymentMethod));
+        }
+
+        return paymentRecordCrudRepository.getAll(paymentRecordPredicate);
     }
 
     private String generatePaymentId(){
