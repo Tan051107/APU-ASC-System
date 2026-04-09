@@ -40,6 +40,7 @@ public class ManageCustomerPanel extends JPanel {
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
         searchPanel.setOpaque(false);
         searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
         JLabel searchLabel = UIUtils.createLabel("Search:");
         searchPanel.add(searchLabel);
         searchField = UIUtils.createTextField();
