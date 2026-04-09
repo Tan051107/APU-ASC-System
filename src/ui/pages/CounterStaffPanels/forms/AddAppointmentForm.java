@@ -21,8 +21,8 @@ public class AddAppointmentForm extends JDialog {
     public JComboBox<CustomComboBoxItem> technicianSelectionCombo;
     public Component technicianSpacing;
     public JButton createAppointmentBtn;
-    private Appointment appointmentToEdit;
-    private boolean isEdit;
+    private final Appointment appointmentToEdit;
+    private final boolean isEdit;
     private final User loginStaff;
 
     public AddAppointmentForm(Frame owner, boolean isEdit , Appointment appointmentToEdit, User loginStaff) {
@@ -128,17 +128,10 @@ public class AddAppointmentForm extends JDialog {
         return appointmentToEdit;
     }
 
-    public void setAppointmentToEdit(Appointment appointmentToEdit) {
-        this.appointmentToEdit = appointmentToEdit;
-    }
-
     public boolean isEdit() {
         return isEdit;
     }
 
-    public void setEdit(boolean edit) {
-        isEdit = edit;
-    }
 
     public User getLoginStaff() {
         return loginStaff;

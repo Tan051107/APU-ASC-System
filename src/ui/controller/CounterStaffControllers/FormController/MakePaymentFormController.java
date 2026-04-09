@@ -49,7 +49,6 @@ public class MakePaymentFormController {
     }
 
 
-
     private void makePayment(){
         String selectedPaymentMethod = Objects.requireNonNull(makePaymentForm.paymentMethodCombo.getSelectedItem()).toString();
         paymentRecordToMakePayment.setPaymentDateTime(LocalDateTime.now());

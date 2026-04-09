@@ -96,9 +96,6 @@ public class MakePaymentForm extends JDialog {
         container.add(Box.createRigidArea(new Dimension(0, 10)));
     }
 
-    public PaymentRecord getPaymentRecord() {
-        return paymentRecord;
-    }
 
     public User getLoginStaff() {
         return loginStaff;
