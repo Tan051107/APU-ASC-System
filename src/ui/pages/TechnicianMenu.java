@@ -74,7 +74,6 @@ public class TechnicianMenu extends JFrame {
 
         add(sidebar, BorderLayout.WEST);
 
-        // 2. Create the Content Panel with CardLayout
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
