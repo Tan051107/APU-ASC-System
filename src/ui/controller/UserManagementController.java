@@ -1,24 +1,18 @@
 package ui.controller;
 
 import exceptions.DeleteException;
-import exceptions.FileCorruptedException;
 import models.User;
 import services.UserService;
 import ui.pages.Manager.forms.AddUserForm;
-import ui.controller.AddUserFormController;
 import ui.pages.ManagerMenu;
 import utils.DialogUtil;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class UserManagementController {
     private final ManagerMenu managerMenu;
     private final UserService userService = new UserService();
-    //private final UserService userService = new UserService();
     //Logger logger = Logger.getLogger(UserManagementController.class.getName());
 
     public UserManagementController(ManagerMenu managerMenu) {
@@ -65,6 +59,10 @@ public class UserManagementController {
 
             try {
                 String targetUserId = managerMenu.userTable.getValueAt(selectedRow, 0).toString();
+                if (targetUserId.equals(managerMenu.getUser().getId())) {
+                    DialogUtil.showWarningMessage("Action Denied", "You cannot delete yourself");
+                    return;
+                }
                 User userToDelete = userService.getUserById(targetUserId); 
                 if (userToDelete != null) {
                     deleteUser(userToDelete);
