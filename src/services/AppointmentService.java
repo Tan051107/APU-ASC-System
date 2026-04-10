@@ -168,7 +168,7 @@ public class AppointmentService {
                 continue;
             } //Skip appointments that are cancelled/completed - No need check
             LocalTime assignedAppointmentStartTime = assignedAppointment.getTime();
-            int appointmentDuration = assignedAppointment.getService().getServiceDuration();
+            int appointmentDuration = assignedAppointment.getService().getDuration();
             LocalTime assignedAppointmentEndTime = assignedAppointmentStartTime.plusHours(appointmentDuration);
 
             LocalDate newAppointmentDate = newAppointmentDateTime.toLocalDate();
@@ -215,7 +215,7 @@ public class AppointmentService {
         final LocalTime operationEndTime = LocalTime.of(18,0);
         LocalDate appointmentDate = appointment.getDate();
         LocalTime appointmentStartTime = appointment.getTime();
-        int appointmentDuration = appointment.getService().getServiceDuration();
+        int appointmentDuration = appointment.getService().getDuration();
         LocalTime appointmentEndTime = appointmentStartTime.plusHours(appointmentDuration);
         DayOfWeek appointmentDay = appointmentDate.getDayOfWeek();
         if(appointmentDay == DayOfWeek.SATURDAY || appointmentDay == DayOfWeek.SUNDAY){
@@ -231,11 +231,11 @@ public class AppointmentService {
             return false;
         }
 
-        int newAppointmentDuration = newAppointment.getService().getServiceDuration();
+        int newAppointmentDuration = newAppointment.getService().getDuration();
         LocalDateTime newAppointmentStartDateTime = LocalDateTime.of(newAppointment.getDate(),newAppointment.getTime());
         LocalDateTime newAppointmentEndDateTime = newAppointmentStartDateTime.plusHours(newAppointmentDuration);
         for(Appointment appointment : carAppointments){
-            int existingAppointmentDuration = appointment.getService().getServiceDuration();
+            int existingAppointmentDuration = appointment.getService().getDuration();
             LocalDateTime existingAppointmentStartDateTime = LocalDateTime.of(appointment.getDate(),appointment.getTime());
             LocalDateTime existingAppointmentEndDateTime = existingAppointmentStartDateTime.plusHours(existingAppointmentDuration);
             if(newAppointmentEndDateTime.isAfter(existingAppointmentStartDateTime) && newAppointmentStartDateTime.isBefore(existingAppointmentEndDateTime)){
@@ -250,10 +250,10 @@ public class AppointmentService {
         if(appointments.isEmpty()){
             return false;
         }
-        int appointmentToSaveDuration = appointmentToSave.getService().getServiceDuration();
+        int appointmentToSaveDuration = appointmentToSave.getService().getDuration();
         LocalDateTime appointmentToSaveEndTime = LocalDateTime.of(appointmentToSave.getDate(),appointmentToSave.getTime()).plusHours(appointmentToSaveDuration);
         for(Appointment appointment :appointments){
-            int existingAppointmentDuration = appointment.getService().getServiceDuration();
+            int existingAppointmentDuration = appointment.getService().getDuration();
             LocalDateTime existingAppointmentEndTime = LocalDateTime.of(appointment.getDate(),appointment.getTime()).plusHours(existingAppointmentDuration);
             if(existingAppointmentEndTime.isAfter(appointmentToSaveEndTime)){
                 return true;
@@ -265,7 +265,7 @@ public class AppointmentService {
     private PaymentRecord createPaymentRecordForAppointment(Appointment appointment) throws GetEntityListException {
         PaymentRecord paymentRecord = new PaymentRecord();
         paymentRecord.setAppointmentId(appointment.getId());
-        double servicePrice = appointment.getService().getServicePrice();
+        double servicePrice = appointment.getService().getPrice();
         paymentRecord.setAmount(servicePrice);
         return paymentRecord;
     }

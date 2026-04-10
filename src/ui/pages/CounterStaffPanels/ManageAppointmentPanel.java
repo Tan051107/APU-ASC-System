@@ -4,7 +4,6 @@ import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import models.*;
 import services.CustomerCarService;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomComboBoxItem;
 import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
 import ui.utils.RoundedPanel;
 import ui.utils.UIUtils;
@@ -155,8 +154,8 @@ public class ManageAppointmentPanel extends JPanel {
         try {
             Services selectedService = appointment.getService();
             if (selectedService != null) {
-                serviceName = selectedService.getServiceName();
-                serviceDuration = String.valueOf(selectedService.getServiceDuration());
+                serviceName = selectedService.getName();
+                serviceDuration = String.valueOf(selectedService.getDuration());
             }
             
             Customer customer = appointment.getCustomer();

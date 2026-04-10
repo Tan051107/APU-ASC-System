@@ -58,8 +58,8 @@ public class CustomerController {
                 }
 
                 Services service = getServiceById(appointment.getServiceId());
-                String serviceType = service == null ? "Unknown Service" : service.getServiceName();
-                String serviceDescription = service == null ? "-" : service.getServiceDetails();
+                String serviceType = service == null ? "Unknown Service" : service.getName();
+                String serviceDescription = service == null ? "-" : service.getDetails();
                 String appointmentStatus = appointment.getStatusService().getDisplayAppointmentStatus();
 
                 boolean matchesStatus;
@@ -113,9 +113,9 @@ public class CustomerController {
                 }
 
                 Services service = getServiceById(appointment.getServiceId());
-                String serviceType = service == null ? "Unknown Service" : service.getServiceName();
-                String description = service == null ? "-" : service.getServiceDetails();
-                String amount = service == null ? "0.00" : String.format("%.2f", service.getServicePrice());
+                String serviceType = service == null ? "Unknown Service" : service.getName();
+                String description = service == null ? "-" : service.getDetails();
+                String amount = service == null ? "0.00" : String.format("%.2f", service.getPrice());
                 String status = appointment.getStatusService().getDisplayAppointmentStatus();
 
                 String appointmentYear = String.valueOf(appointment.getDate().getYear());

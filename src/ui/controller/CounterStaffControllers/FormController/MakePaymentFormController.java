@@ -36,7 +36,7 @@ public class MakePaymentFormController {
         try {
             String customerName = paymentRecordToMakePayment.getAppointment().getCustomer().getName();
             String carPlate = paymentRecordToMakePayment.getAppointment().getCar().getCarPlate();
-            String serviceType = paymentRecordToMakePayment.getAppointment().getService().getServiceName();
+            String serviceType = paymentRecordToMakePayment.getAppointment().getService().getName();
             makePaymentForm.customerNameLbl.setText(customerName);
             makePaymentForm.carPlateLbl.setText(carPlate);
             makePaymentForm.serviceTypeLbl.setText(serviceType);

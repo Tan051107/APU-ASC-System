@@ -19,8 +19,8 @@ public class CustomerCarMapper implements Mapper<CustomerCar> {
         }
         customerCar.setId(data[0]);
         customerCar.setCustomerId(data[1]);
-        customerCar.setCarModel(data[2]);
-        customerCar.setCarBrand(data[3]);
+        customerCar.setModel(data[2]);
+        customerCar.setBrand(data[3]);
         customerCar.setCarPlate(data[4]);
         customerCar.setMileage(Double.parseDouble(data[5]));
         customerCar.setFuelType(FuelType.fromString(data[6]));
@@ -36,8 +36,8 @@ public class CustomerCarMapper implements Mapper<CustomerCar> {
                 "|",
                 customerCar.getId(),
                 customerCar.getCustomerId(),
-                customerCar.getCarModel(),
-                customerCar.getCarBrand(),
+                customerCar.getModel(),
+                customerCar.getBrand(),
                 customerCar.getCarPlate(),
                 String.valueOf(customerCar.getMileage()),
                 customerCar.getFuelType().toString(),

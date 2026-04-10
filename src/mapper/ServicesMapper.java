@@ -16,10 +16,10 @@ public class ServicesMapper implements Mapper<Services>{
             throw new FileCorruptedException("Service file contains extra data or has missing data");
         }
         services.setId(data[0]);
-        services.setServiceName(data[1]);
-        services.setServicePrice(Double.parseDouble(data[2]));
-        services.setServiceDetails(data[3]);
-        services.setServiceDuration(Integer.parseInt(data[4]));
+        services.setName(data[1]);
+        services.setPrice(Double.parseDouble(data[2]));
+        services.setDetails(data[3]);
+        services.setDuration(Integer.parseInt(data[4]));
         services.setCreatedAt(LocalDateTime.parse(data[5]));
         services.setUpdatedAt(LocalDateTime.parse(data[6]));
         return services;
@@ -27,7 +27,7 @@ public class ServicesMapper implements Mapper<Services>{
 
     @Override
     public String toString(Services services){
-        String formattedPrice = String.format("%.2f", services.getServicePrice());
-        return String.join("|" , services.getId(),services.getServiceName(),formattedPrice, services.getServiceDetails(), String.valueOf(services.getServiceDuration()) ,services.getCreatedAt().toString(),services.getUpdatedAt().toString());
+        String formattedPrice = String.format("%.2f", services.getPrice());
+        return String.join("|" , services.getId(),services.getName(),formattedPrice, services.getDetails(), String.valueOf(services.getDuration()) ,services.getCreatedAt().toString(),services.getUpdatedAt().toString());
     }
 }

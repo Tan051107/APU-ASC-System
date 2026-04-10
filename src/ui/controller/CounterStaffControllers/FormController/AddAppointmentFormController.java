@@ -81,7 +81,7 @@ public class AddAppointmentFormController {
 
                 String carPlate = appointmentToEdit.getCar().getCarPlate();
                 String customerName = appointmentToEdit.getCustomer().getName();
-                String serviceName = appointmentToEdit.getService().getServiceName();
+                String serviceName = appointmentToEdit.getService().getName();
                 String technicianName = appointmentToEdit.getTechnician().getName();
                 addAppointmentForm.customerSelectionCombo.setSelectedItem(new CustomComboBoxItem(customerId , " | " + customerName));
                 addAppointmentForm.serviceTypeCombo.setSelectedItem(new ServiceComboBoxItem(serviceId , " | " + serviceName));
@@ -107,7 +107,7 @@ public class AddAppointmentFormController {
                 DialogUtil.showWarningMessage("No service available" , "No service available for appointment assignment");
             }
             for(Services service : services){
-                addAppointmentForm.serviceTypeCombo.addItem(new ServiceComboBoxItem(service.getId() ,service.getServiceName()));
+                addAppointmentForm.serviceTypeCombo.addItem(new ServiceComboBoxItem(service.getId() ,service.getName()));
             }
         } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Init Form Failed" , "Failed to initialize form");
@@ -254,7 +254,7 @@ public class AddAppointmentFormController {
         if(!selectedAppointmentTime.isEmpty() && !selectedAppointmentDate.isEmpty() && !(serviceSelected == null)){
             String serviceSelectedId = serviceSelected.getId();
             try {
-                int selectedServiceDuration = servicesService.getServicesById(serviceSelectedId).getServiceDuration();
+                int selectedServiceDuration = servicesService.getServicesById(serviceSelectedId).getDuration();
                 String appointmentDateTimeString = selectedAppointmentDate+" "+selectedAppointmentTime;
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                 LocalDateTime appointmentDateTime = LocalDateTime.parse(appointmentDateTimeString, formatter);

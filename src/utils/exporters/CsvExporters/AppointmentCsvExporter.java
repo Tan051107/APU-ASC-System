@@ -4,7 +4,6 @@ import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import models.Appointment;
 import models.Services;
-import services.*;
 import utils.exporters.interfaces.CsvExporter;
 
 import java.io.FileWriter;
@@ -29,8 +28,8 @@ public class AppointmentCsvExporter implements CsvExporter<Appointment> {
                 String carPlate =appointment.getCar().getCarPlate();
                 String technicianName = appointment.getTechnician().getName();
                 Services serviceChosen = appointment.getService();
-                String serviceName = serviceChosen.getServiceName();
-                String serviceDuration = String.valueOf(serviceChosen.getServiceDuration());
+                String serviceName = serviceChosen.getName();
+                String serviceDuration = String.valueOf(serviceChosen.getDuration());
                 String appointmentDate = " " + appointment.getDate().format(dateFormatter);
                 String appointmentTime = appointment.getTime().format(timeFormatter);
                 String appointmentStatus = appointment.getStatusService().getDisplayAppointmentStatus();

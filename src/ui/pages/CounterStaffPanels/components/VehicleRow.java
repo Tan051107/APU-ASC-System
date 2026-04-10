@@ -1,7 +1,6 @@
 package ui.pages.CounterStaffPanels.components;
 
 import models.CustomerCar;
-import ui.utils.RoundedPanel;
 import ui.utils.UIUtils;
 
 import javax.swing.*;
@@ -32,7 +31,7 @@ public class VehicleRow extends JPanel {
         plateLabel.setForeground(new Color(31, 41, 55));
 
         //For car model display
-        JLabel modelLabel = new JLabel(car.getCarModel());
+        JLabel modelLabel = new JLabel(car.getModel());
         modelLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         modelLabel.setForeground(new Color(75, 85, 99));
 

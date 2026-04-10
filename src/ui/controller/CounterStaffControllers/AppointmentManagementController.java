@@ -9,7 +9,6 @@ import services.ServicesService;
 import ui.controller.CounterStaffControllers.FormController.AddAppointmentFormController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.ManagePaymentPanel;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomComboBoxItem;
 import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
 import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
 import utils.CSVExporter;
@@ -133,7 +132,7 @@ public class AppointmentManagementController {
         try {
             List<Services> services = servicesService.getServices();
             for(Services service : services){
-                manageAppointmentPanel.serviceTypeFilterCombo.addItem(new ServiceComboBoxItem(service.getId() , service.getServiceName()));
+                manageAppointmentPanel.serviceTypeFilterCombo.addItem(new ServiceComboBoxItem(service.getId() , service.getName()));
             }
         } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Encountered Error" , "Failed to get service types");

@@ -79,14 +79,14 @@ public class ServiceReceipt extends JDialog {
         // --- Vehicle Section ---
         mainPanel.add(createSectionHeader("VEHICLE DETAILS"));
         mainPanel.add(createDetailRow("Plate Number:", car.getCarPlate()));
-        mainPanel.add(createDetailRow("Brand / Model:", car.getCarBrand() + " " + car.getCarModel()));
+        mainPanel.add(createDetailRow("Brand / Model:", car.getBrand() + " " + car.getModel()));
         mainPanel.add(createDetailRow("Current Mileage:", String.format("%.0f km", car.getMileage())));
 
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // --- Service Section ---
         mainPanel.add(createSectionHeader("SERVICE RENDERED"));
-        mainPanel.add(createDetailRow("Service Type:", services.getServiceName()));
+        mainPanel.add(createDetailRow("Service Type:", services.getName()));
 
         mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
         mainPanel.add(new JSeparator());
