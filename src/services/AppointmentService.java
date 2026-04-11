@@ -84,6 +84,9 @@ public class AppointmentService {
         if(carHasNotCompletedAppointment(appointmentToUpdate,appointmentToUpdateId)){
             throw new BusinessRuleException("Car already has an upcoming appointment");
         }
+        if(isNotOperationHour(appointmentToUpdate)){
+            throw new BusinessRuleException("Operating hours are from 9 AM to 6 PM, Monday to Friday");
+        }
         appointmentRepository.update(appointmentToUpdate);
     }
 
@@ -221,7 +224,7 @@ public class AppointmentService {
         if(appointmentDay == DayOfWeek.SATURDAY || appointmentDay == DayOfWeek.SUNDAY){
             return true;
         }
-        return appointmentStartTime.isBefore(operationStartTime) || !appointmentEndTime.isAfter(operationEndTime);
+        return appointmentStartTime.isBefore(operationStartTime) || appointmentEndTime.isAfter(operationEndTime);
     }
 
     private boolean carHasClashAppointment(Appointment newAppointment , String appointmentToIgnore) throws FileCorruptedException, GetEntityListException {
