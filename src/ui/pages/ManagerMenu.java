@@ -11,8 +11,7 @@ import ui.utils.UIUtils;
 import java.awt.*;
 
 public class ManagerMenu extends JFrame {
-    
-    // Panel that will hold all the different views
+    private final User user;
     public JButton addUser; 
     public JButton editUser;
     public JButton deleteUser;
@@ -32,6 +31,7 @@ public class ManagerMenu extends JFrame {
     private final ManagerMenuController controller;
 
     public ManagerMenu(User user) {
+        this.user = user;
         controller = new ManagerMenuController(this);
         setTitle("APU-ASC Manager Dashboard");
         setSize(1100, 600);
@@ -39,14 +39,12 @@ public class ManagerMenu extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // 1. Create the Sidebar Navigation
         sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(new Color(45, 52, 54)); // Dark grey background
+        sidebar.setBackground(new Color(45, 52, 54));
         sidebar.setPreferredSize(new Dimension(220, getHeight()));
         sidebar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Toggle Button
         toggleButton = new JButton("≡");
         styleToggleButton(toggleButton);
         toggleButton.addActionListener(e -> toggleSidebar());
@@ -58,7 +56,6 @@ public class ManagerMenu extends JFrame {
         sidebar.add(togglePanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Create Navigation Buttons
         btnManageUsers = createSidebarButton("Manage Users");
         btnSetPrices = createSidebarButton("Service Pricing");
         btnFeedback = createSidebarButton("View Feedback");
@@ -77,12 +74,9 @@ public class ManagerMenu extends JFrame {
 
         add(sidebar, BorderLayout.WEST);
 
-        // 2. Create the Content Panel with CardLayout
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
-        // Add the individual function panels to the CardLayout
-        // The string acts as an ID to call the specific panel later
         contentPanel.add(createManageUsersPanel(), "Manage Users");
         contentPanel.add(createSetPricesPanel(), "Service Pricing");
         contentPanel.add(createFeedbackPanel(), "View Feedback");
@@ -90,7 +84,6 @@ public class ManagerMenu extends JFrame {
 
         add(contentPanel, BorderLayout.CENTER);
 
-        // 3. Add Action Listeners to swap cards when buttons are clicked
         btnManageUsers.addActionListener(e -> cardLayout.show(contentPanel, "Manage Users"));
         btnSetPrices.addActionListener(e -> cardLayout.show(contentPanel, "Service Pricing"));
         btnFeedback.addActionListener(e -> cardLayout.show(contentPanel, "View Feedback"));
@@ -99,6 +92,10 @@ public class ManagerMenu extends JFrame {
         controller.initListeners();
         new UserManagementController(this); 
     
+    }
+
+    public User getUser() {
+        return user;
     }
 
     private void toggleSidebar() {
@@ -133,7 +130,6 @@ public class ManagerMenu extends JFrame {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    // Helper method to style buttons uniformly
     private JButton createSidebarButton(String text) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
@@ -144,8 +140,6 @@ public class ManagerMenu extends JFrame {
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         return button;
     }
-
-    // --- View Generation Methods ---
 
     private JPanel createManageUsersPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -162,7 +156,6 @@ public class ManagerMenu extends JFrame {
         searchField.setColumns(15);
         JButton searchButton = new JButton("Search");
         
-        // Style the search button to match your theme
         searchButton.setBackground(new Color(99, 110, 114));
         searchButton.setForeground(Color.WHITE);
         searchButton.setFocusPainted(false);
@@ -170,18 +163,15 @@ public class ManagerMenu extends JFrame {
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
 
-        
         topPanel.add(searchPanel);
-        panel.add(topPanel, BorderLayout.NORTH); // Add the whole top section to the main panel
+        panel.add(topPanel, BorderLayout.NORTH);  
         
-        // 3. Setup the Table
         userTable = UIUtils.createTable(controller.loadUserToTable());;
         userTable.setModel(controller.loadUserToTable());
         userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         userTable.getTableHeader().setReorderingAllowed(false);
         panel.add(new JScrollPane(userTable), BorderLayout.CENTER);
 
-        // 4. Implement the "Find and Highlight" Search Logic
         searchButton.addActionListener(e -> {
             String currenttext = searchField.getText().trim().toUpperCase();
 
@@ -210,10 +200,8 @@ public class ManagerMenu extends JFrame {
             }
         });
 
-        // Pro-Tip: Allow the manager to press "Enter" on their keyboard while typing to trigger the search!
         searchField.addActionListener(e -> searchButton.doClick());
 
-        // 5. CRUD Action Buttons
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         addUser = createCRUDButton("Add User");
         bottomPanel.add(addUser);
@@ -231,7 +219,7 @@ public class ManagerMenu extends JFrame {
         JLabel title = displayMenuTitle("Automotive Service Pricing Management");
         panel.add(title, BorderLayout.NORTH);
 
-        JTable table = new JTable();
+        JTable table = UIUtils.createTable(controller.loadServiceToTable());;
         table.setModel(controller.loadServiceToTable());
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -257,7 +245,6 @@ public class ManagerMenu extends JFrame {
                 String details = serviceData[3] != null ? serviceData[3].toString() : "No details";
                 String lastEdited = serviceData[4] != null ? serviceData[4].toString() : "Unknown";
 
-                // Pass all 5 arguments to your method
                 showUpdatePriceDialog(clickedId, name, price, details, lastEdited, table);
             }
         });
@@ -266,7 +253,6 @@ public class ManagerMenu extends JFrame {
     }
 
     private void showUpdatePriceDialog(String id, String name, String price, String details,String lastEdited, JTable table) {
-        // Create a panel with a grid layout (3 rows, 2 columns) for the form
         JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
 
         formPanel.add(new JLabel("Service ID:"));
@@ -287,7 +273,6 @@ public class ManagerMenu extends JFrame {
         formPanel.add(new JLabel(lastEdited));
 
 
-        // Show the popup dialog
         int result = JOptionPane.showConfirmDialog(
             this, 
             formPanel, 
@@ -296,10 +281,8 @@ public class ManagerMenu extends JFrame {
             JOptionPane.PLAIN_MESSAGE
         );
 
-        // If the user clicks "OK"
         if (result == JOptionPane.OK_OPTION) {
             try {
-                // Parse the new price they typed
                 double newPrice = Double.parseDouble(priceField.getText().trim());
                 newPrice = Math.round(newPrice * 100.0) / 100.0; 
                 
@@ -311,8 +294,7 @@ public class ManagerMenu extends JFrame {
                     
                     JOptionPane.showMessageDialog(this, "Price successfully updated!");
                 } else {
-                    // If isSuccess is false, the controller already showed an error message, 
-                    // so we don't need to do anything else here.
+                    
                 }
 
             } catch (NumberFormatException ex) {
@@ -331,7 +313,7 @@ public class ManagerMenu extends JFrame {
         JLabel title = displayMenuTitle("Customer Feedback & Reviews");
         panel.add(title, BorderLayout.NORTH);
 
-        feedbackTable = new JTable();
+        feedbackTable = UIUtils.createTable(controller.loadFeedbackToTable());
         feedbackTable.setModel(controller.loadFeedbackToTable());
         panel.add(new JScrollPane(feedbackTable), BorderLayout.CENTER);
 

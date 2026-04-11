@@ -45,7 +45,7 @@ public class ManagerMenuController {
             String feedbackId = managerMenu.feedbackTable.getValueAt(selectedRow, 0).toString();
 
             // Open the UI and let the Controller fetch the data
-            ViewFeedbackPanel viewPanel = new ViewFeedbackPanel();
+            ViewFeedbackPanel viewPanel = new ViewFeedbackPanel(managerMenu);
             new ViewFeedbackController(viewPanel, feedbackId);
             viewPanel.setVisible(true);
         });
