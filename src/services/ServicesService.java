@@ -9,7 +9,6 @@ import models.Services;
 import repositories.ServicesRepository;
 
 import java.util.List;
-//import java.util.logging.Logger;
 
 public class ServicesService {
     private final String SERVICES_FILE = "txt_files/Services.txt";
@@ -35,7 +34,7 @@ public class ServicesService {
 
     public Services getServicesByName(String name) throws GetEntityListException {
         try{
-            return servicesRepository.getAll(services -> services.getServiceName().equalsIgnoreCase(name)).getFirst();
+            return servicesRepository.getAll(services -> services.getName().equalsIgnoreCase(name)).getFirst();
         }
         catch (FileCorruptedException e){
             throw new GetEntityListException(e.getMessage());

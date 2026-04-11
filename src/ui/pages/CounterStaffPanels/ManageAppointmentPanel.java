@@ -4,9 +4,6 @@ import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import models.*;
 import services.CustomerCarService;
-import services.CustomerService;
-import services.ServicesService;
-import services.TechnicianService;
 import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
 import ui.utils.RoundedPanel;
 import ui.utils.UIUtils;
@@ -71,7 +68,8 @@ public class ManageAppointmentPanel extends JPanel {
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
         searchPanel.setOpaque(false);
-
+        JLabel searchLabel = UIUtils.createLabel("Search:");
+        searchPanel.add(searchLabel);
         searchField = UIUtils.createTextField();
         searchField.setPreferredSize(new Dimension(300, 45));
         searchField.setMaximumSize(new Dimension(300, 45));
@@ -148,27 +146,24 @@ public class ManageAppointmentPanel extends JPanel {
     }
 
     public void addAppointmentRow(Appointment appointment, Consumer<Appointment> onEdit, Consumer<Appointment> onDelete , boolean showActionButtons) {
-        ServicesService servicesService = new ServicesService();
         CustomerCarService customerCarService =new CustomerCarService();
-        CustomerService customerService = new CustomerService();
-        TechnicianService technicianService = new TechnicianService();
         String serviceName = "Service";
         String serviceDuration = "0";
         String customerName = "Unknown";
         String technicianName = "Unassigned";
         try {
-            Services selectedService = servicesService.getServicesById(appointment.getServiceId());
+            Services selectedService = appointment.getService();
             if (selectedService != null) {
-                serviceName = selectedService.getServiceName();
-                serviceDuration = String.valueOf(selectedService.getServiceDuration());
+                serviceName = selectedService.getName();
+                serviceDuration = String.valueOf(selectedService.getDuration());
             }
             
-            Customer customer = customerService.getCustomerById(appointment.getCustomerId());
+            Customer customer = appointment.getCustomer();
             if (customer != null) {
                 customerName = customer.getName();
             }
 
-            Technician technician = technicianService.getTechnicianById(appointment.getTechnicianId());
+            Technician technician = appointment.getTechnician();
             if (technician != null) {
                 technicianName = technician.getName();
             }
@@ -199,7 +194,7 @@ public class ManageAppointmentPanel extends JPanel {
 
         // Car Plate
         try {
-            CustomerCar car = customerCarService.getCarById(appointment.getCarId());
+            CustomerCar car = appointment.getCar();
             String carPlate = (car != null) ? car.getCarPlate() : "Unknown";
             row.add(createLabel(carPlate));
         } catch (GetEntityListException e) {

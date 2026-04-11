@@ -42,16 +42,17 @@ public class CustomerManagementController {
     }
 
     private void openAddCustomerForm(boolean isEdit, Customer customerToEdit) {
-        AddCustomerForm form = new AddCustomerForm(isEdit, customerToEdit);
+        Window parent = SwingUtilities.getWindowAncestor(manageCustomerPanel);
+        AddCustomerForm form = new AddCustomerForm((Frame)parent, isEdit, customerToEdit);
         new AddCustomerFormController(form);
-        form.setVisible(true);
-        // We might want to reload customers after the form is closed
+        // Reload customers after the form is closed
         form.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent windowEvent) {
                 resetAllCustomers();
             }
         });
+        form.setVisible(true);
     }
 
     private void resetAllCustomers(){

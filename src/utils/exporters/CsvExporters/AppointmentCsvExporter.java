@@ -4,11 +4,11 @@ import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import models.Appointment;
 import models.Services;
-import services.*;
 import utils.exporters.interfaces.CsvExporter;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,23 +18,20 @@ public class AppointmentCsvExporter implements CsvExporter<Appointment> {
 
     @Override
     public void exportData(List<Appointment> data, String filePath) throws FileCorruptedException, IOException {
-        AppointmentService appointmentService = new AppointmentService();
-        CustomerService customerService = new CustomerService();
-        TechnicianService technicianService = new TechnicianService();
-        CustomerCarService customerCarService = new CustomerCarService();
-        ServicesService servicesService = new ServicesService();
         try(FileWriter writer = new FileWriter(filePath)){
             writer.append("Appointment Id, Customer Name , Car Plate , Technician Name , Service Type, Appointment Date , Appointment Time , Duration, Status , Description\n");
             for(Appointment appointment : data){
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                 String appointmentId = appointment.getId();
-                String customerName = customerService.getCustomerById(appointment.getCustomerId()).getName();
-                String carPlate = customerCarService.getCarById(appointment.getCarId()).getCarPlate();
-                String technicianName = technicianService.getTechnicianById(appointment.getTechnicianId()).getName();
-                Services serviceChosen = servicesService.getServicesById(appointment.getServiceId());
-                String serviceName = serviceChosen.getServiceName();
-                String serviceDuration = String.valueOf(serviceChosen.getServiceDuration());
-                String appointmentDate = appointment.getDate().toString();
-                String appointmentTime = appointment.getTime().toString();
+                String customerName = appointment.getCustomer().getName();
+                String carPlate =appointment.getCar().getCarPlate();
+                String technicianName = appointment.getTechnician().getName();
+                Services serviceChosen = appointment.getService();
+                String serviceName = serviceChosen.getName();
+                String serviceDuration = String.valueOf(serviceChosen.getDuration());
+                String appointmentDate = " " + appointment.getDate().format(dateFormatter);
+                String appointmentTime = appointment.getTime().format(timeFormatter);
                 String appointmentStatus = appointment.getStatusService().getDisplayAppointmentStatus();
                 String appointmentDescription = appointment.getDescription();
                 String dataRow = String.join("," ,

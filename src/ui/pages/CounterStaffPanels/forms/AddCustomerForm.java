@@ -6,7 +6,7 @@ import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
-public class AddCustomerForm extends JFrame {
+public class AddCustomerForm extends JDialog {
     public JTextField nameField;
     public JTextField emailField;
     public JTextField phoneField;
@@ -35,14 +35,14 @@ public class AddCustomerForm extends JFrame {
     }
 
 
-    public AddCustomerForm(boolean isEdit , Customer customerToEdit) {
+    public AddCustomerForm(Frame owner, boolean isEdit , Customer customerToEdit) {
+        super(owner, isEdit ? "Update Customer" : "Add New Customer", true);
         this.customerToEdit = customerToEdit;
         this.isEdit = isEdit;
 
-        setTitle(isEdit ? "Update Customer" : "Add New Customer");
         setSize(450, 550);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(owner);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));

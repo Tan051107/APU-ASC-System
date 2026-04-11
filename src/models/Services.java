@@ -5,56 +5,56 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Services extends BaseModel{
-    private String serviceName;
-    private double servicePrice;
-    private String serviceDetails;
+    private String name;
+    private double price;
+    private String details;
     private LocalDate date;
     private LocalTime time;
-    private int serviceDuration;
+    private int duration;
 
     public Services() {
     }
 
-    public Services(String serviceName, double servicePrice, String serviceDetails , int duration) {
-        this.serviceName = serviceName;
-        this.servicePrice = servicePrice;
-        this.serviceDetails = serviceDetails;
-        this.serviceDuration = duration;
+    public Services(String name, double price, String details, int duration) {
+        this.name = name;
+        this.price = price;
+        this.details = details;
+        this.duration = duration;
     }
 
-    public Services(String id, LocalDateTime createdAt, LocalDateTime updatedAt,String serviceName, double servicePrice, String serviceDetails, int duration,LocalDate date, LocalTime time) {
+    public Services(String id, LocalDateTime createdAt, LocalDateTime updatedAt, String name, double price, String details, int duration, LocalDate date, LocalTime time) {
         super(id, createdAt,updatedAt);
-        this.serviceName = serviceName;
-        this.servicePrice = servicePrice;
-        this.serviceDetails = serviceDetails;
+        this.name = name;
+        this.price = price;
+        this.details = details;
         this.date = date;
         this.time = time;
-        this.serviceDuration = duration;
+        this.duration = duration;
     }
 
     // Getter and Setter
 
-    public String getServiceName(){
-        return serviceName;
+    public String getName(){
+        return name;
     }
 
-    public void setServiceName(String serviceName){
-        this.serviceName = serviceName;
+    public void setName(String name){
+        this.name = name;
     }
-    public double getServicePrice(){
-        return servicePrice;
-    }
-
-    public void setServicePrice(double servicePrice){
-        this.servicePrice = servicePrice;
+    public double getPrice(){
+        return price;
     }
 
-    public String getServiceDetails(){
-        return serviceDetails;
+    public void setPrice(double price){
+        this.price = price;
     }
 
-    public void setServiceDetails(String serviceDetails){
-        this.serviceDetails = serviceDetails;
+    public String getDetails(){
+        return details;
+    }
+
+    public void setDetails(String details){
+        this.details = details;
     }
 
     public LocalDate getDate() {
@@ -73,22 +73,22 @@ public class Services extends BaseModel{
         this.time = time;
     }
 
-    public int getServiceDuration() {
-        return serviceDuration;
+    public int getDuration() {
+        return duration;
     }
 
-    public void setServiceDuration(int serviceDuration) {
-        this.serviceDuration = serviceDuration;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     @Override
     public String toString() {
         return "Services{" +
                 "id='" + getId() + '\'' + 
-                ", serviceName='" + serviceName + '\'' +
-                ", servicePrice='" + servicePrice + '\'' +
-                ", serviceDetails='" + serviceDetails + '\'' +
-                ", serviceDuration='" + serviceDuration + '\'' +
+                ", serviceName='" + name + '\'' +
+                ", servicePrice='" + price + '\'' +
+                ", serviceDetails='" + details + '\'' +
+                ", serviceDuration='" + duration + '\'' +
                 ", date=" + date +
                 ", time=" + time +
                 '}';

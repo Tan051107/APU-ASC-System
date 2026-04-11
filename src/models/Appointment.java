@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import enums.AppointmentStatus;
+import exceptions.FileCorruptedException;
+import exceptions.GetEntityListException;
+import services.*;
 
 public class Appointment extends BaseModel{
     private String customerId;
@@ -124,8 +127,30 @@ public class Appointment extends BaseModel{
         this.carId = carId;
     }
 
+    public CustomerCar getCar() throws GetEntityListException {
+        CustomerCarService customerCarService = new CustomerCarService();
+        return customerCarService.getCarById(carId);
+    }
 
+    public Customer getCustomer() throws FileCorruptedException {
+        CustomerService customerService = new CustomerService();
+        return customerService.getCustomerById(customerId);
+    }
 
+    public Services getService() throws GetEntityListException {
+        ServicesService servicesService = new ServicesService();
+        return servicesService.getServicesById(serviceId);
+    }
+
+    public User getStaff() throws GetEntityListException {
+        UserService userService = new UserService();
+        return userService.getUserById(staffId);
+    }
+
+    public Technician getTechnician() throws FileCorruptedException {
+        TechnicianService technicianService = new TechnicianService();
+        return technicianService.getTechnicianById(technicianId);
+    }
 
 
     @Override

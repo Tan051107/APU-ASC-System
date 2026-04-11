@@ -47,34 +47,28 @@ public class Login extends Component {
         header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        //logo background
-        RoundedPanel logoBg = new RoundedPanel(20);
-        logoBg.setBackground(new Color(37, 99, 235));
-        logoBg.setLayout(new GridBagLayout());
-        logoBg.setPreferredSize(new Dimension(80, 80));
-        logoBg.setMaximumSize(new Dimension(80, 80));
-        logoBg.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        ImageIcon logoIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/car.png")));
-        Image img = logoIcon.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+        //logo
+        ImageIcon logoIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/logo.png")));
+        Image img = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         JLabel logo = new JLabel(new ImageIcon(img));
-        logoBg.add(logo);
+        logo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
 
-        JLabel appTitle = new JLabel("APU – ASC");
-        appTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        appTitle.setForeground(new Color(30, 30, 30));
-        appTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel subtitle = new JLabel("Automotive Service Centre");
-        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        subtitle.setForeground(new Color(100, 100, 100));
-        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        header.add(logoBg);
-        header.add(Box.createRigidArea(new Dimension(0, 15)));
-        header.add(appTitle);
-        header.add(Box.createRigidArea(new Dimension(0, 5)));
-        header.add(subtitle);
+//        JLabel appTitle = new JLabel("APU – ASC");
+//        appTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
+//        appTitle.setForeground(new Color(30, 30, 30));
+//        appTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+//
+//        JLabel subtitle = new JLabel("Automotive Service Centre");
+//        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+//        subtitle.setForeground(new Color(100, 100, 100));
+//        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+//
+          header.add(logo);
+//        header.add(Box.createRigidArea(new Dimension(0, 15)));
+//        header.add(appTitle);
+//        header.add(Box.createRigidArea(new Dimension(0, 5)));
+//        header.add(subtitle);
 
         // ---------- AUTH CARD ----------
         RoundedPanel authCard = new RoundedPanel(25);

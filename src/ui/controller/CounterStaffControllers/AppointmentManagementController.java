@@ -1,22 +1,22 @@
 package ui.controller.CounterStaffControllers;
 
 import enums.AppointmentStatus;
-import exceptions.FileCorruptedException;
-import exceptions.GetEntityListException;
-import exceptions.NotFoundException;
+import exceptions.*;
 import models.Appointment;
 import models.Services;
 import services.AppointmentService;
 import services.ServicesService;
 import ui.controller.CounterStaffControllers.FormController.AddAppointmentFormController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
+import ui.pages.CounterStaffPanels.ManagePaymentPanel;
 import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
 import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
 import utils.CSVExporter;
 import utils.DialogUtil;
 import utils.exporters.CsvExporters.AppointmentCsvExporter;
-import utils.exporters.interfaces.CsvExporter;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDateTime;
@@ -28,24 +28,28 @@ import java.util.logging.Logger;
 public class AppointmentManagementController {
 
     private final ManageAppointmentPanel manageAppointmentPanel;
+    private final PaymentRecordManagementController paymentRecordManagementController;
     private final AppointmentService appointmentService = new AppointmentService();
     Logger logger = Logger.getLogger(AppointmentManagementController.class.getName());
 
-    public AppointmentManagementController(ManageAppointmentPanel manageAppointmentPanel){
+    public AppointmentManagementController(ManageAppointmentPanel manageAppointmentPanel , ManagePaymentPanel managePaymentPanel){
         this.manageAppointmentPanel = manageAppointmentPanel;
+        this.paymentRecordManagementController = new PaymentRecordManagementController(managePaymentPanel);
         initPanel();
     }
 
     private void openAddAppointmentForm(boolean isEdit , Appointment appointmentToAdd){
-        AddAppointmentForm addAppointmentForm = new AddAppointmentForm(isEdit,appointmentToAdd,manageAppointmentPanel.getLoginStaff());
-        addAppointmentForm.setVisible(true);
+        Window parent = SwingUtilities.getWindowAncestor(manageAppointmentPanel);
+        AddAppointmentForm addAppointmentForm = new AddAppointmentForm((Frame)parent, isEdit, appointmentToAdd, manageAppointmentPanel.getLoginStaff());
         new AddAppointmentFormController(addAppointmentForm);
         addAppointmentForm.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 resetAllAppointments();
+                paymentRecordManagementController.resetAllPaymentRecords();
             }
         });
+        addAppointmentForm.setVisible(true);
     }
 
     private void handleEdit(Appointment appointment) {
@@ -58,10 +62,11 @@ public class AppointmentManagementController {
             try {
                 appointmentService.cancelAppointment(appointment);
                 resetAllAppointments();
-            } catch (FileCorruptedException e) {
+                paymentRecordManagementController.resetAllPaymentRecords();
+            } catch (FileCorruptedException | GetEntityListException e) {
                 logger.log(Level.SEVERE , e.getMessage());
                 DialogUtil.showErrorMessage("Encountered Error" , "Failed to cancel appointment");
-            } catch (NotFoundException e) {
+            } catch (NotFoundException | DeleteException | BusinessRuleException e) {
                 DialogUtil.showErrorMessage("Encountered Error" , e.getMessage());
             }
         }
@@ -127,7 +132,7 @@ public class AppointmentManagementController {
         try {
             List<Services> services = servicesService.getServices();
             for(Services service : services){
-                manageAppointmentPanel.serviceTypeFilterCombo.addItem(new ServiceComboBoxItem(service.getId() , service.getServiceName()));
+                manageAppointmentPanel.serviceTypeFilterCombo.addItem(new ServiceComboBoxItem(service.getId() , service.getName()));
             }
         } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Encountered Error" , "Failed to get service types");

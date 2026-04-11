@@ -3,6 +3,8 @@ package ui.pages;
 import models.User;
 import ui.controller.CounterStaffControllers.AppointmentManagementController;
 import ui.controller.CounterStaffControllers.CustomerManagementController;
+import ui.controller.CounterStaffControllers.PaymentRecordManagementController;
+import ui.controller.ProfilePanelController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.ManageCustomerPanel;
 import ui.pages.CounterStaffPanels.ManagePaymentPanel;
@@ -82,8 +84,13 @@ public class CounterStaffMenu extends JFrame {
         contentPanel.add(manageCustomerPanel, "Manage Customer");
         ManageAppointmentPanel manageAppointmentPanel = new ManageAppointmentPanel(loginStaff);
         contentPanel.add(manageAppointmentPanel, "Manage Appointment");
-        new AppointmentManagementController(manageAppointmentPanel);
-        contentPanel.add(new ManagePaymentPanel(), "Manage Payment");
+        ManagePaymentPanel managePaymentPanel = new ManagePaymentPanel(loginStaff);
+        contentPanel.add(managePaymentPanel, "Manage Payment");
+        new AppointmentManagementController(manageAppointmentPanel , managePaymentPanel);
+        new PaymentRecordManagementController(managePaymentPanel);
+        ProfilePanel profilePanel = new ProfilePanel();
+        contentPanel.add(profilePanel , "My Profile");
+        new ProfilePanelController(profilePanel,loginStaff);
 
         add(contentPanel, BorderLayout.CENTER);
 
@@ -91,6 +98,7 @@ public class CounterStaffMenu extends JFrame {
         manageCustomerBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Customer"));
         manageAppointmentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Appointment"));
         managePaymentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Payment"));
+        myProfileBtn.addActionListener(e -> cardLayout.show(contentPanel , "My Profile"));
         logOutBtn.addActionListener(e->logOut());
     }
 

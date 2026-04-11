@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import enums.UserType;
 
-public class Technician extends User{
+public class    Technician extends User{
     public Technician() {
     }
 

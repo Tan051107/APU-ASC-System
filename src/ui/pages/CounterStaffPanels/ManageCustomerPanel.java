@@ -37,12 +37,19 @@ public class ManageCustomerPanel extends JPanel {
 
         leftHeader.add(Box.createRigidArea(new Dimension(0, 10)));
 
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
+        searchPanel.setOpaque(false);
+        searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
+        JLabel searchLabel = UIUtils.createLabel("Search:");
+        searchPanel.add(searchLabel);
         searchField = UIUtils.createTextField();
         searchField.setPreferredSize(new Dimension(250, 45));
         searchField.setMaximumSize(new Dimension(250, 45));
         searchField.setAlignmentX(Component.LEFT_ALIGNMENT);
         searchField.setToolTipText("Search by name or email");
-        leftHeader.add(searchField);
+        searchPanel.add(searchField);
+        leftHeader.add(searchPanel);
 
         topHeader.add(leftHeader, BorderLayout.WEST);
 

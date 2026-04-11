@@ -2,15 +2,14 @@ package ui.pages.CounterStaffPanels.forms;
 
 import models.Appointment;
 import models.User;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomerComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomComboBoxItem;
 import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.TechnicianComboBoxItem;
 import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
-public class AddAppointmentForm extends JFrame {
-    public JComboBox<CustomerComboBoxItem> customerSelectionCombo;
+public class AddAppointmentForm extends JDialog {
+    public JComboBox<CustomComboBoxItem> customerSelectionCombo;
     public JComboBox<ServiceComboBoxItem> serviceTypeCombo;
     public JFormattedTextField dateField;
     public JFormattedTextField timeField;
@@ -19,21 +18,21 @@ public class AddAppointmentForm extends JFrame {
     public JComboBox<String> carPlateSelectionCombo;
     public Component carPlateSpacing;
     public JLabel technicianLabel;
-    public JComboBox<TechnicianComboBoxItem> technicianSelectionCombo;
+    public JComboBox<CustomComboBoxItem> technicianSelectionCombo;
     public Component technicianSpacing;
     public JButton createAppointmentBtn;
-    private Appointment appointmentToEdit;
-    private boolean isEdit;
+    private final Appointment appointmentToEdit;
+    private final boolean isEdit;
     private final User loginStaff;
 
-    public AddAppointmentForm(boolean isEdit , Appointment appointmentToEdit, User loginStaff) {
+    public AddAppointmentForm(Frame owner, boolean isEdit , Appointment appointmentToEdit, User loginStaff) {
+        super(owner, "Create New Appointment", true);
         this.loginStaff =loginStaff;
         this.appointmentToEdit = appointmentToEdit;
         this.isEdit  = isEdit;
-        setTitle("Create New Appointment");
         setSize(500, 750);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(owner);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -49,7 +48,7 @@ public class AddAppointmentForm extends JFrame {
         // --- Customer Selection ---
         mainPanel.add(UIUtils.createLabel("Select Customer *"));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));// Placeholders
-        CustomerComboBoxItem[] options = {new CustomerComboBoxItem("" , "Select a customer")};
+        CustomComboBoxItem[] options = {new CustomComboBoxItem("" , "Select a customer")};
         customerSelectionCombo = UIUtils.createJComboBox(options);
         mainPanel.add(customerSelectionCombo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -90,7 +89,7 @@ public class AddAppointmentForm extends JFrame {
         technicianLabel = UIUtils.createLabel("Select Available Technician *");
         mainPanel.add(technicianLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        TechnicianComboBoxItem[] technicianOptions = {new TechnicianComboBoxItem("" , "Select a technician")}; // Placeholders
+        CustomComboBoxItem[] technicianOptions = {new CustomComboBoxItem("" , "Select a technician")}; // Placeholders
         technicianSelectionCombo = UIUtils.createJComboBox(technicianOptions);
         mainPanel.add(technicianSelectionCombo);
         technicianSpacing = Box.createRigidArea(new Dimension(0, 20));
@@ -129,17 +128,10 @@ public class AddAppointmentForm extends JFrame {
         return appointmentToEdit;
     }
 
-    public void setAppointmentToEdit(Appointment appointmentToEdit) {
-        this.appointmentToEdit = appointmentToEdit;
-    }
-
     public boolean isEdit() {
         return isEdit;
     }
 
-    public void setEdit(boolean edit) {
-        isEdit = edit;
-    }
 
     public User getLoginStaff() {
         return loginStaff;
