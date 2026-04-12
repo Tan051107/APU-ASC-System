@@ -7,6 +7,7 @@ import models.User;
 import ui.controller.ManagerMenuController;
 import ui.controller.UserManagementController;
 import ui.utils.UIUtils;
+import utils.DialogUtil;
 
 import java.awt.*;
 
@@ -203,11 +204,11 @@ public class ManagerMenu extends JFrame {
         searchField.addActionListener(e -> searchButton.doClick());
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        addUser = createCRUDButton("Add User");
+        addUser = UIUtils.createCRUDButton("Add User");
         bottomPanel.add(addUser);
-        editUser = createCRUDButton("Edit User");
+        editUser = UIUtils.createCRUDButton("Edit User");
         bottomPanel.add(editUser);
-        deleteUser = createCRUDButton("Delete User");
+        deleteUser = UIUtils.createCRUDButton("Delete User");
         bottomPanel.add(deleteUser);
         panel.add(bottomPanel, BorderLayout.SOUTH);
         
@@ -224,7 +225,7 @@ public class ManagerMenu extends JFrame {
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton updatePrice = createCRUDButton("Update Price");
+        JButton updatePrice = UIUtils.createCRUDButton("Update Price");
         bottomPanel.add(updatePrice);
         panel.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -318,7 +319,7 @@ public class ManagerMenu extends JFrame {
         panel.add(new JScrollPane(feedbackTable), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        viewFeedback = createCRUDButton("View Details");
+        viewFeedback = UIUtils.createCRUDButton("View Details");
         bottomPanel.add(viewFeedback);
         panel.add(bottomPanel, BorderLayout.SOUTH);
         
@@ -329,14 +330,70 @@ public class ManagerMenu extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel title = displayMenuTitle("Service Centre Reporting & Analytics");
         panel.add(title, BorderLayout.NORTH);
+
+        JPanel gridPanel = new JPanel(new GridLayout(2, 2, 20, 20));
+        gridPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        String currentMonthAppointment = controller.getAppointmentTotal();
         
-        JTextArea reportArea = new JTextArea("--- Monthly Summary ---\nTotal Revenue: RM 15,400\nTotal Vehicles Serviced: 142\nMost Popular Service: Standard Oil Change");
-        reportArea.setEditable(false);
-        reportArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        reportArea.setMargin(new Insets(10, 10, 10, 10));
-        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
+        gridPanel.add(createReportCard("Current Month Appointments", currentMonthAppointment, e -> {
+            ui.pages.Manager.AppointmentReports viewPanel = new ui.pages.Manager.AppointmentReports(this);
+            new ui.controller.AppointmentReportsController(viewPanel);
+            viewPanel.setVisible(true);
+        }));
+
+        String currentMonthRevenue = controller.getRevenueTotal();
+        gridPanel.add(createReportCard("Current Month Revenue", currentMonthRevenue, e -> {
+            ui.pages.Manager.RevenueReports viewPanel = new ui.pages.Manager.RevenueReports(this);
+            new ui.controller.RevenueReportsController(viewPanel);
+            viewPanel.setVisible(true);
+        }));
         
+        gridPanel.add(createReportCard("Pending Feedbacks", "0", e -> {
+            cardLayout.show(contentPanel, "View Feedback");
+        }));
+
+        panel.add(gridPanel, BorderLayout.CENTER);
+
         return panel;
+    }
+
+    private JPanel createReportCard(String titleText, String valueText, java.awt.event.ActionListener action) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        
+        card.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1), 
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+
+        JLabel titleLabel = UIUtils.createLabel(titleText);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        titleLabel.setForeground(Color.DARK_GRAY);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel valueLabel = UIUtils.createLabel(valueText);
+        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        valueLabel.setForeground(Color.blue);
+        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton viewMoreBtn = UIUtils.createCRUDButton("View More");
+        viewMoreBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        if (action != null) {
+            viewMoreBtn.addActionListener(action);
+        }
+
+        card.add(Box.createVerticalGlue());
+        card.add(titleLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 15)));
+        card.add(valueLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 20)));
+        card.add(viewMoreBtn);
+        card.add(Box.createVerticalGlue());
+
+        return card;
     }
 
     private JLabel displayMenuTitle(String text) {
@@ -348,7 +405,7 @@ public class ManagerMenu extends JFrame {
         return label;
     }
 
-    private JButton createCRUDButton(String text) {
+    /* private JButton createCRUDButton(String text) {
         JButton button = new JButton(text);
         Dimension buttonSize = new Dimension(150, 50);
         button.setPreferredSize(buttonSize);
@@ -358,7 +415,7 @@ public class ManagerMenu extends JFrame {
         button.setForeground(Color.WHITE);
         button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         return button;
-    }
+    } */
 
     public void refreshUserTable() {
         if (userTable != null) {

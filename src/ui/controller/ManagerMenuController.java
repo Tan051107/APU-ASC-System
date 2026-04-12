@@ -2,11 +2,15 @@ package ui.controller;
 import services.UserService;
 import ui.pages.Login;
 import ui.pages.ManagerMenu;
+import ui.pages.Manager.AppointmentReports;
 import ui.pages.Manager.ViewFeedbackPanel;
 import utils.DialogUtil;
 import services.ServicesService;
+import services.AppointmentService;
 import services.FeedbackService;
+import services.PaymentRecordService;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -20,11 +24,15 @@ import exceptions.UpdateException;
 import models.User;
 import models.Services;
 import models.Feedback;
+import models.Appointment;
+import models.PaymentRecord;
 
 public class ManagerMenuController {
     private final UserService userService = new UserService();
     private final ServicesService servicesService = new ServicesService();
     private final FeedbackService feedbackService = new FeedbackService();
+    private final AppointmentService appointmentService = new AppointmentService();
+    private final PaymentRecordService paymentRecordService = new PaymentRecordService();
     private final ManagerMenu managerMenu;
     
 
@@ -204,5 +212,52 @@ public class ManagerMenuController {
             );
         }
         return tableModel;
+    }
+
+    public String getAppointmentTotal(){
+        try {
+            List<Appointment> allAppointments = appointmentService.getAllAppointments();
+
+            int total = 0;
+            LocalDate today = LocalDate.now();
+            int currentMonth = today.getMonthValue();
+            int currentYear = today.getYear();
+
+            for (Appointment appointment : allAppointments){
+                if (appointment.getDate().getMonthValue() == currentMonth && appointment.getDate().getYear() == currentYear){
+                    total++;
+                }
+            }
+            return String.valueOf(total);
+        } catch (Exception e) {
+            DialogUtil.showErrorMessage("Error", "Error Getting Total Appointment Count");
+            return "0";
+        }
+    }
+
+    public String getRevenueTotal(){
+        try {
+            List<PaymentRecord> allPaymentRecords = paymentRecordService.getPaymentRecords();
+
+            double total = 0;
+            LocalDate today = LocalDate.now();
+            int currentMonth = today.getMonthValue();
+            int currentYear = today.getYear();
+
+            for (PaymentRecord paymentRecord : allPaymentRecords){
+                if (paymentRecord.isHasPaid() && 
+                    paymentRecord.getPaymentDateTime() != null && 
+                    paymentRecord.getPaymentDateTime().getMonthValue() == currentMonth && 
+                    paymentRecord.getPaymentDateTime().getYear() == currentYear) {
+                    total = total + paymentRecord.getAmount();
+                }
+            }
+            
+            return "RM" + String.format("%.2f", total); 
+            
+        } catch (Exception e) {
+            DialogUtil.showErrorMessage("Error", "Error Getting Total Revenue: " + e.getMessage());
+            return "0.00";
+        }
     }
 }

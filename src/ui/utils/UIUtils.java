@@ -134,13 +134,26 @@ public class UIUtils {
 
     public static JButton createCRUDButton(String text) {
         JButton button = new JButton(text);
+        Color base = new Color(37, 99, 235);
+        Color hover = new Color(29, 78, 216);
+
         Dimension buttonSize = new Dimension(150, 50);
         button.setPreferredSize(buttonSize);
         button.setFocusPainted(false);
         button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(99, 110, 114));
+        button.setBackground(base);
         button.setForeground(Color.WHITE);
         button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
+        
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hover);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(base);
+            }
+        });
         return button;
     }
 

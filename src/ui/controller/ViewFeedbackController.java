@@ -27,7 +27,6 @@ public class ViewFeedbackController {
     }
 
     private void initListeners() {
-        // Close the window when the close button is clicked
         panel.closeButton.addActionListener(e -> panel.dispose());
     }
 
@@ -52,21 +51,29 @@ public class ViewFeedbackController {
             
             panel.technicianId.setText(technician != null ? technician.getId() : "N/A");
             panel.technicianName.setText(technician != null ? technician.getName() : "N/A");
-            // Assuming feedback has a getTechnicianFeedback() or similar
             panel.technicianFeedback.setText(feedback.getTechnicianFeedback());
-            panel.technicianRating.setText(String.valueOf(feedback.getTechnicianRating()) + " / 5");
+            if (feedback.getTechnicianRating() == null){
+                panel.technicianRating.setText("No rating given");
+            } else {
+                panel.technicianRating.setText(String.valueOf(feedback.getTechnicianRating()) + " / 5");
+            }
+            
 
             panel.staffId.setText(staff != null ? staff.getId() : "N/A");
             panel.staffName.setText(staff != null ? staff.getName() : "N/A");
-            panel.staffRating.setText(String.valueOf(feedback.getStaffRating()) + " / 5");
-
+            if (feedback.getStaffRating() == null){
+                panel.staffRating.setText("No rating given");
+            } else {
+                panel.staffRating.setText(String.valueOf(feedback.getStaffRating()) + " / 5");
+            }
+            
             panel.customerId.setText(customer != null ? customer.getId() : "N/A");
             panel.customerName.setText(customer != null ? customer.getName() : "N/A");
             panel.comment.setText(feedback.getComment());
 
         } catch (Exception ex) {
             DialogUtil.showErrorMessage("Data Error", "Could not load full details: " + ex.getMessage());
-            panel.dispose(); // Close panel if data fails to load
+            panel.dispose();
         }
     }
 }

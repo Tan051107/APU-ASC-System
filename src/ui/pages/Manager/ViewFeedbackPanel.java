@@ -7,7 +7,6 @@ import java.awt.*;
 
 public class ViewFeedbackPanel extends JDialog {
     
-    // 1. Changed all JLabel declarations to JTextField
     public JTextField feedbackId = new JTextField("-");
     public JTextField appointmentId = new JTextField("-");
     public JTextField technicianId = new JTextField("-");
@@ -32,7 +31,6 @@ public class ViewFeedbackPanel extends JDialog {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // 2. Make all text areas and text fields un-editable
         technicianFeedback.setEditable(false);
         comment.setEditable(false);
         feedbackId.setEditable(false);
