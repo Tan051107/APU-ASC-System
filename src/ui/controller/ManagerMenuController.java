@@ -7,6 +7,7 @@ import utils.DialogUtil;
 import services.ServicesService;
 import services.FeedbackService;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -167,7 +168,7 @@ public class ManagerMenuController {
 
             return true; // Update successful!
 
-        } catch (GetEntityListException | FileCorruptedException | NotFoundException | UpdateException e) {
+        } catch (GetEntityListException | FileCorruptedException | NotFoundException | UpdateException | IOException e) {
             // Catch all the exceptions your backend throws and display them to the manager
             JOptionPane.showMessageDialog(
                 null, 
