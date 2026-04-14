@@ -1,6 +1,7 @@
 package ui.pages;
 
 import ui.controller.CustomerController;
+import ui.controller.NotificationPanelController;
 import ui.controller.ProfilePanelController;
 import ui.utils.UIUtils;
 
@@ -19,6 +20,7 @@ public class CustomerMenu extends JFrame {
 
     private final JButton btnServiceHistory;
     private final JButton btnPaymentHistory;
+    private final JButton btnNotification;
     private final JButton btnFeedback;
     private final JButton btnComment;
     private final JButton btnProfile;
@@ -42,8 +44,8 @@ public class CustomerMenu extends JFrame {
     private JSlider technicianRatingSlider;
     private JTextArea commentTextArea;
 
-    private ProfilePanel profilePanel;
     private ProfilePanelController profilePanelController;
+    private NotificationPanelController notificationPanelController;
 
     public CustomerMenu(String customerId) {
         this.controller = new CustomerController(customerId);
@@ -73,6 +75,7 @@ public class CustomerMenu extends JFrame {
 
         btnServiceHistory = createSidebarButton("View Appointments");
         btnPaymentHistory = createSidebarButton("Payment History");
+        btnNotification = createSidebarButton("Notifications");
         btnFeedback = createSidebarButton("My Feedback");
         btnComment = createSidebarButton("Provide Feedback");
         btnProfile = createSidebarButton("My Profile");
@@ -88,12 +91,15 @@ public class CustomerMenu extends JFrame {
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnProfile);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(btnNotification);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnLogout);
 
         add(sidebar, BorderLayout.WEST);
 
         contentPanel.add(createServiceHistoryPanel(), "SERVICE_HISTORY");
         contentPanel.add(createPaymentHistoryPanel(), "PAYMENT_HISTORY");
+        contentPanel.add(createNotificationPanel(), "NOTIFICATION");
         contentPanel.add(createFeedbackPanel(), "FEEDBACK");
         contentPanel.add(createCommentPanel(), "COMMENT");
         contentPanel.add(createProfilePanel(), "PROFILE");
@@ -113,6 +119,13 @@ public class CustomerMenu extends JFrame {
         btnFeedback.addActionListener(e -> {
             refreshFeedback();
             cardLayout.show(contentPanel, "FEEDBACK");
+        });
+
+        btnNotification.addActionListener(e -> {
+            if (notificationPanelController != null) {
+                notificationPanelController.refreshNotifications();
+            }
+            cardLayout.show(contentPanel, "NOTIFICATION");
         });
 
         btnComment.addActionListener(e -> {
@@ -143,6 +156,7 @@ public class CustomerMenu extends JFrame {
             sidebar.setPreferredSize(new Dimension(220, getHeight()));
             btnServiceHistory.setVisible(true);
             btnPaymentHistory.setVisible(true);
+            btnNotification.setVisible(true);
             btnFeedback.setVisible(true);
             btnComment.setVisible(true);
             btnProfile.setVisible(true);
@@ -152,6 +166,7 @@ public class CustomerMenu extends JFrame {
             sidebar.setPreferredSize(new Dimension(60, getHeight()));
             btnServiceHistory.setVisible(false);
             btnPaymentHistory.setVisible(false);
+            btnNotification.setVisible(false);
             btnFeedback.setVisible(false);
             btnComment.setVisible(false);
             btnProfile.setVisible(false);
@@ -263,6 +278,15 @@ public class CustomerMenu extends JFrame {
         return panel;
     }
 
+    private JPanel createNotificationPanel() {
+        NotificationPanel notificationPanel = new NotificationPanel();
+        notificationPanelController = new NotificationPanelController(
+                notificationPanel,
+                controller.getCustomerUser().getId()
+        );
+        return notificationPanel;
+    }
+
     private JPanel createCommentPanel() {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -334,7 +358,7 @@ public class CustomerMenu extends JFrame {
     }
 
     private JPanel createProfilePanel() {
-        profilePanel = new ProfilePanel();
+        ProfilePanel profilePanel = new ProfilePanel();
         profilePanelController = new ProfilePanelController(profilePanel, controller.getCustomerUser());
         return profilePanel;
     }

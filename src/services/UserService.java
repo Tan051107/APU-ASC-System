@@ -62,12 +62,23 @@ public class UserService {
         }
     }
 
-    public void updateUser(User userToUpdate) throws FileCorruptedException, NotFoundException,UpdateException {
+    public void updateUser(User userToUpdate) throws FileCorruptedException, NotFoundException,BusinessRuleException {
         boolean userHasExisted = !userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(userToUpdate.getEmail()) && !user.getId().equalsIgnoreCase(userToUpdate.getId())).isEmpty();
         if(userHasExisted){
-            throw new UpdateException("Email is taken. Please select another email");
+            throw new BusinessRuleException("Email is taken. Please select another email");
         }
         userRepository.update(userToUpdate);
+    }
+
+    public void resetPassword(User userToResetPassword) throws GetEntityListException, BusinessRuleException, FileCorruptedException, NotFoundException {
+        User userDataBeforeUpdate = getUserById(userToResetPassword.getId());
+        if(userToResetPassword.getUserType().equals(UserType.SUPER_MANAGER)){
+            throw new BusinessRuleException("Super manager account is not allowed to change password");
+        }
+        if(userDataBeforeUpdate.getPassword().equals(userToResetPassword.getPassword())){
+            throw new BusinessRuleException("Password cannot be same as original password");
+        }
+        updateUser(userToResetPassword);
     }
 
     public void deleteUser(String userId) throws DeleteException {

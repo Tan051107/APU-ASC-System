@@ -1,9 +1,12 @@
 package services;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import enums.AppointmentStatus;
+import enums.NotificationTargetType;
 import exceptions.*;
 import mapper.AppointmentMapper;
 import models.*;
@@ -66,13 +69,21 @@ public class AppointmentService {
             }
             PaymentRecord paymentRecordToCreate = createPaymentRecordForAppointment(appointmentToAdd);
             appointmentRepository.create(appointmentToAdd);
+
             paymentRecordService.addPaymentRecord(paymentRecordToCreate);
+
+            LocalDateTime appointmentDateTime = LocalDateTime.of(appointmentToAdd.getDate(),appointmentToAdd.getTime());
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
+            String appointmentDateTimeString = appointmentDateTime.format(dateTimeFormatter);
+            createNotification(appointmentToAdd.getCustomerId() , "Appointment Created" , "An appointment is created and is scheduled on "+appointmentDateTimeString);
+            createNotification(appointmentToAdd.getTechnicianId() , "Appointment Created" , "An appointment is created and is scheduled on "+appointmentDateTimeString);
+
         } catch (Exception e) {
             throw new Exception("Failed to create appointment: " + e.getMessage());
         }
     }
 
-    public void updateAppointment(Appointment appointmentToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException {
+    public void updateAppointment(Appointment appointmentToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException, IOException {
         LocalDateTime chosenAppointmentDateTime = LocalDateTime.of(appointmentToUpdate.getDate(),appointmentToUpdate.getTime());
         String appointmentToUpdateId = appointmentToUpdate.getId();
         if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
@@ -85,14 +96,19 @@ public class AppointmentService {
             throw new BusinessRuleException("Car already has an upcoming appointment");
         }
         appointmentRepository.update(appointmentToUpdate);
+
+        createNotification(appointmentToUpdate.getTechnicianId() , "Appointment Updated" , appointmentToUpdateId+" is updated");
+        createNotification(appointmentToUpdate.getCustomerId() , "Appointment Updated" , appointmentToUpdateId+" is updated");
     }
 
-    public void cancelAppointment(Appointment appointmentToCancel) throws FileCorruptedException, NotFoundException, BusinessRuleException, DeleteException, GetEntityListException {
+    public void cancelAppointment(Appointment appointmentToCancel) throws FileCorruptedException, NotFoundException, BusinessRuleException, DeleteException, GetEntityListException, IOException {
         PaymentRecordService paymentRecordService = new PaymentRecordService();
         appointmentToCancel.setStatusService(AppointmentStatus.CANCELLED);
         appointmentRepository.update(appointmentToCancel);
         PaymentRecord paymentRecord = paymentRecordService.getPaymentRecordByAppointment(appointmentToCancel.getId());
         paymentRecordService.deletePaymentRecord(paymentRecord);
+        createNotification(appointmentToCancel.getTechnicianId() , "Appointment Cancelled" , appointmentToCancel.getId()+ "is cancelled");
+        createNotification(appointmentToCancel.getCustomerId() , "Appointment Cancelled" , appointmentToCancel.getId()+ "is cancelled");
     }
 
     public List<Appointment> getAppointments() throws FileCorruptedException {
@@ -221,7 +237,7 @@ public class AppointmentService {
         if(appointmentDay == DayOfWeek.SATURDAY || appointmentDay == DayOfWeek.SUNDAY){
             return true;
         }
-        return appointmentStartTime.isBefore(operationStartTime) || !appointmentEndTime.isAfter(operationEndTime);
+        return appointmentStartTime.isBefore(operationStartTime) || appointmentEndTime.isAfter(operationEndTime);
     }
 
     private boolean carHasClashAppointment(Appointment newAppointment , String appointmentToIgnore) throws FileCorruptedException, GetEntityListException {
@@ -268,6 +284,17 @@ public class AppointmentService {
         double servicePrice = appointment.getService().getPrice();
         paymentRecord.setAmount(servicePrice);
         return paymentRecord;
+    }
+
+    private void createNotification(String recipientId , String title , String message) throws IOException {
+        NotificationService notificationService = new NotificationService();
+        Notification notification = new Notification();
+        notification.setTitle(title);
+        notification.setMessage(message);
+        notification.setTargetType(NotificationTargetType.USER);
+        notification.setUserId(recipientId);
+        notification.setUserType(null);
+        notificationService.addNotification(notification);
     }
 
 }

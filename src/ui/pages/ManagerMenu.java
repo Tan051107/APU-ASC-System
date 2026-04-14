@@ -5,6 +5,7 @@ import javax.swing.*;
 import models.User;
 
 import ui.controller.ManagerMenuController;
+import ui.controller.NotificationPanelController;
 import ui.controller.UserManagementController;
 import ui.utils.UIUtils;
 
@@ -28,8 +29,10 @@ public class ManagerMenu extends JFrame {
     private final JButton btnSetPrices;
     private final JButton btnFeedback;
     private final JButton btnReports;
+    private final JButton btnNotification;
     public final JButton btnLogOut;
     private final ManagerMenuController controller;
+    private NotificationPanelController notificationPanelController;
 
     public ManagerMenu(User user) {
         controller = new ManagerMenuController(this);
@@ -63,6 +66,7 @@ public class ManagerMenu extends JFrame {
         btnSetPrices = createSidebarButton("Service Pricing");
         btnFeedback = createSidebarButton("View Feedback");
         btnReports = createSidebarButton("Reporting");
+        btnNotification = createSidebarButton("Notifications");
         btnLogOut = createSidebarButton("Log Out");
 
         sidebar.add(btnManageUsers);
@@ -72,6 +76,8 @@ public class ManagerMenu extends JFrame {
         sidebar.add(btnFeedback);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnReports);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(btnNotification);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnLogOut);
 
@@ -87,6 +93,7 @@ public class ManagerMenu extends JFrame {
         contentPanel.add(createSetPricesPanel(), "Service Pricing");
         contentPanel.add(createFeedbackPanel(), "View Feedback");
         contentPanel.add(createReportsPanel(), "Reporting");
+        contentPanel.add(createNotificationPanel(user), "Notifications");
 
         add(contentPanel, BorderLayout.CENTER);
 
@@ -95,6 +102,12 @@ public class ManagerMenu extends JFrame {
         btnSetPrices.addActionListener(e -> cardLayout.show(contentPanel, "Service Pricing"));
         btnFeedback.addActionListener(e -> cardLayout.show(contentPanel, "View Feedback"));
         btnReports.addActionListener(e -> cardLayout.show(contentPanel, "Reporting"));
+        btnNotification.addActionListener(e -> {
+            if (notificationPanelController != null) {
+                notificationPanelController.refreshNotifications();
+            }
+            cardLayout.show(contentPanel, "Notifications");
+        });
         
         controller.initListeners();
         new UserManagementController(this); 
@@ -109,6 +122,7 @@ public class ManagerMenu extends JFrame {
             btnSetPrices.setVisible(true);
             btnFeedback.setVisible(true);
             btnReports.setVisible(true);
+            btnNotification.setVisible(true);
             btnLogOut.setVisible(true);
             toggleButton.setText("≡");
         } else {
@@ -117,6 +131,7 @@ public class ManagerMenu extends JFrame {
             btnSetPrices.setVisible(false);
             btnFeedback.setVisible(false);
             btnReports.setVisible(false);
+            btnNotification.setVisible(false);
             btnLogOut.setVisible(false);
             toggleButton.setText("»");
         }
@@ -355,6 +370,12 @@ public class ManagerMenu extends JFrame {
         panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
         
         return panel;
+    }
+
+    private JPanel createNotificationPanel(User user) {
+        NotificationPanel notificationPanel = new NotificationPanel();
+        notificationPanelController = new NotificationPanelController(notificationPanel, user.getId());
+        return notificationPanel;
     }
 
     private JLabel displayMenuTitle(String text) {

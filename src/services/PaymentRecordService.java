@@ -1,14 +1,17 @@
 package services;
 
 import enums.AppointmentStatus;
+import enums.NotificationTargetType;
 import exceptions.*;
 import mapper.PaymentRecordMapper;
 import models.Appointment;
+import models.Notification;
 import models.PaymentRecord;
 import repositories.CrudRepository;
 import utils.RandomIdGenerator;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -48,13 +51,17 @@ public class PaymentRecordService {
         paymentRecordCrudRepository.delete(paymentRecordToDelete.getId());
     }
 
-    public void makePayment(PaymentRecord paymentRecordToMakePayment) throws GetEntityListException, BusinessRuleException, FileCorruptedException, NotFoundException {
+    public void makePayment(PaymentRecord paymentRecordToMakePayment) throws GetEntityListException, BusinessRuleException, FileCorruptedException, NotFoundException, IOException {
         Appointment appointment = appointmentService.getAppointmentById(paymentRecordToMakePayment.getAppointmentId());
         if(!appointment.getStatusService().equals(AppointmentStatus.COMPLETED)){
             throw new BusinessRuleException("Payment can only be made for completed appointments");
         }
         paymentRecordToMakePayment.setHasPaid(true);
         paymentRecordCrudRepository.update(paymentRecordToMakePayment);
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
+        String appointmentDateTimeString = paymentRecordToMakePayment.getPaymentDateTime().format(dateTimeFormatter);
+        createNotification(paymentRecordToMakePayment.getAppointment().getCustomerId(),"Payment Is Made" ,String.format("Payment is successfully made for appointment %s at %s" , paymentRecordToMakePayment.getAppointmentId() , appointmentDateTimeString));
     }
 
     public List<PaymentRecord> searchPaymentRecord(String keyword , String paymentStatus , String paymentMethod) throws FileCorruptedException {
@@ -86,6 +93,17 @@ public class PaymentRecordService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private void createNotification(String recipientId , String title , String message) throws IOException {
+        NotificationService notificationService = new NotificationService();
+        Notification notification = new Notification();
+        notification.setTitle(title);
+        notification.setMessage(message);
+        notification.setTargetType(NotificationTargetType.USER);
+        notification.setUserId(recipientId);
+        notification.setUserType(null);
+        notificationService.addNotification(notification);
     }
 
 }

@@ -17,7 +17,12 @@ public class Login extends Component {
     public JButton demoCustomerButton;
     public JButton demoTechnicianButton;
     public JButton demoCounterStaffButton;
+    private CardLayout authCardLayout;
+    private JPanel authCardContent;
     private JFrame frame;
+    public JPasswordField forgotPasswordField;
+    public JTextField forgotEmailField;
+    public JButton resetPasswordButton;
 
     public void createUI() {
         frame = new JFrame("APU - ASC");
@@ -85,10 +90,17 @@ public class Login extends Component {
         ac.fill = GridBagConstraints.BOTH;
         ac.anchor = GridBagConstraints.NORTHWEST;
 
+        authCardLayout = new CardLayout();
+        authCardContent = new JPanel(authCardLayout);
+        authCardContent.setOpaque(false);
+
         JPanel signInPanel = createSignInPanel();
+        JPanel forgotPasswordPanel = createForgotPasswordPanel();
         new SignInController(this);
 
-        authCard.add(signInPanel, ac);
+        authCardContent.add(signInPanel, "SIGN_IN");
+        authCardContent.add(forgotPasswordPanel, "FORGOT_PASSWORD");
+        authCard.add(authCardContent, ac);
 
         mainContainer.add(header);
         mainContainer.add(Box.createRigidArea(new Dimension(0, 30)));
@@ -124,6 +136,25 @@ public class Login extends Component {
         panel.add(Box.createRigidArea(new Dimension(0, 8)));
         passwordField = UIUtils.createPasswordField();
         panel.add(passwordField);
+        panel.add(createShowPasswordCheckBox(passwordField));
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        JLabel forgotPasswordLabel = new JLabel("Forgot Password?");
+        forgotPasswordLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        forgotPasswordLabel.setForeground(new Color(37, 99, 235));
+        forgotPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        forgotPasswordLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                showForgotPasswordPanel();
+            }
+        });
+        JPanel forgotWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        forgotWrapper.setOpaque(false);
+        forgotWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        forgotWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
+        forgotWrapper.add(forgotPasswordLabel);
+        panel.add(forgotWrapper);
         panel.add(Box.createRigidArea(new Dimension(0, 25)));
 
         signInButton = UIUtils.createPrimaryButton("Sign In");
@@ -155,6 +186,79 @@ public class Login extends Component {
 
         panel.setPreferredSize(new Dimension(350, panel.getPreferredSize().height));
         return panel;
+    }
+
+    private JPanel createForgotPasswordPanel() {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel title = new JLabel("Forgot Password");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(title);
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        JLabel subtitle = new JLabel("Enter your email and new password to reset password.");
+        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        subtitle.setForeground(new Color(120, 120, 120));
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(subtitle);
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        panel.add(UIUtils.createLabel("Email *"));
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+        forgotEmailField = UIUtils.createTextField();
+        panel.add(forgotEmailField);
+        panel.add(Box.createRigidArea(new Dimension(0, 25)));
+
+        panel.add(UIUtils.createLabel("New Password *"));
+        panel.add(Box.createRigidArea(new Dimension(0, 8)));
+        forgotPasswordField = UIUtils.createPasswordField();
+        panel.add(forgotPasswordField);
+        panel.add(createShowPasswordCheckBox(forgotPasswordField));
+        panel.add(Box.createRigidArea(new Dimension(0, 25)));
+
+        resetPasswordButton = UIUtils.createPrimaryButton("Reset Password");
+        panel.add(resetPasswordButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        JLabel backToSignInLabel = new JLabel("Back to Sign In");
+        backToSignInLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        backToSignInLabel.setForeground(new Color(37, 99, 235));
+        backToSignInLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backToSignInLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        backToSignInLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                showSignInPanel();
+            }
+        });
+        panel.add(backToSignInLabel);
+
+        panel.setPreferredSize(new Dimension(350, panel.getPreferredSize().height));
+        return panel;
+    }
+
+    private void showForgotPasswordPanel() {
+        authCardLayout.show(authCardContent, "FORGOT_PASSWORD");
+    }
+
+    public void showSignInPanel() {
+        authCardLayout.show(authCardContent, "SIGN_IN");
+    }
+
+    private JCheckBox createShowPasswordCheckBox(JPasswordField passwordInput) {
+        JCheckBox checkBox = new JCheckBox("Show password");
+        checkBox.setOpaque(false);
+        checkBox.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        checkBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        final char defaultEchoChar = passwordInput.getEchoChar();
+        checkBox.addActionListener(e ->
+                passwordInput.setEchoChar(checkBox.isSelected() ? (char) 0 : defaultEchoChar)
+        );
+        return checkBox;
     }
 
     private JButton createRoleButton(String text) {
