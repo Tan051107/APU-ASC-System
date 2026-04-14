@@ -10,6 +10,7 @@ public class AppointmentReports extends JDialog{
     public JLabel yearTotal = new JLabel();
     public JLabel completeTotal = new JLabel();
     public JLabel assignedTotal = new JLabel();
+    public JLabel cancelledTotal = new JLabel();
     public JButton closeButton;
 
     public AppointmentReports(JFrame parent){
@@ -24,12 +25,14 @@ public class AppointmentReports extends JDialog{
         JLabel title = UIUtils.createMenuTitle("Appointment Reports");
         panel.add(title, BorderLayout.NORTH);
 
-        JPanel gridPanel = new JPanel(new GridLayout(3, 1, 20, 20));
+        JPanel gridPanel = new JPanel(new GridLayout(5, 1, 20, 20));
         gridPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         gridPanel.add(createReportCard("Current Month Total Appointments", monthTotal));
-        gridPanel.add(createReportCard("Current Year Totol Appointments", yearTotal));
+        gridPanel.add(createReportCard("Current Year Total Appointments", yearTotal));
         gridPanel.add(createReportCard("Total Completed Appointments", completeTotal));
+        gridPanel.add(createReportCard("Total Assigned Appointments", assignedTotal));
+        gridPanel.add(createReportCard("Total Cancelled Appointments", cancelledTotal));
 
         panel.add(gridPanel, BorderLayout.CENTER);
         

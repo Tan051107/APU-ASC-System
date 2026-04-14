@@ -8,6 +8,8 @@ import java.awt.*;
 public class RevenueReports extends JDialog{
     public JLabel monthTotal = new JLabel();
     public JLabel yearTotal = new JLabel();
+    public JLabel selectedMonthTotal = new JLabel();
+    public JComboBox<String> monthComboBox = new JComboBox<>();
     public JButton closeButton;
 
     public RevenueReports(JFrame parent){
@@ -22,11 +24,12 @@ public class RevenueReports extends JDialog{
         JLabel title = UIUtils.createMenuTitle("Revenue Reports");
         panel.add(title, BorderLayout.NORTH);
 
-        JPanel gridPanel = new JPanel(new GridLayout(2, 1, 20, 20));
+        JPanel gridPanel = new JPanel(new GridLayout(3, 1, 20, 20));
         gridPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        gridPanel.add(createReportCard("Current Month Total Revenue", monthTotal));
-        gridPanel.add(createReportCard("Current Year Total Revenue", yearTotal));
+        gridPanel.add(createReportCard("Selected Month Total Revenue", selectedMonthTotal, true));
+        gridPanel.add(createReportCard("Current Month Total Revenue", monthTotal, false));
+        gridPanel.add(createReportCard("Current Year Total Revenue", yearTotal, false));
 
         panel.add(gridPanel, BorderLayout.CENTER);
         
@@ -51,7 +54,7 @@ public class RevenueReports extends JDialog{
     }
 
 
-    private JPanel createReportCard(String titleText, JLabel valueLabel) {
+    private JPanel createReportCard(String titleText, JLabel valueLabel, Boolean dropDown) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Color.WHITE);
@@ -74,6 +77,14 @@ public class RevenueReports extends JDialog{
         card.add(Box.createVerticalGlue());
         card.add(titleLabel);
         card.add(Box.createRigidArea(new Dimension(0, 15)));
+        if (dropDown == true){
+            String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+            monthComboBox = UIUtils.createJComboBox(months);
+            monthComboBox.setMaximumSize(new Dimension(150, 30));
+            monthComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+            card.add(monthComboBox);
+            card.add(Box.createRigidArea(new Dimension(0, 15)));
+        }
         card.add(valueLabel);
         card.add(Box.createVerticalGlue());
 

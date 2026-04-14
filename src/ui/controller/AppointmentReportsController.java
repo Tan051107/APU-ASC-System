@@ -19,6 +19,8 @@ public class AppointmentReportsController {
         loadMonthlyAppointments();
         loadYearlyAppointments();
         loadCompletedAppointments();
+        loadAssignedAppointments();
+        loadCancelledAppointments();
     }
 
     private void initListeners() {
@@ -79,6 +81,42 @@ public class AppointmentReportsController {
             }
             String totalString = Integer.toString(total);
             panel.completeTotal.setText(totalString);
+        } catch (Exception e) {
+            DialogUtil.showErrorMessage("Error", "Error Getting Total Completed Appointment Count!");
+        }
+    }
+
+    public void loadAssignedAppointments(){
+        try {
+            List<Appointment> allAppointments = appointmentService.getAllAppointments();
+
+            int total = 0;
+
+            for (Appointment appointment : allAppointments){
+                if (appointment.getStatusService().getDisplayAppointmentStatus().equals("Assigned")){
+                    total++;
+                }
+            }
+            String totalString = Integer.toString(total);
+            panel.assignedTotal.setText(totalString);
+        } catch (Exception e) {
+            DialogUtil.showErrorMessage("Error", "Error Getting Total Completed Appointment Count!");
+        }
+    }
+
+    public void loadCancelledAppointments(){
+        try {
+            List<Appointment> allAppointments = appointmentService.getAllAppointments();
+
+            int total = 0;
+
+            for (Appointment appointment : allAppointments){
+                if (appointment.getStatusService().getDisplayAppointmentStatus().equals("Cancelled")){
+                    total++;
+                }
+            }
+            String totalString = Integer.toString(total);
+            panel.cancelledTotal.setText(totalString);
         } catch (Exception e) {
             DialogUtil.showErrorMessage("Error", "Error Getting Total Completed Appointment Count!");
         }
