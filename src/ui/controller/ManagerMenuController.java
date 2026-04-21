@@ -7,6 +7,7 @@ import utils.DialogUtil;
 import services.ServicesService;
 import services.FeedbackService;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class ManagerMenuController {
             String feedbackId = managerMenu.feedbackTable.getValueAt(selectedRow, 0).toString();
 
             // Open the UI and let the Controller fetch the data
-            ViewFeedbackPanel viewPanel = new ViewFeedbackPanel();
+            ViewFeedbackPanel viewPanel = new ViewFeedbackPanel(managerMenu);
             new ViewFeedbackController(viewPanel, feedbackId);
             viewPanel.setVisible(true);
         });
@@ -93,10 +94,10 @@ public class ManagerMenuController {
             List<Services> servicesData = servicesService.getServices();
             
             for (Services services : servicesData) {
-                String formattedPrice = String.format("RM %.2f", services.getServicePrice());
+                String formattedPrice = String.format("RM %.2f", services.getPrice());
                 Object[] rowData = {
                     services.getId(),
-                    services.getServiceName(),
+                    services.getName(),
                     formattedPrice
                 };
                 tableModel.addRow(rowData);
@@ -121,7 +122,7 @@ public class ManagerMenuController {
             
             // 2. Check if the service was actually found
             if (service != null) {
-                String formattedPrice = String.format("%.2f", service.getServicePrice());
+                String formattedPrice = String.format("%.2f", service.getPrice());
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                 String lastEdited = (service.getUpdatedAt() != null) 
                                     ? service.getUpdatedAt().format(formatter) 
@@ -129,9 +130,9 @@ public class ManagerMenuController {
                 // 3. Return a single array containing the data
                 return new Object[] {
                     service.getId(),
-                    service.getServiceName(),
+                    service.getName(),
                     formattedPrice,
-                    service.getServiceDetails(),
+                    service.getDetails(),
                     lastEdited
                 };
             }
@@ -160,14 +161,14 @@ public class ManagerMenuController {
             }
 
             // 2. Update ONLY the price (the rest of the data stays exactly the same)
-            serviceToUpdate.setServicePrice(newPrice);
+            serviceToUpdate.setPrice(newPrice);
 
             // 3. Send the modified object back to be saved
             servicesService.updateService(serviceToUpdate);
 
             return true; // Update successful!
 
-        } catch (GetEntityListException | FileCorruptedException | NotFoundException | UpdateException e) {
+        } catch (GetEntityListException | FileCorruptedException | NotFoundException | UpdateException | IOException e) {
             // Catch all the exceptions your backend throws and display them to the manager
             JOptionPane.showMessageDialog(
                 null, 

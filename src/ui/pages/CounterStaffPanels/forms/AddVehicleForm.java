@@ -7,7 +7,7 @@ import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
-public class AddVehicleForm extends JFrame {
+public class AddVehicleForm extends JDialog {
     public JTextField plateField;
     public JTextField brandField;
     public JTextField modelField;
@@ -20,15 +20,14 @@ public class AddVehicleForm extends JFrame {
     private final CustomerCar customerCar;
 
 
-    public AddVehicleForm(Customer customer , boolean isEdit , CustomerCar customerCar) {
+    public AddVehicleForm(Frame owner, Customer customer , boolean isEdit , CustomerCar customerCar) {
+        super(owner, (isEdit ? "Update Vehicle for " : "Add New Vehicle for ") + customer.getName(), true);
         this.customer = customer;
         this.isEdit = isEdit;
         this.customerCar = customerCar;
-        String windowTitle = isEdit ? "Update Vehicle for " : "Add New Vehicle for ";
-        setTitle(windowTitle + customer.getName());
         setSize(450, 600);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(owner);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));

@@ -2,7 +2,6 @@ package ui.controller;
 
 import enums.UserType;
 import exceptions.*;
-import models.Customer;
 import models.User;
 import services.UserService;
 import ui.pages.Manager.forms.AddUserForm;
@@ -10,10 +9,8 @@ import utils.DialogUtil;
 import utils.validators.ValidationResult;
 import utils.validators.Validator;
 
-import javax.swing.*;
 import java.awt.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 public class AddUserFormController {
     private final AddUserForm form;
@@ -94,7 +91,7 @@ public class AddUserFormController {
             DialogUtil.showInfoMessage("Updated Successfully" , String.format("Successfully updated %s." , user.getName()));
             form.dispose();
         }
-        catch (NotFoundException | ValidationException | UpdateException e ) {
+        catch (NotFoundException | ValidationException  e ) {
             DialogUtil.showErrorMessage("Failed to Update Customer" , e.getMessage());
         }
         catch (Exception e) {

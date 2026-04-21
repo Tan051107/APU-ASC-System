@@ -2,7 +2,8 @@ package enums;
 
 public enum AppointmentStatus {
     ASSIGNED("Assigned"),
-    COMPLETED("Completed");
+    COMPLETED("Completed"),
+    CANCELLED("Cancelled");
 
 
     private final String displayAppointmentStatus;

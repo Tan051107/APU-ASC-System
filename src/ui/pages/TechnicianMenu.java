@@ -6,6 +6,8 @@ import models.Appointment;
 import models.CustomerCar;
 import models.Feedback;
 import models.User;
+import ui.controller.NotificationPanelController;
+import ui.controller.ProfilePanelController;
 import ui.controller.TechnicianMenuController;
 import ui.pages.TechnicianPanels.ViewAppointment;
 import ui.utils.UIUtils;
@@ -27,9 +29,11 @@ public class TechnicianMenu extends JFrame {
     private final JButton appointmentsBtn;
     private final JButton historyBtn;
     private final JButton myProfileBtn;
+    private final JButton notificationBtn;
     private final JButton logOutBtn;
     private Runnable refreshAppointmentsTask;
     private Runnable refreshHistoryTask;
+    private NotificationPanelController notificationPanelController;
 
     public TechnicianMenu(User user) {
         this.controller = new TechnicianMenuController(user.getId());
@@ -62,6 +66,7 @@ public class TechnicianMenu extends JFrame {
         appointmentsBtn = createSidebarButton("Appointments");
         historyBtn = createSidebarButton("History");
         myProfileBtn = createSidebarButton("My Profile");
+        notificationBtn = createSidebarButton("Notifications");
         logOutBtn = createSidebarButton("Log Out");
 
         sidebar.add(appointmentsBtn);
@@ -70,16 +75,21 @@ public class TechnicianMenu extends JFrame {
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(myProfileBtn);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(notificationBtn);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(logOutBtn);
 
         add(sidebar, BorderLayout.WEST);
 
-        // 2. Create the Content Panel with CardLayout
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
         contentPanel.add(createAppointmentsPanel(), "Appointments");
         contentPanel.add(createHistoryPanel(), "History");
+        contentPanel.add(createNotificationPanel(user), "Notifications");
+        ProfilePanel profilePanel = new ProfilePanel();
+        contentPanel.add(profilePanel,"My Profile");
+        new ProfilePanelController(profilePanel,user);
         /* contentPanel.add(createReportsPanel(), "Reporting"); */
 
         add(contentPanel, BorderLayout.CENTER);
@@ -99,6 +109,14 @@ public class TechnicianMenu extends JFrame {
             cardLayout.show(contentPanel, "History");
         });
 
+        myProfileBtn.addActionListener(e->cardLayout.show(contentPanel, "My Profile"));
+        notificationBtn.addActionListener(e -> {
+            if (notificationPanelController != null) {
+                notificationPanelController.refreshNotifications();
+            }
+            cardLayout.show(contentPanel, "Notifications");
+        });
+
         logOutBtn.addActionListener(e -> {
             this.dispose();
             new Login().createUI(); 
@@ -113,6 +131,7 @@ public class TechnicianMenu extends JFrame {
             appointmentsBtn.setVisible(true);
             historyBtn.setVisible(true);
             myProfileBtn.setVisible(true);
+            notificationBtn.setVisible(true);
             logOutBtn.setVisible(true);
             toggleButton.setText("≡");
         } else {
@@ -120,6 +139,7 @@ public class TechnicianMenu extends JFrame {
             appointmentsBtn.setVisible(false);
             historyBtn.setVisible(false);
             myProfileBtn.setVisible(false);
+            notificationBtn.setVisible(false);
             logOutBtn.setVisible(false);
             toggleButton.setText("»");
         }
@@ -449,6 +469,12 @@ public class TechnicianMenu extends JFrame {
         });
 
         return button;
+    }
+
+    private JPanel createNotificationPanel(User user) {
+        NotificationPanel notificationPanel = new NotificationPanel();
+        notificationPanelController = new NotificationPanelController(notificationPanel, user.getId());
+        return notificationPanel;
     }
 
 

@@ -4,7 +4,8 @@ public enum UserType {
     MANAGER("Manager"),
     COUNTER_STAFF("Counter Staff"),
     TECHNICIAN ("Technician"),
-    CUSTOMER("Customer");
+    CUSTOMER("Customer"),
+    SUPER_MANAGER("Super Manager");
 
     private final String displayUserType;
 

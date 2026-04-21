@@ -1,21 +1,27 @@
 package ui.controller;
 
+import exceptions.*;
 import models.User;
 import services.AuthService;
+import services.UserService;
 import ui.pages.Login;
 import ui.pages.CounterStaffMenu;
 import ui.pages.TechnicianMenu;
 import ui.pages.ManagerMenu;
 import ui.pages.CustomerMenu;
+import utils.DialogUtil;
 import utils.validators.ValidationResult;
 import utils.validators.Validator;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.*;
 import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SignInController {
     private final Login loginPage;
+    Logger logger = Logger.getLogger(SignInController.class.getName());
 
     public SignInController(Login loginPage){
         this.loginPage = loginPage;
@@ -29,6 +35,7 @@ public class SignInController {
         loginPage.demoCustomerButton.addActionListener(e->demoCustomerLogin());
         loginPage.demoManagerButton.addActionListener(e->demoManagerLogin());
         loginPage.demoCounterStaffButton.addActionListener(e->demoCounterStaffLogin());
+        loginPage.resetPasswordButton.addActionListener(e->resetPassword());
     }
 
     public void signIn() {
@@ -52,6 +59,37 @@ public class SignInController {
                     "Login Error",
                     JOptionPane.ERROR_MESSAGE
             );
+        }
+    }
+
+    public void resetPassword(){
+        UserService userService = new UserService();
+        String email = loginPage.forgotEmailField.getText();
+        char[] passwordChars = loginPage.forgotPasswordField.getPassword();
+        String password = new String(passwordChars);
+        try{
+            ValidationResult validationResult = new ValidationResult();
+            Validator.validateEmail(validationResult,email);
+            Validator.validatePassword(validationResult,"Password" ,password);
+            if(validationResult.hasError()){
+                DialogUtil.showWarningMessage("Validation Error" , validationResult.getErrors());
+            }
+            else{
+                User user = userService.getUserByEmail(email);
+                if(user == null){
+                    DialogUtil.showWarningMessage("Not Found" , "Email not found");
+                }
+                else{
+                    user.setPassword(password);
+                    userService.resetPassword(user);
+                    DialogUtil.showInfoMessage("Reset Successfully" , "Successfully reset password");
+                    loginPage.showSignInPanel();
+                }
+            }
+        } catch (GetEntityListException | FileCorruptedException e) {
+            logger.log(Level.SEVERE,e.getMessage());
+        } catch (NotFoundException | BusinessRuleException e) {
+            DialogUtil.showWarningMessage("Encountered Error" , e.getMessage());
         }
     }
 
@@ -92,7 +130,7 @@ public class SignInController {
                 break;
             case COUNTER_STAFF:
                 loginPage.dispose();
-                new CounterStaffMenu().setVisible(true);
+                new CounterStaffMenu(user).setVisible(true);
                 break;
             case TECHNICIAN:
                 TechnicianMenu techMenu = new TechnicianMenu(user);

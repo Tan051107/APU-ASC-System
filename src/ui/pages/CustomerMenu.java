@@ -1,6 +1,8 @@
 package ui.pages;
 
 import ui.controller.CustomerController;
+import ui.controller.NotificationPanelController;
+import ui.controller.ProfilePanelController;
 import ui.utils.UIUtils;
 
 import javax.swing.*;
@@ -18,6 +20,7 @@ public class CustomerMenu extends JFrame {
 
     private final JButton btnServiceHistory;
     private final JButton btnPaymentHistory;
+    private final JButton btnNotification;
     private final JButton btnFeedback;
     private final JButton btnComment;
     private final JButton btnProfile;
@@ -37,12 +40,12 @@ public class CustomerMenu extends JFrame {
     private JComboBox<String> appointmentComboBox;
     private JTextField staffField;
     private JTextField technicianField;
-    private JComboBox<String> staffRatingComboBox;
-    private JComboBox<String> technicianRatingComboBox;
+    private JSlider staffRatingSlider;
+    private JSlider technicianRatingSlider;
     private JTextArea commentTextArea;
 
-    private JTextField profileNameField;
-    private JTextField profilePhoneField;
+    private ProfilePanelController profilePanelController;
+    private NotificationPanelController notificationPanelController;
 
     public CustomerMenu(String customerId) {
         this.controller = new CustomerController(customerId);
@@ -72,6 +75,7 @@ public class CustomerMenu extends JFrame {
 
         btnServiceHistory = createSidebarButton("View Appointments");
         btnPaymentHistory = createSidebarButton("Payment History");
+        btnNotification = createSidebarButton("Notifications");
         btnFeedback = createSidebarButton("My Feedback");
         btnComment = createSidebarButton("Provide Feedback");
         btnProfile = createSidebarButton("My Profile");
@@ -86,13 +90,16 @@ public class CustomerMenu extends JFrame {
         sidebar.add(btnComment);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnProfile);
-        sidebar.add(Box.createVerticalGlue());
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(btnNotification);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnLogout);
 
         add(sidebar, BorderLayout.WEST);
 
         contentPanel.add(createServiceHistoryPanel(), "SERVICE_HISTORY");
         contentPanel.add(createPaymentHistoryPanel(), "PAYMENT_HISTORY");
+        contentPanel.add(createNotificationPanel(), "NOTIFICATION");
         contentPanel.add(createFeedbackPanel(), "FEEDBACK");
         contentPanel.add(createCommentPanel(), "COMMENT");
         contentPanel.add(createProfilePanel(), "PROFILE");
@@ -114,13 +121,20 @@ public class CustomerMenu extends JFrame {
             cardLayout.show(contentPanel, "FEEDBACK");
         });
 
+        btnNotification.addActionListener(e -> {
+            if (notificationPanelController != null) {
+                notificationPanelController.refreshNotifications();
+            }
+            cardLayout.show(contentPanel, "NOTIFICATION");
+        });
+
         btnComment.addActionListener(e -> {
             refreshFeedbackAppointmentDropdown();
             cardLayout.show(contentPanel, "COMMENT");
         });
 
         btnProfile.addActionListener(e -> {
-            loadProfileData();
+            profilePanelController.initProfile();
             cardLayout.show(contentPanel, "PROFILE");
         });
 
@@ -133,7 +147,6 @@ public class CustomerMenu extends JFrame {
         refreshPaymentHistory();
         refreshFeedback();
         refreshFeedbackAppointmentDropdown();
-        loadProfileData();
         cardLayout.show(contentPanel, "SERVICE_HISTORY");
     }
 
@@ -143,6 +156,7 @@ public class CustomerMenu extends JFrame {
             sidebar.setPreferredSize(new Dimension(220, getHeight()));
             btnServiceHistory.setVisible(true);
             btnPaymentHistory.setVisible(true);
+            btnNotification.setVisible(true);
             btnFeedback.setVisible(true);
             btnComment.setVisible(true);
             btnProfile.setVisible(true);
@@ -152,6 +166,7 @@ public class CustomerMenu extends JFrame {
             sidebar.setPreferredSize(new Dimension(60, getHeight()));
             btnServiceHistory.setVisible(false);
             btnPaymentHistory.setVisible(false);
+            btnNotification.setVisible(false);
             btnFeedback.setVisible(false);
             btnComment.setVisible(false);
             btnProfile.setVisible(false);
@@ -263,6 +278,15 @@ public class CustomerMenu extends JFrame {
         return panel;
     }
 
+    private JPanel createNotificationPanel() {
+        NotificationPanel notificationPanel = new NotificationPanel();
+        notificationPanelController = new NotificationPanelController(
+                notificationPanel,
+                controller.getCustomerUser().getId()
+        );
+        return notificationPanel;
+    }
+
     private JPanel createCommentPanel() {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -295,24 +319,20 @@ public class CustomerMenu extends JFrame {
         mainPanel.add(staffField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
+        mainPanel.add(UIUtils.createLabel("Counter Staff Rating *"));
+        staffRatingSlider = createRatingSlider();
+        mainPanel.add(staffRatingSlider);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
         mainPanel.add(UIUtils.createLabel("Technician"));
         technicianField = UIUtils.createTextField();
         technicianField.setEditable(false);
         mainPanel.add(technicianField);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        mainPanel.add(UIUtils.createLabel("Staff Rating *"));
-        staffRatingComboBox = new JComboBox<>(new String[]{"1", "2", "3", "4", "5"});
-        staffRatingComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        staffRatingComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(staffRatingComboBox);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
         mainPanel.add(UIUtils.createLabel("Technician Rating *"));
-        technicianRatingComboBox = new JComboBox<>(new String[]{"1", "2", "3", "4", "5"});
-        technicianRatingComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        technicianRatingComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(technicianRatingComboBox);
+        technicianRatingSlider = createRatingSlider();
+        mainPanel.add(technicianRatingSlider);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         mainPanel.add(UIUtils.createLabel("Comment (Optional)"));
@@ -338,34 +358,9 @@ public class CustomerMenu extends JFrame {
     }
 
     private JPanel createProfilePanel() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JLabel title = new JLabel("My Profile");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        mainPanel.add(title);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        mainPanel.add(UIUtils.createLabel("Current Name"));
-        profileNameField = UIUtils.createTextField();
-        mainPanel.add(profileNameField);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        mainPanel.add(UIUtils.createLabel("Current Phone Number"));
-        profilePhoneField = UIUtils.createTextField();
-        mainPanel.add(profilePhoneField);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        JButton updateButton = UIUtils.createPrimaryButton("Update Profile");
-        updateButton.addActionListener(e -> updateProfile());
-        mainPanel.add(updateButton);
-
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.add(mainPanel, BorderLayout.NORTH);
-        return wrapper;
+        ProfilePanel profilePanel = new ProfilePanel();
+        profilePanelController = new ProfilePanelController(profilePanel, controller.getCustomerUser());
+        return profilePanel;
     }
 
     private void refreshServiceHistory() {
@@ -398,11 +393,11 @@ public class CustomerMenu extends JFrame {
     private void refreshFeedbackAppointmentDropdown() {
         appointmentComboBox.setModel(controller.getCompletedAppointmentComboModel());
         commentTextArea.setText("");
-        if (staffRatingComboBox.getItemCount() > 0) {
-            staffRatingComboBox.setSelectedIndex(0);
+        if (staffRatingSlider != null) {
+            staffRatingSlider.setValue(3);
         }
-        if (technicianRatingComboBox.getItemCount() > 0) {
-            technicianRatingComboBox.setSelectedIndex(0);
+        if (technicianRatingSlider != null) {
+            technicianRatingSlider.setValue(3);
         }
         updateSelectedAppointmentPeople();
     }
@@ -430,14 +425,6 @@ public class CustomerMenu extends JFrame {
         }
     }
 
-    private void loadProfileData() {
-        controller.loadProfileIntoFields(profileNameField, profilePhoneField);
-    }
-
-    private void updateProfile() {
-        controller.updateProfile(profileNameField.getText(), profilePhoneField.getText());
-    }
-
     private void submitComment() {
         if (appointmentComboBox.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(this, "No completed appointment available for feedback.");
@@ -446,12 +433,71 @@ public class CustomerMenu extends JFrame {
 
         controller.submitFeedback(
                 appointmentComboBox.getSelectedItem().toString(),
-                staffRatingComboBox.getSelectedItem().toString(),
-                technicianRatingComboBox.getSelectedItem().toString(),
+                String.valueOf(staffRatingSlider.getValue()),
+                String.valueOf(technicianRatingSlider.getValue()),
                 commentTextArea.getText()
         );
 
         refreshFeedback();
         refreshFeedbackAppointmentDropdown();
+    }
+    
+    private JSlider createRatingSlider() {
+        JSlider slider = new JSlider(1, 5, 3);
+        slider.setMajorTickSpacing(1);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        slider.setSnapToTicks(true);
+        slider.setAlignmentX(Component.LEFT_ALIGNMENT);
+        slider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        slider.setBackground(Color.WHITE);
+        slider.setFont(new Font("Segoe UI", Font.BOLD, 13));
+
+        slider.setUI(new javax.swing.plaf.basic.BasicSliderUI(slider) {
+            @Override
+            protected Dimension getThumbSize() {
+                return new Dimension(14, 20); 
+            }
+
+            @Override
+            public void paintTrack(Graphics g) {
+                Rectangle trackBounds = trackRect;
+                int trackHeight = 4; 
+                int trackY = trackBounds.y + (trackBounds.height - trackHeight) / 2;
+
+                g.setColor(new Color(220, 220, 220)); 
+                g.fillRect(trackBounds.x, trackY, trackBounds.width, trackHeight);
+
+                int thumbX = thumbRect.x + thumbRect.width / 2;
+                int filledWidth = thumbX - trackBounds.x;
+                
+                if (filledWidth > 0) {
+                    g.setColor(new Color(37, 99, 235)); 
+                    g.fillRect(trackBounds.x, trackY, filledWidth, trackHeight);
+                }
+            }
+
+            @Override
+            public void paintThumb(Graphics g) {
+                int x = thumbRect.x;
+                int y = thumbRect.y;
+                int w = thumbRect.width;
+                int h = thumbRect.height;
+
+                int[] xPoints = {x, x + w - 1, x + w - 1, x + w / 2, x};
+                int[] yPoints = {y, y, y + h - 6, y + h - 1, y + h - 6};
+
+                g.setColor(new Color(245, 245, 245));
+                g.fillPolygon(xPoints, yPoints, 5);
+
+                g.setColor(new Color(150, 150, 150));
+                g.drawPolygon(xPoints, yPoints, 5);
+            }
+            @Override
+            public void paintFocus(Graphics g) {}
+
+        });
+
+        return slider;
     }
 }

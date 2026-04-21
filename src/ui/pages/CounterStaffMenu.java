@@ -1,6 +1,11 @@
 package ui.pages;
 
+import models.User;
+import ui.controller.CounterStaffControllers.AppointmentManagementController;
 import ui.controller.CounterStaffControllers.CustomerManagementController;
+import ui.controller.CounterStaffControllers.PaymentRecordManagementController;
+import ui.controller.NotificationPanelController;
+import ui.controller.ProfilePanelController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.ManageCustomerPanel;
 import ui.pages.CounterStaffPanels.ManagePaymentPanel;
@@ -20,9 +25,13 @@ public class CounterStaffMenu extends JFrame {
     private final JButton manageAppointmentBtn;
     private final JButton managePaymentBtn;
     private final JButton myProfileBtn;
+    private final JButton notificationBtn;
     public final JButton logOutBtn;
+    private final User loginStaff;
+    private NotificationPanelController notificationPanelController;
 
-    public CounterStaffMenu() {
+    public CounterStaffMenu(User loginStaff) {
+        this.loginStaff = loginStaff;
         setTitle("APU-ASC Counter Staff Dashboard");
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,6 +62,7 @@ public class CounterStaffMenu extends JFrame {
         manageAppointmentBtn = createSidebarButton("Manage Appointments");
         managePaymentBtn = createSidebarButton("Manage Payment");
         myProfileBtn = createSidebarButton("My Profile");
+        notificationBtn = createSidebarButton("Notifications");
         logOutBtn = createSidebarButton("Log Out");
 
         sidebar.add(manageCustomerBtn);
@@ -62,6 +72,8 @@ public class CounterStaffMenu extends JFrame {
         sidebar.add(managePaymentBtn);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(myProfileBtn);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(notificationBtn);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(logOutBtn);
 
@@ -76,8 +88,16 @@ public class CounterStaffMenu extends JFrame {
         ManageCustomerPanel manageCustomerPanel = new ManageCustomerPanel();
         new CustomerManagementController(manageCustomerPanel);
         contentPanel.add(manageCustomerPanel, "Manage Customer");
-        contentPanel.add(new ManageAppointmentPanel(), "Manage Appointment");
-        contentPanel.add(new ManagePaymentPanel(), "Manage Payment");
+        ManageAppointmentPanel manageAppointmentPanel = new ManageAppointmentPanel(loginStaff);
+        contentPanel.add(manageAppointmentPanel, "Manage Appointment");
+        ManagePaymentPanel managePaymentPanel = new ManagePaymentPanel(loginStaff);
+        contentPanel.add(managePaymentPanel, "Manage Payment");
+        new AppointmentManagementController(manageAppointmentPanel , managePaymentPanel);
+        new PaymentRecordManagementController(managePaymentPanel);
+        ProfilePanel profilePanel = new ProfilePanel();
+        contentPanel.add(profilePanel , "My Profile");
+        new ProfilePanelController(profilePanel,loginStaff);
+        contentPanel.add(createNotificationPanel(), "Notifications");
 
         add(contentPanel, BorderLayout.CENTER);
 
@@ -85,6 +105,13 @@ public class CounterStaffMenu extends JFrame {
         manageCustomerBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Customer"));
         manageAppointmentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Appointment"));
         managePaymentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Payment"));
+        myProfileBtn.addActionListener(e -> cardLayout.show(contentPanel , "My Profile"));
+        notificationBtn.addActionListener(e -> {
+            if (notificationPanelController != null) {
+                notificationPanelController.refreshNotifications();
+            }
+            cardLayout.show(contentPanel, "Notifications");
+        });
         logOutBtn.addActionListener(e->logOut());
     }
 
@@ -96,6 +123,7 @@ public class CounterStaffMenu extends JFrame {
             manageAppointmentBtn.setVisible(true);
             managePaymentBtn.setVisible(true);
             myProfileBtn.setVisible(true);
+            notificationBtn.setVisible(true);
             logOutBtn.setVisible(true);
             toggleButton.setText("≡");
         } else {
@@ -104,6 +132,7 @@ public class CounterStaffMenu extends JFrame {
             manageAppointmentBtn.setVisible(false);
             managePaymentBtn.setVisible(false);
             myProfileBtn.setVisible(false);
+            notificationBtn.setVisible(false);
             logOutBtn.setVisible(false);
             toggleButton.setText("»");
         }
@@ -137,4 +166,13 @@ public class CounterStaffMenu extends JFrame {
         new Login().createUI();
     }
 
+    private JPanel createNotificationPanel() {
+        NotificationPanel notificationPanel = new NotificationPanel();
+        notificationPanelController = new NotificationPanelController(notificationPanel, loginStaff.getId());
+        return notificationPanel;
+    }
+
+    public User getLoginStaff() {
+        return loginStaff;
+    }
 }

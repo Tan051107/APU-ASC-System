@@ -6,7 +6,7 @@ import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
-public class AddCustomerForm extends JFrame {
+public class AddCustomerForm extends JDialog {
     public JTextField nameField;
     public JTextField emailField;
     public JTextField phoneField;
@@ -35,14 +35,14 @@ public class AddCustomerForm extends JFrame {
     }
 
 
-    public AddCustomerForm(boolean isEdit , Customer customerToEdit) {
+    public AddCustomerForm(Frame owner, boolean isEdit , Customer customerToEdit) {
+        super(owner, isEdit ? "Update Customer" : "Add New Customer", true);
         this.customerToEdit = customerToEdit;
         this.isEdit = isEdit;
 
-        setTitle(isEdit ? "Update Customer" : "Add New Customer");
         setSize(450, 550);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(owner);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -75,6 +75,9 @@ public class AddCustomerForm extends JFrame {
         passwordField = UIUtils.createPasswordField();
         mainPanel.add(passwordField);
         passwordField.setVisible(!isEdit);
+        JCheckBox showPasswordCheckBox = createShowPasswordCheckBox(passwordField);
+        showPasswordCheckBox.setVisible(!isEdit);
+        mainPanel.add(showPasswordCheckBox);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         confirmPasswordLabel = UIUtils.createLabel("Confirm Password *");
@@ -83,6 +86,9 @@ public class AddCustomerForm extends JFrame {
         confirmPasswordField = UIUtils.createPasswordField();
         mainPanel.add(confirmPasswordField);
         confirmPasswordField.setVisible(!isEdit);
+        JCheckBox showConfirmPasswordCheckBox = createShowPasswordCheckBox(confirmPasswordField);
+        showConfirmPasswordCheckBox.setVisible(!isEdit);
+        mainPanel.add(showConfirmPasswordCheckBox);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 25)));
 
         addCustomerButton = UIUtils.createPrimaryButton(isEdit ? "Update Customer" : "Add Customer");
@@ -93,5 +99,21 @@ public class AddCustomerForm extends JFrame {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         add(scrollPane);
+    }
+
+    private JCheckBox createShowPasswordCheckBox(JTextField passwordTextField) {
+        JCheckBox checkBox = new JCheckBox("Show password");
+        checkBox.setOpaque(false);
+        checkBox.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        checkBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        final char defaultEchoChar = passwordTextField instanceof JPasswordField passwordFieldComponent
+                ? passwordFieldComponent.getEchoChar()
+                : '\u2022';
+        checkBox.addActionListener(e -> {
+            if (passwordTextField instanceof JPasswordField passwordFieldComponent) {
+                passwordFieldComponent.setEchoChar(checkBox.isSelected() ? (char) 0 : defaultEchoChar);
+            }
+        });
+        return checkBox;
     }
 }

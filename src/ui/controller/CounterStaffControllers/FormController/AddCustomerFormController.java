@@ -1,4 +1,4 @@
-package ui.controller.CounterStaffControllers;
+package ui.controller.CounterStaffControllers.FormController;
 
 import enums.UserType;
 import exceptions.*;
@@ -10,7 +10,6 @@ import utils.DialogUtil;
 import utils.validators.ValidationResult;
 import utils.validators.Validator;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,7 +92,7 @@ public class AddCustomerFormController {
             DialogUtil.showInfoMessage("Updated Successfully" , String.format("Successfully updated %s." , user.getName()));
             form.dispose();
         }
-        catch (NotFoundException | ValidationException | UpdateException e ) {
+        catch (NotFoundException | ValidationException e ) {
             DialogUtil.showErrorMessage("Failed to Update Customer" , e.getMessage());
         }
         catch (Exception e) {

@@ -5,11 +5,11 @@ import exceptions.FileCorruptedException;
 import models.Customer;
 import models.CustomerCar;
 import services.CustomerCarService;
+import ui.controller.CounterStaffControllers.FormController.AddVehicleFormController;
 import ui.pages.CounterStaffPanels.components.VehicleRow;
 import ui.pages.CounterStaffPanels.forms.AddVehicleForm;
 import utils.DialogUtil;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -31,8 +31,8 @@ public class VehicleManagementController {
     }
 
     public void openVehicleForm(Customer owner, boolean isEdit, CustomerCar car) {
-        AddVehicleForm form = new AddVehicleForm(owner, isEdit, car);
-        form.setVisible(true);
+        Window parent = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+        AddVehicleForm form = new AddVehicleForm((Frame)parent, owner, isEdit, car);
         form.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
@@ -42,6 +42,7 @@ public class VehicleManagementController {
             }
         });
         new AddVehicleFormController(form);
+        form.setVisible(true);
     }
 
     private void deleteVehicle(CustomerCar car) {

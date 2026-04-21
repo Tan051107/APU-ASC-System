@@ -1,4 +1,4 @@
-package ui.controller.CounterStaffControllers;
+package ui.controller.CounterStaffControllers.FormController;
 
 import enums.FuelType;
 import exceptions.AddException;
@@ -45,8 +45,8 @@ public class AddVehicleFormController {
         if(addVehicleForm.isEdit() && addVehicleForm.getCustomerCar()!=null){
             CustomerCar customerCar = addVehicleForm.getCustomerCar();
             addVehicleForm.plateField.setText(customerCar.getCarPlate());
-            addVehicleForm.brandField.setText(customerCar.getCarBrand());
-            addVehicleForm.modelField.setText(customerCar.getCarModel());
+            addVehicleForm.brandField.setText(customerCar.getBrand());
+            addVehicleForm.modelField.setText(customerCar.getModel());
             addVehicleForm.yearField.setText(String.valueOf(customerCar.getManufactureYear()));
             addVehicleForm.mileageField.setText(String.valueOf(customerCar.getMileage()));
             addVehicleForm.fuelTypeCombo.setSelectedItem(customerCar.getFuelType().toString());
@@ -72,8 +72,8 @@ public class AddVehicleFormController {
         }
         CustomerCar customerCar = new CustomerCar();
         customerCar.setCarPlate(carPlate);
-        customerCar.setCarBrand(brand);
-        customerCar.setCarModel(model);
+        customerCar.setBrand(brand);
+        customerCar.setModel(model);
         customerCar.setManufactureYear(Integer.parseInt(manufactureYear));
         customerCar.setMileage(Double.parseDouble(mileAge));
         customerCar.setFuelType(FuelType.fromString(fuelType));

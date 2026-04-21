@@ -58,8 +58,8 @@ public class CustomerController {
                 }
 
                 Services service = getServiceById(appointment.getServiceId());
-                String serviceType = service == null ? "Unknown Service" : service.getServiceName();
-                String serviceDescription = service == null ? "-" : service.getServiceDetails();
+                String serviceType = service == null ? "Unknown Service" : service.getName();
+                String serviceDescription = service == null ? "-" : service.getDetails();
                 String appointmentStatus = appointment.getStatusService().getDisplayAppointmentStatus();
 
                 boolean matchesStatus;
@@ -113,9 +113,9 @@ public class CustomerController {
                 }
 
                 Services service = getServiceById(appointment.getServiceId());
-                String serviceType = service == null ? "Unknown Service" : service.getServiceName();
-                String description = service == null ? "-" : service.getServiceDetails();
-                String amount = service == null ? "0.00" : String.format("%.2f", service.getServicePrice());
+                String serviceType = service == null ? "Unknown Service" : service.getName();
+                String description = service == null ? "-" : service.getDetails();
+                String amount = service == null ? "0.00" : String.format("%.2f", service.getPrice());
                 String status = appointment.getStatusService().getDisplayAppointmentStatus();
 
                 String appointmentYear = String.valueOf(appointment.getDate().getYear());
@@ -333,43 +333,11 @@ public class CustomerController {
         }
     }
 
-    public void loadProfileIntoFields(JTextField nameField, JTextField phoneField) {
+    public User getCustomerUser() {
         try {
-            User user = userRepo.getOne(customerId);
-            if (user != null) {
-                nameField.setText(user.getName());
-                phoneField.setText(user.getContactNumber());
-            }
+            return userRepo.getOne(customerId);
         } catch (Exception e) {
-            DialogUtil.showErrorMessage("Load Error", "Failed to load profile");
-        }
-    }
-
-    public void updateProfile(String name, String phoneNumber) {
-        try {
-            ValidationResult validationResult = new ValidationResult();
-
-            Validator.required(validationResult, "Name", name);
-            Validator.validatePhone(validationResult, phoneNumber);
-
-            if (validationResult.hasError()) {
-                DialogUtil.showWarningMessage("Validation Error", validationResult.getErrors());
-                return;
-            }
-
-            User user = userRepo.getOne(customerId);
-            if (user == null) {
-                DialogUtil.showErrorMessage("Error", "User not found");
-                return;
-            }
-
-            user.setName(name);
-            user.setContactNumber(phoneNumber);
-            userRepo.update(user);
-
-            DialogUtil.showInfoMessage("Success", "Profile updated successfully");
-        } catch (Exception e) {
-            DialogUtil.showErrorMessage("Error", "Failed to update profile");
+            return null;
         }
     }
 
