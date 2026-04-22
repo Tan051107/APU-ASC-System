@@ -11,7 +11,7 @@ import java.util.Vector;
 public class UIUtils {
     public static JTextField createTextField() {
         JTextField field = new JTextField();
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
@@ -25,7 +25,7 @@ public class UIUtils {
 
     public static JPasswordField createPasswordField() {
         JPasswordField field = new JPasswordField();
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1),

@@ -96,7 +96,7 @@ public class AddAppointmentForm extends JDialog {
         mainPanel.add(technicianSpacing);
 
         // --- Description ---
-        mainPanel.add(UIUtils.createLabel("Description / Notes"));
+        mainPanel.add(UIUtils.createLabel("Description / Notes *"));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
         descriptionArea = new JTextArea(5, 20);
         descriptionArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));

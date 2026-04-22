@@ -19,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -63,7 +64,7 @@ public class AppointmentManagementController {
                 appointmentService.cancelAppointment(appointment);
                 resetAllAppointments();
                 paymentRecordManagementController.resetAllPaymentRecords();
-            } catch (FileCorruptedException | GetEntityListException e) {
+            } catch (FileCorruptedException | GetEntityListException | IOException e) {
                 logger.log(Level.SEVERE , e.getMessage());
                 DialogUtil.showErrorMessage("Encountered Error" , "Failed to cancel appointment");
             } catch (NotFoundException | DeleteException | BusinessRuleException e) {

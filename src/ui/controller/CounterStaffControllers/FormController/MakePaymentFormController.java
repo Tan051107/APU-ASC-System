@@ -9,6 +9,7 @@ import services.PaymentRecordService;
 import ui.pages.CounterStaffPanels.forms.MakePaymentForm;
 import utils.DialogUtil;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -58,7 +59,7 @@ public class MakePaymentFormController {
             paymentRecordService.makePayment(paymentRecordToMakePayment);
             DialogUtil.showInfoMessage("Payment Successful" , String.format("Payment for  appointment %s has been successfully made", paymentRecordToMakePayment.getAppointmentId()));
             makePaymentForm.dispose();
-        } catch (GetEntityListException | FileCorruptedException e) {
+        } catch (GetEntityListException | FileCorruptedException | IOException e) {
             logger.log(Level.SEVERE,e.getMessage());
         } catch (BusinessRuleException | NotFoundException e) {
             DialogUtil.showWarningMessage("Failed to make payment" ,e.getMessage());

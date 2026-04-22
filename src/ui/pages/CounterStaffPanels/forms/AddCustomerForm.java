@@ -75,6 +75,9 @@ public class AddCustomerForm extends JDialog {
         passwordField = UIUtils.createPasswordField();
         mainPanel.add(passwordField);
         passwordField.setVisible(!isEdit);
+        JCheckBox showPasswordCheckBox = createShowPasswordCheckBox(passwordField);
+        showPasswordCheckBox.setVisible(!isEdit);
+        mainPanel.add(showPasswordCheckBox);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         confirmPasswordLabel = UIUtils.createLabel("Confirm Password *");
@@ -83,6 +86,9 @@ public class AddCustomerForm extends JDialog {
         confirmPasswordField = UIUtils.createPasswordField();
         mainPanel.add(confirmPasswordField);
         confirmPasswordField.setVisible(!isEdit);
+        JCheckBox showConfirmPasswordCheckBox = createShowPasswordCheckBox(confirmPasswordField);
+        showConfirmPasswordCheckBox.setVisible(!isEdit);
+        mainPanel.add(showConfirmPasswordCheckBox);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 25)));
 
         addCustomerButton = UIUtils.createPrimaryButton(isEdit ? "Update Customer" : "Add Customer");
@@ -93,5 +99,21 @@ public class AddCustomerForm extends JDialog {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         add(scrollPane);
+    }
+
+    private JCheckBox createShowPasswordCheckBox(JTextField passwordTextField) {
+        JCheckBox checkBox = new JCheckBox("Show password");
+        checkBox.setOpaque(false);
+        checkBox.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        checkBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        final char defaultEchoChar = passwordTextField instanceof JPasswordField passwordFieldComponent
+                ? passwordFieldComponent.getEchoChar()
+                : '\u2022';
+        checkBox.addActionListener(e -> {
+            if (passwordTextField instanceof JPasswordField passwordFieldComponent) {
+                passwordFieldComponent.setEchoChar(checkBox.isSelected() ? (char) 0 : defaultEchoChar);
+            }
+        });
+        return checkBox;
     }
 }

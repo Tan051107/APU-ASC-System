@@ -1,5 +1,6 @@
 package ui.controller;
 
+import exceptions.BusinessRuleException;
 import exceptions.FileCorruptedException;
 import exceptions.NotFoundException;
 import exceptions.UpdateException;
@@ -68,7 +69,7 @@ public class ProfilePanelController {
                 profilePanel.profilePhoneField.setText(phoneNumber);
             } catch (FileCorruptedException e) {
                 logger.log(Level.SEVERE,e.getMessage());
-            } catch (NotFoundException | UpdateException e) {
+            } catch (NotFoundException | BusinessRuleException e) {
                 DialogUtil.showWarningMessage("Encountered Error" , e.getMessage());
             }
         }

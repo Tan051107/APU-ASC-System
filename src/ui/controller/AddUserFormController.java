@@ -91,7 +91,7 @@ public class AddUserFormController {
             DialogUtil.showInfoMessage("Updated Successfully" , String.format("Successfully updated %s." , user.getName()));
             form.dispose();
         }
-        catch (NotFoundException | ValidationException | UpdateException e ) {
+        catch (NotFoundException | ValidationException  e ) {
             DialogUtil.showErrorMessage("Failed to Update Customer" , e.getMessage());
         }
         catch (Exception e) {
