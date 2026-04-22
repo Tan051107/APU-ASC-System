@@ -1,4 +1,4 @@
-package ui.controller;
+package ui.controller.Manager;
 
 import models.Feedback;
 import models.Appointment;

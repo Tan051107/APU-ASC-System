@@ -1,4 +1,4 @@
-package ui.controller;
+package ui.controller.Manager;
 import services.UserService;
 import ui.pages.Login;
 import ui.pages.ManagerMenu;
@@ -11,6 +11,7 @@ import services.FeedbackService;
 import services.PaymentRecordService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -68,18 +69,26 @@ public class ManagerMenuController {
     public DefaultTableModel loadUserToTable() {
         String[] columns = {"User ID", "Name", "Role"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+
+        String currentUserRole = managerMenu.getUser().getUserType().getDisplayUserType();
         
         try {
             List<User> userData = userService.getUsers();
             
             for (User user : userData) {
-                if (!user.getUserType().getDisplayUserType().equals("Customer")) {
-                    Object[] rowData = {
-                        user.getId(),
-                        user.getName(),
-                        user.getUserType().getDisplayUserType()
-                    };
-                    tableModel.addRow(rowData);
+                String rowUserRole = user.getUserType().getDisplayUserType();
+                
+                if (currentUserRole.equals("Super Manager")) {
+                    if (!rowUserRole.equals("Customer") && !rowUserRole.equals("Super Manager")) {
+                        Object[] rowData = { user.getId(), user.getName(), rowUserRole };
+                        tableModel.addRow(rowData);
+                    }
+                    
+                } else {
+                    if (rowUserRole.equals("Counter Staff") || rowUserRole.equals("Technician")) {
+                        Object[] rowData = { user.getId(), user.getName(), rowUserRole };
+                        tableModel.addRow(rowData);
+                    }
                 }
             }
             
@@ -91,6 +100,7 @@ public class ManagerMenuController {
                 JOptionPane.ERROR_MESSAGE
             );
         }
+        
         return tableModel;
     }
     
@@ -170,6 +180,7 @@ public class ManagerMenuController {
 
             // 2. Update ONLY the price (the rest of the data stays exactly the same)
             serviceToUpdate.setPrice(newPrice);
+            serviceToUpdate.setUpdatedAt(LocalDateTime.now());
 
             // 3. Send the modified object back to be saved
             servicesService.updateService(serviceToUpdate);

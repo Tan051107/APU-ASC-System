@@ -3,10 +3,10 @@ package ui.pages;
 import javax.swing.*;
 
 import models.User;
-
-import ui.controller.ManagerMenuController;
 import ui.controller.NotificationPanelController;
-import ui.controller.UserManagementController;
+import ui.controller.Manager.ManagerMenuController;
+import ui.controller.Manager.UserManagementController;
+import ui.pages.Manager.RatingReports;
 import ui.utils.UIUtils;
 import utils.DialogUtil;
 
@@ -360,12 +360,14 @@ public class ManagerMenu extends JFrame {
         String currentMonthRevenue = controller.getRevenueTotal();
         gridPanel.add(createReportCard("Current Month Revenue", currentMonthRevenue, e -> {
             ui.pages.Manager.RevenueReports viewPanel = new ui.pages.Manager.RevenueReports(this);
-            new ui.controller.RevenueReportsController(viewPanel);
+            new ui.controller.Manager.RevenueReportsController(viewPanel);
             viewPanel.setVisible(true);
         }));
         
-        gridPanel.add(createReportCard("Pending Feedbacks", "0", e -> {
-            cardLayout.show(contentPanel, "View Feedback");
+        gridPanel.add(createReportCard("Rating Details", "", e -> {
+            ui.pages.Manager.RatingReports viewPanel = new ui.pages.Manager.RatingReports(this);
+            new ui.controller.Manager.RatingReportController(viewPanel);
+            viewPanel.setVisible(true);
         }));
 
         panel.add(gridPanel, BorderLayout.CENTER);

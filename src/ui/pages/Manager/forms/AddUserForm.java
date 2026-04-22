@@ -6,7 +6,7 @@ import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
-public class AddUserForm extends JFrame {
+public class AddUserForm extends JDialog {
     public JTextField nameField;
     public JTextField emailField;
     public JTextField phoneField;
@@ -37,12 +37,12 @@ public class AddUserForm extends JFrame {
     }
 
 
-    public AddUserForm(boolean isEdit , User userToEdit) {
+    public AddUserForm(Frame owner, boolean isEdit , User userToEdit) {
+        super(owner, isEdit ? "Update User" : "Add New User", true);
         this.userToEdit = userToEdit;
         this.isEdit = isEdit;
 
-        setTitle(isEdit ? "Update User" : "Add New User");
-        setSize(450, 550);
+        setSize(450, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

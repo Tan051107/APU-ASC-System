@@ -1,4 +1,4 @@
-package ui.controller;
+package ui.controller.Manager;
 
 import java.time.LocalDate;
 import java.util.List;

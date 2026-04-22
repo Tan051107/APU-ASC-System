@@ -10,3 +10,5 @@ N15903|Appointment Created|An appointment is created and is scheduled on 16-04-2
 N07121|Appointment Updated|APP-73542 is updated|User||TP982184|2026-04-14T22:57:47.184434100|2026-04-14T22:57:47.184434100
 N52874|Appointment Updated|APP-73542 is updated|User||TP991703|2026-04-14T22:57:47.184434100|2026-04-14T22:57:47.184434100
 N54403|Payment Is Made|Payment is successfully made for appointment APP-73542 at 14-04-2026 10:59 PM|User||TP991703|2026-04-14T22:59:05.228491800|2026-04-14T22:59:05.228491800
+N39053|Service Information Updated|Service price is updated to RM 500.0|All|||2026-04-22T21:35:24.219789600|2026-04-22T21:35:24.219789600
+N08502|Service Information Updated|Service price is updated to RM 600.0|All|||2026-04-22T22:07:00.686165700|2026-04-22T22:07:00.686165700

@@ -1,4 +1,4 @@
-package ui.controller;
+package ui.controller.Manager;
 
 import exceptions.DeleteException;
 import models.User;
@@ -7,8 +7,12 @@ import ui.pages.Manager.forms.AddUserForm;
 import ui.pages.ManagerMenu;
 import utils.DialogUtil;
 
+import java.awt.Window;
+import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import javax.swing.SwingUtilities;
 
 public class UserManagementController {
     private final ManagerMenu managerMenu;
@@ -78,10 +82,10 @@ public class UserManagementController {
     }
 
     private void openAddUserForm(boolean isEdit, User userToEdit) {
-        AddUserForm form = new AddUserForm(isEdit, userToEdit);
+        Window parent = SwingUtilities.getWindowAncestor(managerMenu);
+        AddUserForm form = new AddUserForm((Frame)parent, isEdit, userToEdit);
         new AddUserFormController(form);
         form.setVisible(true);
-        // We might want to reload customers after the form is closed
         form.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent windowEvent) {

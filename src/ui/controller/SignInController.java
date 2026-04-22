@@ -120,13 +120,14 @@ public class SignInController {
 
     private void routeUser(User user) {
         switch (user.getUserType()){
-            case CUSTOMER:
-                loginPage.dispose();
-                new CustomerMenu(user.getId()).setVisible(true);
-                break;
+            case SUPER_MANAGER:
             case MANAGER:
                 ManagerMenu managerMenu = new ManagerMenu(user);
                 managerMenu.setVisible(true);
+                break;
+            case CUSTOMER:
+                loginPage.dispose();
+                new CustomerMenu(user.getId()).setVisible(true);
                 break;
             case COUNTER_STAFF:
                 loginPage.dispose();
