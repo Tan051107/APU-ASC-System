@@ -86,14 +86,19 @@ public class AppointmentService {
     public void updateAppointment(Appointment appointmentToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException, IOException {
         LocalDateTime chosenAppointmentDateTime = LocalDateTime.of(appointmentToUpdate.getDate(),appointmentToUpdate.getTime());
         String appointmentToUpdateId = appointmentToUpdate.getId();
+        Appointment originalAppt = appointmentRepository.getOne(appointmentToUpdateId);
+        boolean isTimeChanged = !originalAppt.getDate().equals(appointmentToUpdate.getDate()) || 
+                                !originalAppt.getTime().equals(appointmentToUpdate.getTime());
         if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
             throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
         }
         if(carHasClashAppointment(appointmentToUpdate, appointmentToUpdateId)){
             throw new BusinessRuleException("Car already has an appointment during the date and time chosen");
         }
-        if(carHasNotCompletedAppointment(appointmentToUpdate,appointmentToUpdateId)){
-            throw new BusinessRuleException("Car already has an upcoming appointment");
+        if(isTimeChanged) {
+            if(carHasNotCompletedAppointment(appointmentToUpdate,appointmentToUpdateId)){
+                throw new BusinessRuleException("Car already has an upcoming appointment");
+            }
         }
         if(isNotOperationHour(appointmentToUpdate)){
             throw new BusinessRuleException("Operating hours are from 9 AM to 6 PM, Monday to Friday");

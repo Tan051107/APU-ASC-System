@@ -30,7 +30,7 @@ public class RatingReports extends JDialog{
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(title);
 
-        String[] roles = {"Counter Staff", "Technician", "Customer"};
+        String[] roles = {"Counter Staff", "Technician"};
         roleComboBox = UIUtils.createJComboBox(roles);
         roleComboBox.setMaximumSize(new Dimension(150, 40));
         roleComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);

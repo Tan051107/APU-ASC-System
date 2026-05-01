@@ -229,8 +229,24 @@ public class CustomerController {
             for (Appointment appointment : appointments) {
                 boolean isOwnAppointment = appointment.getCustomerId().equalsIgnoreCase(customerId);
                 boolean isCompleted = appointment.getStatusService() == AppointmentStatus.COMPLETED;
-                boolean feedbackExists = feedbacks.stream()
-                        .anyMatch(feedback -> feedback.getAppointmentId().equalsIgnoreCase(appointment.getId()));
+                boolean feedbackExists = feedbacks.stream().anyMatch(feedback -> {
+                    boolean isMatchingAppt = feedback.getAppointmentId() != null && 
+                                            feedback.getAppointmentId().trim().equalsIgnoreCase(appointment.getId().trim());
+                    
+                    if (!isMatchingAppt) {
+                        return false;
+                    }
+
+                    boolean isStaffRatingEmpty = (feedback.getStaffRating() == null);
+                    boolean isTechRatingEmpty = (feedback.getTechnicianRating() == null);
+                    boolean isCommentEmpty = (feedback.getComment() == null || feedback.getComment().trim().isEmpty());
+
+                    if (isStaffRatingEmpty && isTechRatingEmpty && isCommentEmpty) {
+                        return false; 
+                    }
+
+                    return true; 
+                });
 
                 if (isOwnAppointment && isCompleted && !feedbackExists) {
                     model.addElement(appointment.getId());
@@ -239,7 +255,7 @@ public class CustomerController {
         } catch (Exception e) {
             DialogUtil.showErrorMessage("Load Error", "Failed to load completed appointments");
         }
-
+        
         return model;
     }
 
@@ -310,8 +326,24 @@ public class CustomerController {
             }
 
             List<Feedback> feedbacks = feedbackRepo.getAll();
-            boolean feedbackExists = feedbacks.stream()
-                    .anyMatch(feedback -> feedback.getAppointmentId().equalsIgnoreCase(appointmentId));
+            boolean feedbackExists = feedbacks.stream().anyMatch(feedback -> {
+                boolean isMatchingAppt = feedback.getAppointmentId() != null && 
+                                        feedback.getAppointmentId().trim().equalsIgnoreCase(appointment.getId().trim());
+                
+                if (!isMatchingAppt) {
+                    return false;
+                }
+
+                boolean isStaffRatingEmpty = (feedback.getStaffRating() == null);
+                boolean isTechRatingEmpty = (feedback.getTechnicianRating() == null);
+                boolean isCommentEmpty = (feedback.getComment() == null || feedback.getComment().trim().isEmpty());
+
+                if (isStaffRatingEmpty && isTechRatingEmpty && isCommentEmpty) {
+                    return false; 
+                }
+
+                return true; 
+            });
 
             if (feedbackExists) {
                 DialogUtil.showWarningMessage("Validation Error", "This appointment already has feedback. One appointment can only be submitted once.");
