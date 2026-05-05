@@ -111,13 +111,12 @@ public class AppointmentManagementController {
 
     private void resetAllAppointments(){
         try {
-            List<Appointment> appointments = appointmentService.getAppointments();
+            List<Appointment> appointments = appointmentService.getAllAppointments();
             manageAppointmentPanel.setAppointments(appointments);
             loadAppointments();
-        } catch (FileCorruptedException e) {
+        } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Encountered Error" , "Failed to get appointments");
             logger.log(Level.SEVERE, e.getMessage());
-
         }
     }
 

@@ -114,10 +114,6 @@ public class AppointmentService {
         createNotification(appointmentToCancel.getCustomerId() , "Appointment Cancelled" , appointmentToCancel.getId()+ "is cancelled");
     }
 
-    public List<Appointment> getAppointments() throws FileCorruptedException {
-        return appointmentRepository.getAll();
-    }
-
     public List<Appointment> getAppointmentsByTechnician(String technicianId) throws FileCorruptedException {
         return appointmentRepository.getAll(appointment -> appointment.getTechnicianId().equalsIgnoreCase(technicianId));
     }

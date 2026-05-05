@@ -50,6 +50,7 @@ public class NotificationService {
         return userNotifications;
     }
 
+
     private String generateId(){
         while (true){
             String id = RandomIdGenerator.generateId("N" ,5);

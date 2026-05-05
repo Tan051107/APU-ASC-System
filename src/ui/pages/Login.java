@@ -166,8 +166,8 @@ public class Login extends Component {
         demoLabel.setForeground(new Color(140, 140, 140));
         demoLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
         demoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(demoLabel);
-        panel.add(Box.createRigidArea(new Dimension(0, 15)));
+//        panel.add(demoLabel);
+//        panel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         JPanel rolePanel = new JPanel(new GridLayout(2, 2, 6, 6));
         rolePanel.setOpaque(false);
@@ -182,7 +182,7 @@ public class Login extends Component {
         rolePanel.add(wrapRoleButton(demoTechnicianButton));
         Dimension rolePref = rolePanel.getPreferredSize();
         rolePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, rolePref.height));
-        panel.add(rolePanel);
+//        panel.add(rolePanel);
 
         panel.setPreferredSize(new Dimension(350, panel.getPreferredSize().height));
         return panel;
