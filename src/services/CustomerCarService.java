@@ -42,18 +42,18 @@ public class CustomerCarService {
         return customerCarCrudRepository.getAll(filter);
     }
 
-    public void addCar(CustomerCar carToAdd) throws AddException, IOException, FileCorruptedException {
+    public void addCar(CustomerCar carToAdd) throws BusinessRuleException, IOException, FileCorruptedException {
         boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate())).isEmpty();
         final int maxCarAllowed = 3;
         boolean hasReachedMaxCarAllowed = getCustomerCars(carToAdd.getCustomerId()).size() >=maxCarAllowed;
         if(carPlateHasExisted){
-            throw new AddException("Car plate has existed");
+            throw new BusinessRuleException("Car plate has existed");
         }
         if(hasReachedMaxCarAllowed){
-            throw new AddException("Already reached maximum car allowed to be added");
+            throw new BusinessRuleException("Already reached maximum car allowed to be added");
         }
         if(hasExceededCurrentYear(carToAdd.getManufactureYear())){
-            throw new AddException("Invalid manufacture year");
+            throw new BusinessRuleException("Invalid manufacture year");
         }
         String carId = generateCarId();
         carToAdd.setId(carId);

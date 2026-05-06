@@ -48,17 +48,16 @@ public class SignInController {
             Validator.validateEmail(validationResult,email);
             Validator.validatePassword(validationResult,"Password" ,password);
             if(validationResult.hasError()){
-                throw new LoginException(validationResult.getErrors());
+                throw new ValidationException(validationResult.getErrors());
             }
             User user = authService.login(email,password);
             routeUser(user);
-        } catch (LoginException e) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    e.getMessage(),
-                    "Login Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+        } catch (ValidationException | BusinessRuleException e) {
+            DialogUtil.showErrorMessage("Login Error" , e.getMessage());
+        }
+        catch (GetEntityListException e){
+            DialogUtil.showErrorMessage("Encountered Error" , "Encountered error when login");
+            logger.log(Level.SEVERE,e.getMessage());
         }
     }
 
@@ -137,14 +136,9 @@ public class SignInController {
                 techMenu.setVisible(true);
                 break;
             default:
-                JOptionPane.showMessageDialog(
-                        null,
-                        "User Role not found",
-                        "Login Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                DialogUtil.showErrorMessage("Login Error","User Role not found" );
         }
-        // Close window
+        // Close login page
         loginPage.dispose();
     }
 }

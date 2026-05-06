@@ -19,11 +19,6 @@ public class CustomerService {
     private final CustomerMapper customerMapper = new CustomerMapper();
     private final CrudRepository<Customer> customerCrudRepository = new CrudRepository<>(USER_FILE,customerMapper);
 
-    public void addCustomer(User customerToSignUp) throws SignUpException {
-        customerToSignUp.setUserType(UserType.CUSTOMER);
-        userService.signUpUser(customerToSignUp);
-    }
-
     public void deleteCustomer(String customerId) throws FileCorruptedException, DeleteException {
         AppointmentService appointmentService = new AppointmentService();
         List<Appointment> notCompletedAppointments = appointmentService.getAppointments(appointment -> appointment.getCustomerId().equalsIgnoreCase(customerId) && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
@@ -32,14 +27,6 @@ public class CustomerService {
         }
         userService.deleteUser(customerId);
         customerCarService.deleteCarByCustomerId(customerId);
-    }
-
-    public void updateCustomer(Customer customer){
-        try {
-            customerCrudRepository.update(customer);
-        } catch (FileCorruptedException | NotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public List<Customer> getCustomers() throws FileCorruptedException {

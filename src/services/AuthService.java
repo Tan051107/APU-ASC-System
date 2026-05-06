@@ -1,5 +1,6 @@
 package services;
 
+import exceptions.BusinessRuleException;
 import exceptions.GetEntityListException;
 import models.User;
 import utils.validators.ValidationResult;
@@ -12,20 +13,15 @@ public class AuthService {
     private final UserService userService = new UserService();
 
 
-    public User login(String email, String password) throws LoginException{
-        try{
-            User loginUser = userService.getUserByEmail(email);
-            boolean userHasExisted = loginUser != null;
-            if(!userHasExisted){
-                throw new LoginException("Email not found");
-            }
-            if(!loginUser.getPassword().equals(password)) {
-                throw new LoginException("Incorrect password");
-            }
-            return loginUser;
+    public User login(String email, String password) throws BusinessRuleException, GetEntityListException {
+        User loginUser = userService.getUserByEmail(email);
+        boolean userHasExisted = loginUser != null;
+        if(!userHasExisted){
+            throw new BusinessRuleException("Email not found");
         }
-        catch(GetEntityListException e){
-            throw new LoginException(e.getMessage());
+        if(!loginUser.getPassword().equals(password)) {
+            throw new BusinessRuleException("Incorrect password");
         }
+        return loginUser;
     }
 }
