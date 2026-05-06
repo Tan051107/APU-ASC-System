@@ -51,7 +51,8 @@ public class VehicleManagementController {
     }
 
     private void deleteVehicle(CustomerCar car) {
-        boolean confirmDelete = DialogUtil.showConfirmationMessage("Confirm Delete?" , String.format("Are you sure you want to delete %s" , car.getCarPlate()));
+        boolean confirmDelete = DialogUtil.showConfirmationMessage("Confirm Delete?" ,
+                String.format("Are you sure you want to delete %s" , car.getCarPlate()));
         if(confirmDelete){
             try {
                 customerCarService.deleteCarById(car.getId());
@@ -61,7 +62,8 @@ public class VehicleManagementController {
                 DialogUtil.showErrorMessage("Failed to Delete Vehicle", e.getMessage());
             } catch (FileCorruptedException e) {
                 logger.log(Level.SEVERE,e.getMessage());
-                DialogUtil.showErrorMessage("Failed to Delete Vehicle", "Encountered error when trying to delete vehicle");
+                DialogUtil.showErrorMessage("Failed to Delete Vehicle",
+                        "Encountered error when trying to delete vehicle");
             }
         }
     }
@@ -71,13 +73,15 @@ public class VehicleManagementController {
             int maxCarAllowed = 3;
             boolean hasReachedMaxCarAllowed = customerCarService.getCustomerCars(owner.getId()).size() >= maxCarAllowed;
             if(hasReachedMaxCarAllowed){
-                DialogUtil.showWarningMessage("Failed to Add Vehicle" , "Only allowed to add a maximum of 3 cars. Please remove one of the cars to add new car");
+                DialogUtil.showWarningMessage(
+                        "Failed to Add Vehicle" ,
+                        "Only allowed to add a maximum of 3 cars. Please remove one of the cars to add new car");
                 return;
             }
             openVehicleForm(owner,false,null);
         } catch (FileCorruptedException e) {
             logger.log(Level.SEVERE,e.getMessage());
-            DialogUtil.showErrorMessage("Failed to Add Vehicle", "Encountered error when trying to delete vehicle");
+            DialogUtil.showErrorMessage("Failed to Add Vehicle", "Encountered error when trying to add vehicle");
         }
     }
 

@@ -97,7 +97,8 @@ public class CustomerManagementController {
 
 
     private void deleteCustomer(Customer customer){
-        boolean confirmDeleteCustomer = DialogUtil.showConfirmationMessage("Confirm Delete?" , String.format("Are you sure you want to delete %s?" , customer.getName()));
+        boolean confirmDeleteCustomer = DialogUtil.showConfirmationMessage("Confirm Delete?" ,
+                String.format("Are you sure you want to delete %s?" , customer.getName()));
         if(confirmDeleteCustomer){
             try {
                 customerService.deleteCustomer(customer.getId());
@@ -106,7 +107,8 @@ public class CustomerManagementController {
             } catch (DeleteException e) {
                 DialogUtil.showErrorMessage("Failed to Delete Customer" , e.getMessage());
             } catch (Exception e) {
-                DialogUtil.showErrorMessage("Failed to Delete Customer" , "Encountered error when trying to delete customer");
+                DialogUtil.showErrorMessage("Failed to Delete Customer" ,
+                        "Encountered error when trying to delete customer");
                 logger.log(Level.SEVERE , e.getMessage());
             }
         }

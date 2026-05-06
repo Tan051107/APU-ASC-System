@@ -21,7 +21,9 @@ public class CustomerService {
 
     public void deleteCustomer(String customerId) throws FileCorruptedException, DeleteException, BusinessRuleException {
         AppointmentService appointmentService = new AppointmentService();
-        List<Appointment> notCompletedAppointments = appointmentService.getAppointments(appointment -> appointment.getCustomerId().equalsIgnoreCase(customerId) && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
+        List<Appointment> notCompletedAppointments = appointmentService.
+                getAppointments(appointment -> appointment.getCustomerId().equalsIgnoreCase(customerId)
+                        && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
         if(!notCompletedAppointments.isEmpty()){
             throw new DeleteException("Customer couldn't be deleted because still have upcoming appointments");
         }

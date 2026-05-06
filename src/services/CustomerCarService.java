@@ -70,7 +70,8 @@ public class CustomerCarService {
     }
 
     public void deleteCarByCustomerId(String customerId) throws FileCorruptedException, BusinessRuleException {
-        List<CustomerCar> customerCars = customerCarCrudRepository.getAll(customerCar -> customerCar.getCustomerId().equals(customerId));
+        List<CustomerCar> customerCars = customerCarCrudRepository.getAll(
+                customerCar -> customerCar.getCustomerId().equals(customerId));
         for(CustomerCar customerCar : customerCars){
             if(hasNotCompletedAppointment(customerCar.getId())){
                 throw new BusinessRuleException("Not allowed to delete car when still have upcoming appointments");
@@ -117,7 +118,9 @@ public class CustomerCarService {
 
     private boolean hasNotCompletedAppointment(String carId) throws FileCorruptedException {
         AppointmentService appointmentService = new AppointmentService();
-        List<Appointment> upcomingAppointments = appointmentService.getAppointments(appointment -> appointment.getCarId().equals(carId) && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
+        List<Appointment> upcomingAppointments =
+                appointmentService.getAppointments(appointment -> appointment.getCarId().equals(carId)
+                        && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
         return !upcomingAppointments.isEmpty();
     }
 
