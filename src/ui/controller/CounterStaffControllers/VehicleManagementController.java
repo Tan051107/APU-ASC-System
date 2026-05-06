@@ -1,9 +1,13 @@
 package ui.controller.CounterStaffControllers;
 
+import enums.AppointmentStatus;
+import exceptions.BusinessRuleException;
 import exceptions.DeleteException;
 import exceptions.FileCorruptedException;
+import models.Appointment;
 import models.Customer;
 import models.CustomerCar;
+import services.AppointmentService;
 import services.CustomerCarService;
 import ui.controller.CounterStaffControllers.FormController.AddVehicleFormController;
 import ui.pages.CounterStaffPanels.components.VehicleRow;
@@ -13,6 +17,7 @@ import utils.DialogUtil;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,8 +57,11 @@ public class VehicleManagementController {
                 customerCarService.deleteCarById(car.getId());
                 refreshCallback.run();
                 DialogUtil.showInfoMessage("Deleted Successfully" , "Successfully deleted vehicle");
-            } catch (DeleteException e) {
-                DialogUtil.showErrorMessage("Failed to delete vehicle", e.getMessage());
+            } catch (DeleteException | BusinessRuleException e) {
+                DialogUtil.showErrorMessage("Failed to Delete Vehicle", e.getMessage());
+            } catch (FileCorruptedException e) {
+                logger.log(Level.SEVERE,e.getMessage());
+                DialogUtil.showErrorMessage("Failed to Delete Vehicle", "Encountered error when trying to delete vehicle");
             }
         }
     }
@@ -63,12 +71,14 @@ public class VehicleManagementController {
             int maxCarAllowed = 3;
             boolean hasReachedMaxCarAllowed = customerCarService.getCustomerCars(owner.getId()).size() >= maxCarAllowed;
             if(hasReachedMaxCarAllowed){
-                DialogUtil.showWarningMessage("Error Adding Car" , "Only allowed to add a maximum of 3 cars. Please remove one of the cars to add new car");
+                DialogUtil.showWarningMessage("Failed to Add Vehicle" , "Only allowed to add a maximum of 3 cars. Please remove one of the cars to add new car");
                 return;
             }
             openVehicleForm(owner,false,null);
         } catch (FileCorruptedException e) {
             logger.log(Level.SEVERE,e.getMessage());
+            DialogUtil.showErrorMessage("Failed to Add Vehicle", "Encountered error when trying to delete vehicle");
         }
     }
+
 }

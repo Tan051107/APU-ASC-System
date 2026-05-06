@@ -61,7 +61,9 @@ public class CustomerManagementController {
             manageCustomerPanel.setCustomers(customers);
             loadCustomers();
         } catch (FileCorruptedException e) {
-            DialogUtil.showErrorMessage("Encountered Error" , "Failed to get customers");
+            DialogUtil.showErrorMessage(
+                    "Failed to Reload Customers" , "Encountered error when trying to reload customers' data."
+            );
             logger.log(Level.SEVERE , e.getMessage());
         }
     }
@@ -104,7 +106,7 @@ public class CustomerManagementController {
             } catch (DeleteException e) {
                 DialogUtil.showErrorMessage("Failed to Delete Customer" , e.getMessage());
             } catch (Exception e) {
-                DialogUtil.showErrorMessage("Failed to Delete Customer" , "Encountered error when deleting customer");
+                DialogUtil.showErrorMessage("Failed to Delete Customer" , "Encountered error when trying to delete customer");
                 logger.log(Level.SEVERE , e.getMessage());
             }
         }
@@ -122,7 +124,7 @@ public class CustomerManagementController {
                 loadCustomers();
             }
         } catch (FileCorruptedException e) {
-            DialogUtil.showErrorMessage("Error encountered" , "Failed to search customer");
+            DialogUtil.showErrorMessage("Failed to Search Customer" , "Encountered error when trying to search customer");
             logger.log(Level.SEVERE,e.getMessage());
         }
     }
