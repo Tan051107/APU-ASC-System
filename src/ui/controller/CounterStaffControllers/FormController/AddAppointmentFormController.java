@@ -4,8 +4,8 @@ import enums.AppointmentStatus;
 import exceptions.*;
 import models.*;
 import services.*;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomComboBoxItem;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.VisibleIdCustomComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.HiddenIdCustomComboBoxItem;
 import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
 import utils.DialogUtil;
 import utils.validators.ValidationResult;
@@ -19,7 +19,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,15 +82,15 @@ public class AddAppointmentFormController {
                 String customerName = appointmentToEdit.getCustomer().getName();
                 String serviceName = appointmentToEdit.getService().getName();
                 String technicianName = appointmentToEdit.getTechnician().getName();
-                addAppointmentForm.customerSelectionCombo.setSelectedItem(new CustomComboBoxItem(customerId , " | " + customerName));
-                addAppointmentForm.serviceTypeCombo.setSelectedItem(new ServiceComboBoxItem(serviceId , " | " + serviceName));
+                addAppointmentForm.customerSelectionCombo.setSelectedItem(new VisibleIdCustomComboBoxItem(customerId , " | " + customerName));
+                addAppointmentForm.serviceTypeCombo.setSelectedItem(new HiddenIdCustomComboBoxItem(serviceId , " | " + serviceName));
                 addAppointmentForm.timeField.setText(appointmentTime);
                 addAppointmentForm.dateField.setText(appointmentDate);
                 addAppointmentForm.descriptionArea.setText(description);
                 getCarPlateSelections(); //Get car plates based on customer chosen
                 getAvailableTechnicians(); //Get available technicians based on the time and date in the created appointment
                 addAppointmentForm.carPlateSelectionCombo.setSelectedItem(carPlate);
-                addAppointmentForm.technicianSelectionCombo.setSelectedItem(new CustomComboBoxItem(technicianId, " | " + technicianName));
+                addAppointmentForm.technicianSelectionCombo.setSelectedItem(new VisibleIdCustomComboBoxItem(technicianId, " | " + technicianName));
 
             } catch (FileCorruptedException | GetEntityListException e) {
                 logger.log(Level.SEVERE,e.getMessage());
@@ -107,7 +106,7 @@ public class AddAppointmentFormController {
                 DialogUtil.showWarningMessage("No service available" , "No service available for appointment assignment");
             }
             for(Services service : services){
-                addAppointmentForm.serviceTypeCombo.addItem(new ServiceComboBoxItem(service.getId() ,service.getName()));
+                addAppointmentForm.serviceTypeCombo.addItem(new HiddenIdCustomComboBoxItem(service.getId() ,service.getName()));
             }
         } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Init Form Failed" , "Failed to initialize form");
@@ -124,7 +123,7 @@ public class AddAppointmentFormController {
             }
             else{
                 for(Customer customer : customers){
-                    CustomComboBoxItem customerComboBoxItem= new CustomComboBoxItem(customer.getId() , " | " + customer.getName());
+                    VisibleIdCustomComboBoxItem customerComboBoxItem= new VisibleIdCustomComboBoxItem(customer.getId() , " | " + customer.getName());
                     addAppointmentForm.customerSelectionCombo.addItem(customerComboBoxItem);
                 }
             }
@@ -135,31 +134,26 @@ public class AddAppointmentFormController {
     }
 
     private Appointment fieldToAppointment() throws ValidationException {
-        CustomComboBoxItem customerSelected = (CustomComboBoxItem) addAppointmentForm.customerSelectionCombo.getSelectedItem();
-        ServiceComboBoxItem serviceSelected = (ServiceComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
-        CustomComboBoxItem technicianSelected = (CustomComboBoxItem)addAppointmentForm.technicianSelectionCombo.getSelectedItem();
+        VisibleIdCustomComboBoxItem customerSelected = (VisibleIdCustomComboBoxItem) addAppointmentForm.customerSelectionCombo.getSelectedItem();
+        HiddenIdCustomComboBoxItem serviceSelected = (HiddenIdCustomComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
+        VisibleIdCustomComboBoxItem technicianSelected = (VisibleIdCustomComboBoxItem)addAppointmentForm.technicianSelectionCombo.getSelectedItem();
+        VisibleIdCustomComboBoxItem carSelected = (VisibleIdCustomComboBoxItem) addAppointmentForm.carPlateSelectionCombo.getSelectedItem();
         String description = addAppointmentForm.descriptionArea.getText();
-        String carSelected = Objects.requireNonNull(addAppointmentForm.carPlateSelectionCombo.getSelectedItem()).toString();
         String appointmentDateString = addAppointmentForm.dateField.getText();
         String appointmentTimeString = addAppointmentForm.timeField.getText();
-        if(customerSelected == null || serviceSelected == null || technicianSelected == null || carSelected.isEmpty()){
+        if(customerSelected == null || serviceSelected == null || technicianSelected == null || carSelected == null){
             throw new ValidationException("Please fill up required fields");
         }
         String customerIdSelected = customerSelected.getId();
         String serviceIdSelected = serviceSelected.getId();
         String technicianIdSelected = technicianSelected.getId();
-        String carId;
-        try {
-            carId = customerCarService.getCarByCarPlate(carSelected).getId();
-        } catch (FileCorruptedException e) {
-            throw new RuntimeException(e);
-        }
+        String carIdSelected = carSelected.getId();
         ValidationResult validationResult = new ValidationResult();
         Validator.required(validationResult,"Customer" , customerIdSelected);
         Validator.required(validationResult,"Service" , serviceIdSelected);
         Validator.required(validationResult,"Technician" , technicianIdSelected);
         Validator.required(validationResult,"Appointment description" , description);
-        Validator.required(validationResult,"Car" , carId);
+        Validator.required(validationResult,"Car" , carIdSelected);
         if(validationResult.hasError()){
             throw new ValidationException(validationResult.getErrors());
 
@@ -179,7 +173,7 @@ public class AddAppointmentFormController {
         appointment.setServiceId(serviceIdSelected);
         appointment.setTechnicianId(technicianIdSelected);
         appointment.setDescription(description);
-        appointment.setCarId(carId);
+        appointment.setCarId(carIdSelected);
         return appointment;
     }
 
@@ -216,7 +210,7 @@ public class AddAppointmentFormController {
     }
 
     private void getCarPlateSelections(){
-        CustomComboBoxItem customerSelected = (CustomComboBoxItem) addAppointmentForm.customerSelectionCombo.getSelectedItem();
+        VisibleIdCustomComboBoxItem customerSelected = (VisibleIdCustomComboBoxItem) addAppointmentForm.customerSelectionCombo.getSelectedItem();
         if(customerSelected == null){
             DialogUtil.showErrorMessage("Validation Error" , "Customer is required");
             return;
@@ -231,7 +225,8 @@ public class AddAppointmentFormController {
                 else{
                     showCarPlateField();
                     for(CustomerCar customerCar :customerCars){
-                        addAppointmentForm.carPlateSelectionCombo.addItem(customerCar.getCarPlate());
+                        HiddenIdCustomComboBoxItem customerCarComboBoxItem = new HiddenIdCustomComboBoxItem(customerCar.getId() , customerCar.getCarPlate());
+                        addAppointmentForm.carPlateSelectionCombo.addItem(customerCarComboBoxItem);
                     }
                 }
             } catch (FileCorruptedException e) {
@@ -250,7 +245,7 @@ public class AddAppointmentFormController {
     private void getAvailableTechnicians(){
         String selectedAppointmentDate = addAppointmentForm.dateField.getText();
         String selectedAppointmentTime = addAppointmentForm.timeField.getText();
-        ServiceComboBoxItem serviceSelected = (ServiceComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
+        HiddenIdCustomComboBoxItem serviceSelected = (HiddenIdCustomComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
         if(!selectedAppointmentTime.isEmpty() && !selectedAppointmentDate.isEmpty() && !(serviceSelected == null)){
             String serviceSelectedId = serviceSelected.getId();
             try {
@@ -267,7 +262,7 @@ public class AddAppointmentFormController {
                 }
                 if(!availableTechnicians.isEmpty()){
                     for(Technician availableTechnician : availableTechnicians){
-                        CustomComboBoxItem technicianComboBoxItem = new CustomComboBoxItem(availableTechnician.getId(), " | "+availableTechnician.getName());
+                        VisibleIdCustomComboBoxItem technicianComboBoxItem = new VisibleIdCustomComboBoxItem(availableTechnician.getId(), " | "+availableTechnician.getName());
                         addAppointmentForm.technicianSelectionCombo.addItem(technicianComboBoxItem);
                     }
                     showTechnicianField();

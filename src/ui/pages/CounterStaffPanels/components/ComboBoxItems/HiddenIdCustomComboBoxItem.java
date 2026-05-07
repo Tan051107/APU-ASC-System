@@ -1,7 +1,7 @@
 package ui.pages.CounterStaffPanels.components.ComboBoxItems;
 
-public class ServiceComboBoxItem extends CustomComboBoxItem{
-    public ServiceComboBoxItem(String id, String name) {
+public class HiddenIdCustomComboBoxItem extends VisibleIdCustomComboBoxItem {
+    public HiddenIdCustomComboBoxItem(String id, String name) {
         super(id, name);
     }
 

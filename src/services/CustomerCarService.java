@@ -28,10 +28,6 @@ public class CustomerCarService {
         return customerCarCrudRepository.getAll(customerCar -> customerCar.getCustomerId().equalsIgnoreCase(customerId));
     }
 
-    public CustomerCar getCarByCarPlate(String carPlate) throws FileCorruptedException {
-        return customerCarCrudRepository.getAll(customerCar -> customerCar.getCarPlate().equalsIgnoreCase(carPlate)).getFirst();
-    }
-
     public CustomerCar getCarById(String id) throws GetEntityListException {
         try {
             return customerCarCrudRepository.getOne(id);
@@ -40,7 +36,7 @@ public class CustomerCarService {
         }
     }
 
-    public List<CustomerCar>customerCars(Predicate<CustomerCar> filter) throws FileCorruptedException {
+    public List<CustomerCar> getCars(Predicate<CustomerCar> filter) throws FileCorruptedException {
         return customerCarCrudRepository.getAll(filter);
     }
 
@@ -82,7 +78,6 @@ public class CustomerCarService {
         customerCarCrudRepository.writeAll(cars);
     }
 
-    //TODO Don't allow update car when car is assigned to an appointment
     public void updateCar(CustomerCar carToUpdate) throws FileCorruptedException,UpdateException {
         boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar ->customerCar.getCarPlate().equalsIgnoreCase(carToUpdate.getCarPlate()) && !customerCar.getId().equalsIgnoreCase(carToUpdate.getId())).isEmpty();
         if(carPlateHasExisted){
