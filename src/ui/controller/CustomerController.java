@@ -2,32 +2,24 @@ package ui.controller;
 
 import enums.AppointmentStatus;
 import exceptions.FileCorruptedException;
-import mapper.AppointmentMapper;
-import mapper.FeedbackMapper;
-import mapper.ServicesMapper;
-import mapper.UserMapper;
-import models.Appointment;
-import models.Feedback;
-import models.Services;
-import models.User;
+import mapper.*;
+import models.*;
 import repositories.CrudRepository;
 import utils.DialogUtil;
-import utils.RandomIdGenerator;
 import utils.validators.ValidationResult;
 import utils.validators.Validator;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CustomerController {
 
     private final String customerId;
 
+    // ================= REPOSITORIES =================
+    // Handle file operations for each module
     private final CrudRepository<Appointment> appointmentRepo =
             new CrudRepository<>("txt_files/Appointment.txt", new AppointmentMapper());
 
@@ -40,215 +32,107 @@ public class CustomerController {
     private final CrudRepository<Services> servicesRepo =
             new CrudRepository<>("txt_files/Services.txt", new ServicesMapper());
 
+    private final CrudRepository<PaymentRecord> paymentRepo =
+            new CrudRepository<>("txt_files/PaymentRecord.txt", new PaymentRecordMapper());
+
     public CustomerController(String customerId) {
         this.customerId = customerId;
     }
 
+    // ================= VIEW APPOINTMENT HISTORY =================
+    // Purpose: Display customer's appointments with search + filter
     public DefaultTableModel getServiceHistoryTableModel(String search, String statusFilter) {
+
         String[] columns = {"Appointment ID", "Date", "Time", "Service Type", "Description", "Status"};
-        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
 
         try {
             List<Appointment> appointments = appointmentRepo.getAll();
-            String keyword = search == null ? "" : search.trim().toLowerCase();
+            String keyword = search == null ? "" : search.toLowerCase();
 
-            for (Appointment appointment : appointments) {
-                if (!appointment.getCustomerId().equalsIgnoreCase(customerId)) {
-                    continue;
-                }
+            for (Appointment a : appointments) {
 
-                Services service = getServiceById(appointment.getServiceId());
-                String serviceType = service == null ? "Unknown Service" : service.getName();
-                String serviceDescription = service == null ? "-" : service.getDetails();
-                String appointmentStatus = appointment.getStatusService().getDisplayAppointmentStatus();
+                // Only show current customer's appointments
+                if (!a.getCustomerId().equalsIgnoreCase(customerId)) continue;
 
-                boolean matchesStatus;
-                if ("All".equalsIgnoreCase(statusFilter)) {
-                    matchesStatus = true;
-                } else if ("Assigned".equalsIgnoreCase(statusFilter)) {
-                    matchesStatus = appointment.getStatusService() == AppointmentStatus.ASSIGNED;
-                } else if ("Completed".equalsIgnoreCase(statusFilter)) {
-                    matchesStatus = appointment.getStatusService() == AppointmentStatus.COMPLETED;
-                } else {
-                    matchesStatus = true;
-                }
+                // Get service info
+                Services service = getServiceById(a.getServiceId());
+                String type = service == null ? "Unknown" : service.getName();
+                String desc = service == null ? "-" : service.getDetails();
+                String status = a.getStatusService().getDisplayAppointmentStatus();
 
-                boolean matchesSearch = keyword.isEmpty()
-                        || appointment.getId().toLowerCase().contains(keyword)
-                        || serviceType.toLowerCase().contains(keyword)
-                        || serviceDescription.toLowerCase().contains(keyword)
-                        || appointmentStatus.toLowerCase().contains(keyword)
-                        || appointment.getDate().toString().toLowerCase().contains(keyword);
+                // Status filter logic
+                boolean matchStatus =
+                        statusFilter.equalsIgnoreCase("All") ||
+                        (statusFilter.equalsIgnoreCase("Assigned") && a.getStatusService() == AppointmentStatus.ASSIGNED) ||
+                        (statusFilter.equalsIgnoreCase("Completed") && a.getStatusService() == AppointmentStatus.COMPLETED);
 
-                if (matchesStatus && matchesSearch) {
-                    Object[] row = {
-                            appointment.getId(),
-                            appointment.getDate(),
-                            appointment.getTime(),
-                            serviceType,
-                            serviceDescription,
-                            appointmentStatus
-                    };
-                    tableModel.addRow(row);
+                // Search logic
+                boolean matchSearch =
+                        keyword.isEmpty() ||
+                        a.getId().toLowerCase().contains(keyword) ||
+                        type.toLowerCase().contains(keyword) ||
+                        desc.toLowerCase().contains(keyword);
+
+                // Add row if matches filter
+                if (matchStatus && matchSearch) {
+                    model.addRow(new Object[]{
+                            a.getId(), a.getDate(), a.getTime(), type, desc, status
+                    });
                 }
             }
+
         } catch (Exception e) {
-            DialogUtil.showErrorMessage("Load Error", "Failed to load appointment history");
-        }
-
-        return tableModel;
-    }
-
-    public DefaultTableModel getPaymentHistoryTableModel(String search, String yearFilter, String monthFilter) {
-        String[] columns = {"Appointment ID", "Service Type", "Description", "Amount (RM)", "Status", "Date"};
-        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
-
-        try {
-            List<Appointment> appointments = appointmentRepo.getAll();
-            String keyword = search == null ? "" : search.trim().toLowerCase();
-
-            for (Appointment appointment : appointments) {
-                if (!appointment.getCustomerId().equalsIgnoreCase(customerId)) {
-                    continue;
-                }
-
-                Services service = getServiceById(appointment.getServiceId());
-                String serviceType = service == null ? "Unknown Service" : service.getName();
-                String description = service == null ? "-" : service.getDetails();
-                String amount = service == null ? "0.00" : String.format("%.2f", service.getPrice());
-                String status = appointment.getStatusService().getDisplayAppointmentStatus();
-
-                String appointmentYear = String.valueOf(appointment.getDate().getYear());
-                String appointmentMonth = Month.of(appointment.getDate().getMonthValue()).name();
-
-                boolean matchesYear = "All".equalsIgnoreCase(yearFilter) || appointmentYear.equals(yearFilter);
-                boolean matchesMonth = "All".equalsIgnoreCase(monthFilter) || appointmentMonth.equalsIgnoreCase(monthFilter);
-
-                boolean matchesSearch = keyword.isEmpty()
-                        || appointment.getId().toLowerCase().contains(keyword)
-                        || serviceType.toLowerCase().contains(keyword)
-                        || description.toLowerCase().contains(keyword)
-                        || amount.toLowerCase().contains(keyword)
-                        || appointment.getDate().toString().toLowerCase().contains(keyword);
-
-                if (matchesYear && matchesMonth && matchesSearch) {
-                    Object[] row = {
-                            appointment.getId(),
-                            serviceType,
-                            description,
-                            amount,
-                            status,
-                            appointment.getDate()
-                    };
-                    tableModel.addRow(row);
-                }
-            }
-        } catch (Exception e) {
-            DialogUtil.showErrorMessage("Load Error", "Failed to load payment history");
-        }
-
-        return tableModel;
-    }
-
-    public DefaultComboBoxModel<String> getPaymentYearComboModel() {
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-        model.addElement("All");
-
-        try {
-            Set<String> years = new LinkedHashSet<>();
-            for (Appointment appointment : appointmentRepo.getAll()) {
-                if (appointment.getCustomerId().equalsIgnoreCase(customerId)) {
-                    years.add(String.valueOf(appointment.getDate().getYear()));
-                }
-            }
-            for (String year : years) {
-                model.addElement(year);
-            }
-        } catch (Exception e) {
-            // keep All only
+            DialogUtil.showErrorMessage("Error", "Failed to load appointments");
         }
 
         return model;
     }
-
-    public DefaultComboBoxModel<String> getPaymentMonthComboModel() {
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-        model.addElement("All");
-
-        try {
-            Set<String> months = new LinkedHashSet<>();
-            for (Appointment appointment : appointmentRepo.getAll()) {
-                if (appointment.getCustomerId().equalsIgnoreCase(customerId)) {
-                    months.add(Month.of(appointment.getDate().getMonthValue()).name());
-                }
-            }
-            for (String month : months) {
-                model.addElement(month);
-            }
-        } catch (Exception e) {
-            // keep All only
-        }
-
-        return model;
-    }
-
-    public DefaultTableModel getFeedbackTableModel() {
-        String[] columns = {"Feedback ID", "Appointment ID", "Staff Rating", "Technician Rating", "Comment"};
-        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
-
-        try {
-            List<Feedback> feedbacks = feedbackRepo.getAll();
-            List<String> customerAppointmentIds = getCustomerAppointmentIds();
-
-            for (Feedback feedback : feedbacks) {
-                if (customerAppointmentIds.contains(feedback.getAppointmentId())) {
-                    Object[] row = {
-                            feedback.getId(),
-                            feedback.getAppointmentId(),
-                            feedback.getStaffRating(),
-                            feedback.getTechnicianRating(),
-                            feedback.getComment()
-                    };
-                    tableModel.addRow(row);
-                }
-            }
-        } catch (Exception e) {
-            DialogUtil.showErrorMessage("Load Error", "Failed to load feedback");
-        }
-
-        return tableModel;
-    }
-
+    
+    // ================= DROPDOWN =================
+    // Purpose: Show only completed appointments WITHOUT feedback
     public DefaultComboBoxModel<String> getCompletedAppointmentComboModel() {
+
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 
         try {
             List<Appointment> appointments = appointmentRepo.getAll();
             List<Feedback> feedbacks = feedbackRepo.getAll();
 
-            for (Appointment appointment : appointments) {
-                boolean isOwnAppointment = appointment.getCustomerId().equalsIgnoreCase(customerId);
-                boolean isCompleted = appointment.getStatusService() == AppointmentStatus.COMPLETED;
-                boolean feedbackExists = feedbacks.stream()
-                        .anyMatch(feedback -> feedback.getAppointmentId().equalsIgnoreCase(appointment.getId()));
+            for (Appointment a : appointments) {
 
-                if (isOwnAppointment && isCompleted && !feedbackExists) {
-                    model.addElement(appointment.getId());
+                // Only own appointment
+                if (!a.getCustomerId().equalsIgnoreCase(customerId)) continue;
+
+                // Must be completed
+                if (a.getStatusService() != AppointmentStatus.COMPLETED) continue;
+
+                // Check if already has feedback
+                boolean alreadyRated = feedbacks.stream()
+                        .anyMatch(f ->
+                                f.getAppointmentId().equalsIgnoreCase(a.getId()) &&
+                                f.getStaffRating() != null &&
+                                f.getStaffRating() > 0
+                        );
+
+                if (!alreadyRated) {
+                    model.addElement(a.getId());
                 }
             }
+
         } catch (Exception e) {
-            DialogUtil.showErrorMessage("Load Error", "Failed to load completed appointments");
+            DialogUtil.showErrorMessage("Error", "Failed to load appointments");
         }
 
         return model;
     }
 
+    // ================= GET STAFF & TECHNICIAN =================
+    // Purpose: Display staff + technician name in UI
     public String[] getAppointmentPeopleDetails(String appointmentId) {
         try {
             Appointment appointment = appointmentRepo.getOne(appointmentId);
-            if (appointment == null) {
-                return null;
-            }
+            if (appointment == null) return null;
 
             User staff = userRepo.getOne(appointment.getStaffId());
             User technician = userRepo.getOne(appointment.getTechnicianId());
@@ -262,77 +146,214 @@ public class CustomerController {
                     : technician.getId() + " | " + technician.getName();
 
             return new String[]{staffText, technicianText};
+
         } catch (Exception e) {
             return null;
         }
     }
 
-    public void submitFeedback(String appointmentId, String staffRatingText, String technicianRatingText, String comment) {
+    // ================= PAYMENT HISTORY =================
+    // Purpose: Show payment using PaymentRecord.txt (NOT appointment anymore)
+    public DefaultTableModel getPaymentHistoryTableModel(String search, String year, String month) {
+
+        String[] columns = {"Appointment ID", "Service", "Description", "Amount (RM)", "Transaction Type", "Date"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+
         try {
-            ValidationResult validationResult = new ValidationResult();
+            List<PaymentRecord> payments = paymentRepo.getAll();
+            String keyword = search == null ? "" : search.toLowerCase();
 
-            Validator.required(validationResult, "Appointment ID", appointmentId);
-            Validator.validateInteger(validationResult, "Staff Rating", staffRatingText);
-            Validator.validateInteger(validationResult, "Technician Rating", technicianRatingText);
+            for (PaymentRecord p : payments) {
 
-            if (validationResult.hasError()) {
-                DialogUtil.showWarningMessage("Validation Error", validationResult.getErrors());
-                return;
+                Appointment a = appointmentRepo.getOne(p.getAppointmentId());
+                if (a == null) continue;
+
+                // Only show own payment
+                if (!a.getCustomerId().equalsIgnoreCase(customerId)) continue;
+
+                Services s = getServiceById(a.getServiceId());
+
+                String type = s == null ? "Unknown" : s.getName();
+                String desc = s == null ? "-" : s.getDetails();
+                String amount = String.format("%.2f", p.getAmount());
+
+                // Convert boolean to readable text
+                String transactionType = p.isHasPaid() ? "Paid" : "Pending";
+
+                // Format date
+                String date = (p.getPaymentDateTime() == null)
+                        ? "-"
+                        : p.getPaymentDateTime().toLocalDate().toString();
+
+                // Extract year/month for filter
+                String y = (p.getPaymentDateTime() == null) ? "" :
+                        String.valueOf(p.getPaymentDateTime().getYear());
+
+                String m = (p.getPaymentDateTime() == null) ? "" :
+                        Month.of(p.getPaymentDateTime().getMonthValue()).name();
+
+                boolean matchYear = year.equalsIgnoreCase("All") || y.equals(year);
+                boolean matchMonth = month.equalsIgnoreCase("All") || m.equalsIgnoreCase(month);
+
+                boolean matchSearch =
+                        keyword.isEmpty() ||
+                        a.getId().toLowerCase().contains(keyword) ||
+                        type.toLowerCase().contains(keyword);
+
+                if (matchYear && matchMonth && matchSearch) {
+                    model.addRow(new Object[]{
+                            a.getId(), type, desc, amount, transactionType, date
+                    });
+                }
             }
 
-            int staffRating = Integer.parseInt(staffRatingText);
-            int technicianRating = Integer.parseInt(technicianRatingText);
+        } catch (Exception e) {
+            DialogUtil.showErrorMessage("Error", "Failed to load payment history");
+        }
 
-            if (staffRating < 1 || staffRating > 5) {
-                DialogUtil.showWarningMessage("Validation Error", "Staff rating must be between 1 and 5");
-                return;
+        return model;
+    }
+
+    // ================= FILTER (YEAR) =================
+    public DefaultComboBoxModel<String> getPaymentYearComboModel() {
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("All");
+
+        try {
+            Set<String> years = new LinkedHashSet<>();
+            for (PaymentRecord p : paymentRepo.getAll()) {
+                if (p.getPaymentDateTime() != null) {
+                    years.add(String.valueOf(p.getPaymentDateTime().getYear()));
+                }
             }
+            years.forEach(model::addElement);
+        } catch (Exception ignored) {}
 
-            if (technicianRating < 1 || technicianRating > 5) {
-                DialogUtil.showWarningMessage("Validation Error", "Technician rating must be between 1 and 5");
-                return;
+        return model;
+    }
+
+    // ================= FILTER (MONTH) =================
+    public DefaultComboBoxModel<String> getPaymentMonthComboModel() {
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("All");
+
+        try {
+            Set<String> months = new LinkedHashSet<>();
+            for (PaymentRecord p : paymentRepo.getAll()) {
+                if (p.getPaymentDateTime() != null) {
+                    months.add(Month.of(p.getPaymentDateTime().getMonthValue()).name());
+                }
             }
+            months.forEach(model::addElement);
+        } catch (Exception ignored) {}
 
-            Appointment appointment = appointmentRepo.getOne(appointmentId);
-            if (appointment == null) {
-                DialogUtil.showWarningMessage("Validation Error", "Appointment ID not found");
-                return;
-            }
+        return model;
+    }
 
-            if (!appointment.getCustomerId().equalsIgnoreCase(customerId)) {
-                DialogUtil.showWarningMessage("Validation Error", "You can only provide feedback for your own appointment");
-                return;
-            }
+    // ================= FEEDBACK TABLE =================
+    // Purpose: Display all feedback for current customer
+    public DefaultTableModel getFeedbackTableModel() {
 
-            if (appointment.getStatusService() != AppointmentStatus.COMPLETED) {
-                DialogUtil.showWarningMessage("Validation Error", "Only completed appointments can receive feedback");
-                return;
-            }
+        String[] columns = {"Feedback ID", "Appointment ID", "Staff Rating", "Technician Rating", "Comment"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
 
+        try {
             List<Feedback> feedbacks = feedbackRepo.getAll();
-            boolean feedbackExists = feedbacks.stream()
-                    .anyMatch(feedback -> feedback.getAppointmentId().equalsIgnoreCase(appointmentId));
 
-            if (feedbackExists) {
-                DialogUtil.showWarningMessage("Validation Error", "This appointment already has feedback. One appointment can only be submitted once.");
+            for (Feedback f : feedbacks) {
+
+                // Only show feedback for THIS customer's appointments
+                Appointment a = appointmentRepo.getOne(f.getAppointmentId());
+                if (a == null) continue;
+
+                if (!a.getCustomerId().equalsIgnoreCase(customerId)) continue;
+
+                model.addRow(new Object[]{
+                        f.getId(),
+                        f.getAppointmentId(),
+                        f.getStaffRating(),
+                        f.getTechnicianRating(),
+                        f.getComment()
+                });
+            }
+
+        } catch (Exception e) {
+            DialogUtil.showErrorMessage("Error", "Failed to load feedback");
+        }
+
+        return model;
+    }    
+    
+    // ================= SUBMIT FEEDBACK =================
+    // IMPORTANT: Update existing record (NOT create new)
+    public void submitFeedback(String appointmentId, String staffText, String techText, String comment) {
+
+        try {
+            // ===== VALIDATION =====
+            ValidationResult vr = new ValidationResult();
+
+            Validator.required(vr, "Appointment ID", appointmentId);
+            Validator.validateInteger(vr, "Staff Rating", staffText);
+            Validator.validateInteger(vr, "Technician Rating", techText);
+
+            if (vr.hasError()) {
+                DialogUtil.showWarningMessage("Validation Error", vr.getErrors());
                 return;
             }
 
-            Feedback feedback = new Feedback();
-            feedback.setId(generateFeedbackId());
-            feedback.setAppointmentId(appointmentId);
-            feedback.setStaffRating(staffRating);
-            feedback.setTechnicianRating(technicianRating);
-            feedback.setComment(comment == null ? "" : comment.trim());
+            int staff = Integer.parseInt(staffText);
+            int tech = Integer.parseInt(techText);
 
-            feedbackRepo.create(feedback);
+            if (staff < 1 || staff > 5 || tech < 1 || tech > 5) {
+                DialogUtil.showWarningMessage("Validation Error", "Rating must be 1–5");
+                return;
+            }
 
-            DialogUtil.showInfoMessage("Success", "Feedback submitted successfully");
+            // ===== BUSINESS RULE =====
+            Appointment a = appointmentRepo.getOne(appointmentId);
+
+            if (a == null || !a.getCustomerId().equalsIgnoreCase(customerId)
+                    || a.getStatusService() != AppointmentStatus.COMPLETED) {
+
+                DialogUtil.showWarningMessage("Error", "Invalid appointment");
+                return;
+            }
+
+            // ===== FIND EXISTING FEEDBACK =====
+            Feedback existing = null;
+            for (Feedback f : feedbackRepo.getAll()) {
+                if (f.getAppointmentId().equalsIgnoreCase(appointmentId)) {
+                    existing = f;
+                    break;
+                }
+            }
+
+            if (existing == null) {
+                DialogUtil.showErrorMessage("Error", "Feedback record not found");
+                return;
+            }
+
+            // Prevent duplicate submission
+            if (existing.getStaffRating() != null && existing.getStaffRating() > 0) {
+                DialogUtil.showWarningMessage("Error", "Already submitted");
+                return;
+            }
+
+            // ===== UPDATE =====
+            existing.setStaffRating(staff);
+            existing.setTechnicianRating(tech);
+            existing.setComment(comment == null ? "" : comment.trim());
+
+            feedbackRepo.update(existing);
+
+            DialogUtil.showInfoMessage("Success", "Feedback submitted");
+
         } catch (Exception e) {
             DialogUtil.showErrorMessage("Error", "Failed to submit feedback");
         }
     }
 
+    // ================= PROFILE =================
     public User getCustomerUser() {
         try {
             return userRepo.getOne(customerId);
@@ -341,38 +362,12 @@ public class CustomerController {
         }
     }
 
-    private List<String> getCustomerAppointmentIds() throws FileCorruptedException {
-        List<String> ids = new ArrayList<>();
-        List<Appointment> appointments = appointmentRepo.getAll();
-
-        for (Appointment appointment : appointments) {
-            if (appointment.getCustomerId().equalsIgnoreCase(customerId)) {
-                ids.add(appointment.getId());
-            }
-        }
-
-        return ids;
-    }
-
-    private Services getServiceById(String serviceId) {
+    // ================= HELPER =================
+    private Services getServiceById(String id) {
         try {
-            return servicesRepo.getOne(serviceId);
+            return servicesRepo.getOne(id);
         } catch (Exception e) {
             return null;
-        }
-    }
-
-    private String generateFeedbackId() {
-        try {
-            while (true) {
-                String id = RandomIdGenerator.generateId("FB-", 3);
-                Feedback existing = feedbackRepo.getOne(id);
-                if (existing == null) {
-                    return id;
-                }
-            }
-        } catch (Exception e) {
-            return RandomIdGenerator.generateId("FB-", 3);
         }
     }
 }
