@@ -1,7 +1,9 @@
 package services;
 
+import enums.AppointmentStatus;
 import exceptions.*;
 import mapper.CustomerCarMapper;
+import models.Appointment;
 import models.CustomerCar;
 import repositories.CrudRepository;
 import utils.RandomIdGenerator;
@@ -26,10 +28,6 @@ public class CustomerCarService {
         return customerCarCrudRepository.getAll(customerCar -> customerCar.getCustomerId().equalsIgnoreCase(customerId));
     }
 
-    public CustomerCar getCarByCarPlate(String carPlate) throws FileCorruptedException {
-        return customerCarCrudRepository.getAll(customerCar -> customerCar.getCarPlate().equalsIgnoreCase(carPlate)).getFirst();
-    }
-
     public CustomerCar getCarById(String id) throws GetEntityListException {
         try {
             return customerCarCrudRepository.getOne(id);
@@ -38,39 +36,48 @@ public class CustomerCarService {
         }
     }
 
-    public List<CustomerCar>customerCars(Predicate<CustomerCar> filter) throws FileCorruptedException {
+    public List<CustomerCar> getCars(Predicate<CustomerCar> filter) throws FileCorruptedException {
         return customerCarCrudRepository.getAll(filter);
     }
 
-    public void addCar(CustomerCar carToAdd) throws AddException, IOException, FileCorruptedException {
+    public void addCar(CustomerCar carToAdd) throws BusinessRuleException, IOException, FileCorruptedException {
         boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate())).isEmpty();
         final int maxCarAllowed = 3;
         boolean hasReachedMaxCarAllowed = getCustomerCars(carToAdd.getCustomerId()).size() >=maxCarAllowed;
         if(carPlateHasExisted){
-            throw new AddException("Car plate has existed");
+            throw new BusinessRuleException("Car plate has existed");
         }
         if(hasReachedMaxCarAllowed){
-            throw new AddException("Already reached maximum car allowed to be added");
+            throw new BusinessRuleException("Already reached maximum car allowed to be added");
         }
         if(hasExceededCurrentYear(carToAdd.getManufactureYear())){
-            throw new AddException("Invalid manufacture year");
+            throw new BusinessRuleException("Invalid manufacture year");
         }
         String carId = generateCarId();
         carToAdd.setId(carId);
         customerCarCrudRepository.create(carToAdd);
     }
 
-    public void deleteCarById(String carId) throws DeleteException {
+    public void deleteCarById(String carId) throws DeleteException, FileCorruptedException, BusinessRuleException {
         customerCarCrudRepository.delete(carId);
+        if(hasNotCompletedAppointment(carId)){
+            throw new BusinessRuleException("Not allowed to delete car when still have upcoming appointments");
+        }
     }
 
-    public void deleteCarByCustomerId(String customerId) throws FileCorruptedException {
+    public void deleteCarByCustomerId(String customerId) throws FileCorruptedException, BusinessRuleException {
+        List<CustomerCar> customerCars = customerCarCrudRepository.getAll(
+                customerCar -> customerCar.getCustomerId().equals(customerId));
+        for(CustomerCar customerCar : customerCars){
+            if(hasNotCompletedAppointment(customerCar.getId())){
+                throw new BusinessRuleException("Not allowed to delete car when still have upcoming appointments");
+            }
+        }
         List<CustomerCar> cars = getCars();
         cars.removeIf(customerCar -> customerCar.getCustomerId().equals(customerId));
         customerCarCrudRepository.writeAll(cars);
     }
 
-    //TODO Don't allow update car when car is assigned to an appointment
     public void updateCar(CustomerCar carToUpdate) throws FileCorruptedException,UpdateException {
         boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar ->customerCar.getCarPlate().equalsIgnoreCase(carToUpdate.getCarPlate()) && !customerCar.getId().equalsIgnoreCase(carToUpdate.getId())).isEmpty();
         if(carPlateHasExisted){
@@ -102,6 +109,14 @@ public class CustomerCarService {
     private boolean hasExceededCurrentYear(int year){
         int currentYear = Year.now().getValue();
         return year > currentYear;
+    }
+
+    private boolean hasNotCompletedAppointment(String carId) throws FileCorruptedException {
+        AppointmentService appointmentService = new AppointmentService();
+        List<Appointment> upcomingAppointments =
+                appointmentService.getAppointments(appointment -> appointment.getCarId().equals(carId)
+                        && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
+        return !upcomingAppointments.isEmpty();
     }
 
 }

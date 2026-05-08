@@ -4,7 +4,7 @@ import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import models.*;
 import services.CustomerCarService;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.HiddenIdCustomComboBoxItem;
 import ui.utils.RoundedPanel;
 import ui.utils.UIUtils;
 import utils.DialogUtil;
@@ -22,7 +22,7 @@ public class ManageAppointmentPanel extends JPanel {
     public JButton newAppointmentBtn;
     public JButton exportBtn;
     public JTextField searchField;
-    public JComboBox<ServiceComboBoxItem> serviceTypeFilterCombo;
+    public JComboBox<HiddenIdCustomComboBoxItem> serviceTypeFilterCombo;
     public JComboBox<String> statusFilterCombo;
     private List<Appointment> appointments;
     private final User loginStaff;
@@ -81,8 +81,8 @@ public class ManageAppointmentPanel extends JPanel {
         serviceTypeFilterPanel.setOpaque(false);
         JLabel serviceLabel = UIUtils.createLabel("Service Type:");
         serviceTypeFilterPanel.add(serviceLabel);
-        ServiceComboBoxItem serviceComboBoxItem = new ServiceComboBoxItem("" , "All");
-        ServiceComboBoxItem[] serviceOptions = {serviceComboBoxItem};
+        HiddenIdCustomComboBoxItem serviceComboBoxItem = new HiddenIdCustomComboBoxItem("" , "All");
+        HiddenIdCustomComboBoxItem[] serviceOptions = {serviceComboBoxItem};
         serviceTypeFilterCombo = UIUtils.createJComboBox(serviceOptions);
         serviceTypeFilterCombo.setPreferredSize(new Dimension(180, 45));
         serviceTypeFilterPanel.add(serviceTypeFilterCombo);

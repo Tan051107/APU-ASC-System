@@ -1,10 +1,10 @@
 package ui.pages.CounterStaffPanels.components.ComboBoxItems;
 
-public class CustomComboBoxItem {
+public class VisibleIdCustomComboBoxItem {
     private String id;
     private String name;
 
-    public CustomComboBoxItem(String id, String name) {
+    public VisibleIdCustomComboBoxItem(String id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -28,8 +28,8 @@ public class CustomComboBoxItem {
     @Override
     public boolean equals(Object object) {
         if(this == object)return true;
-        if(!(object instanceof CustomComboBoxItem))return false;
-        return this.id.equals(((CustomComboBoxItem) object).id);
+        if(!(object instanceof VisibleIdCustomComboBoxItem))return false;
+        return this.id.equals(((VisibleIdCustomComboBoxItem) object).id);
     }
 
     @Override

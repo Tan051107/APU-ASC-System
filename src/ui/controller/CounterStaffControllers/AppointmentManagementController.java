@@ -9,7 +9,7 @@ import services.ServicesService;
 import ui.controller.CounterStaffControllers.FormController.AddAppointmentFormController;
 import ui.pages.CounterStaffPanels.ManageAppointmentPanel;
 import ui.pages.CounterStaffPanels.ManagePaymentPanel;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.HiddenIdCustomComboBoxItem;
 import ui.pages.CounterStaffPanels.forms.AddAppointmentForm;
 import utils.CSVExporter;
 import utils.DialogUtil;
@@ -77,7 +77,7 @@ public class AppointmentManagementController {
         String keyword = manageAppointmentPanel.searchField.getText();
         String statusFilterSelection = Objects.requireNonNull(manageAppointmentPanel.statusFilterCombo.getSelectedItem()).toString();
         AppointmentStatus appointmentStatusFilterSelected = statusFilterSelection.equalsIgnoreCase("All") ? null :AppointmentStatus.fromString(statusFilterSelection);
-        ServiceComboBoxItem serviceTypeSelection = (ServiceComboBoxItem) manageAppointmentPanel.serviceTypeFilterCombo.getSelectedItem();
+        HiddenIdCustomComboBoxItem serviceTypeSelection = (HiddenIdCustomComboBoxItem) manageAppointmentPanel.serviceTypeFilterCombo.getSelectedItem();
         String serviceTypeId;
         if(serviceTypeSelection == null){
             serviceTypeId = "";
@@ -111,13 +111,12 @@ public class AppointmentManagementController {
 
     private void resetAllAppointments(){
         try {
-            List<Appointment> appointments = appointmentService.getAppointments();
+            List<Appointment> appointments = appointmentService.getAllAppointments();
             manageAppointmentPanel.setAppointments(appointments);
             loadAppointments();
-        } catch (FileCorruptedException e) {
+        } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Encountered Error" , "Failed to get appointments");
             logger.log(Level.SEVERE, e.getMessage());
-
         }
     }
 
@@ -133,7 +132,7 @@ public class AppointmentManagementController {
         try {
             List<Services> services = servicesService.getServices();
             for(Services service : services){
-                manageAppointmentPanel.serviceTypeFilterCombo.addItem(new ServiceComboBoxItem(service.getId() , service.getName()));
+                manageAppointmentPanel.serviceTypeFilterCombo.addItem(new HiddenIdCustomComboBoxItem(service.getId() , service.getName()));
             }
         } catch (GetEntityListException e) {
             DialogUtil.showErrorMessage("Encountered Error" , "Failed to get service types");

@@ -47,7 +47,6 @@ public class AppointmentService {
     }
 
 
-    //TODO Don't allow create appointment if the car already has an assigned appointment that not completed yet
     public void createAppointment(Appointment appointmentToAdd) throws Exception {
         PaymentRecordService paymentRecordService = new PaymentRecordService();
         try {
@@ -119,10 +118,6 @@ public class AppointmentService {
         createNotification(appointmentToCancel.getCustomerId() , "Appointment Cancelled" , appointmentToCancel.getId()+ "is cancelled");
     }
 
-    public List<Appointment> getAppointments() throws FileCorruptedException {
-        return appointmentRepository.getAll();
-    }
-
     public List<Appointment> getAppointmentsByTechnician(String technicianId) throws FileCorruptedException {
         return appointmentRepository.getAll(appointment -> appointment.getTechnicianId().equalsIgnoreCase(technicianId));
     }
@@ -133,7 +128,7 @@ public class AppointmentService {
             String keywordLowerCase = keyword.toLowerCase();
             CustomerService customerService = new CustomerService();
             List<String> customerIdsFound = customerService.getCustomers(customer -> customer.getName().toLowerCase().contains(keywordLowerCase)).stream().map(Customer::getId).toList();
-            List<String> carIdsFound = customerCarService.customerCars(customerCar->customerCar.getCarPlate().toLowerCase().contains(keywordLowerCase)).stream().map(CustomerCar::getId).toList();
+            List<String> carIdsFound = customerCarService.getCars(customerCar->customerCar.getCarPlate().toLowerCase().contains(keywordLowerCase)).stream().map(CustomerCar::getId).toList();
             List<String> technicianIdsFound = technicianService.getTechnicians(technician -> technician.getName().toLowerCase().contains(keywordLowerCase)).stream().map(Technician::getId).toList();
             Predicate<Appointment> keywordPredicate = appointment -> appointment.getId().toLowerCase().contains(keywordLowerCase);
             if(!customerIdsFound.isEmpty()){

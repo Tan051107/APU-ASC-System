@@ -1,10 +1,7 @@
 package ui.controller.CounterStaffControllers.FormController;
 
 import enums.FuelType;
-import exceptions.AddException;
-import exceptions.FileCorruptedException;
-import exceptions.UpdateException;
-import exceptions.ValidationException;
+import exceptions.*;
 import models.Customer;
 import models.CustomerCar;
 import services.CustomerCarService;
@@ -88,7 +85,7 @@ public class AddVehicleFormController {
             customerCarService.addCar(vehicleToBeAdded);
             DialogUtil.showInfoMessage("Added Successfully" , String.format("Successfully added %s." , vehicleToBeAdded.getCarPlate()));
             addVehicleForm.dispose();
-        } catch (AddException | ValidationException e) {
+        } catch (BusinessRuleException | ValidationException e) {
             DialogUtil.showErrorMessage("Failed to Add Car" , e.getMessage());
         } catch (FileCorruptedException | IOException e) {
             logger.log(Level.SEVERE,e.getMessage());

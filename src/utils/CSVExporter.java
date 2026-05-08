@@ -36,6 +36,7 @@ public class CSVExporter<T>{
             }
         } catch (FileCorruptedException | IOException e) {
             logger.log(Level.SEVERE , e.getMessage());
+            DialogUtil.showInfoMessage("Failed to export","Encountered error when trying to export data");
         }
         logger.log(Level.INFO , "Successfully exported data");
         DialogUtil.showInfoMessage("Export Successful","Successfully exported data");

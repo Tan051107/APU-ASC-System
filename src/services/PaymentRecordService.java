@@ -19,7 +19,6 @@ public class PaymentRecordService {
     private final String PAYMENT_RECORD_FILE = "txt_files/PaymentRecord.txt";
     private final PaymentRecordMapper paymentRecordMapper = new PaymentRecordMapper();
     private final CrudRepository<PaymentRecord> paymentRecordCrudRepository = new CrudRepository<>(PAYMENT_RECORD_FILE,paymentRecordMapper);
-    private final AppointmentService appointmentService = new AppointmentService();
 
     public List<PaymentRecord> getPaymentRecords() throws FileCorruptedException {
         return paymentRecordCrudRepository.getAll();
@@ -52,6 +51,7 @@ public class PaymentRecordService {
     }
 
     public void makePayment(PaymentRecord paymentRecordToMakePayment) throws GetEntityListException, BusinessRuleException, FileCorruptedException, NotFoundException, IOException {
+        AppointmentService appointmentService = new AppointmentService();
         Appointment appointment = appointmentService.getAppointmentById(paymentRecordToMakePayment.getAppointmentId());
         if(!appointment.getStatusService().equals(AppointmentStatus.COMPLETED)){
             throw new BusinessRuleException("Payment can only be made for completed appointments");

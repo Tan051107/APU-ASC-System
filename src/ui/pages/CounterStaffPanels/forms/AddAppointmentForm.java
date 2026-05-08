@@ -2,23 +2,23 @@ package ui.pages.CounterStaffPanels.forms;
 
 import models.Appointment;
 import models.User;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.CustomComboBoxItem;
-import ui.pages.CounterStaffPanels.components.ComboBoxItems.ServiceComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.VisibleIdCustomComboBoxItem;
+import ui.pages.CounterStaffPanels.components.ComboBoxItems.HiddenIdCustomComboBoxItem;
 import ui.utils.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 
 public class AddAppointmentForm extends JDialog {
-    public JComboBox<CustomComboBoxItem> customerSelectionCombo;
-    public JComboBox<ServiceComboBoxItem> serviceTypeCombo;
+    public JComboBox<VisibleIdCustomComboBoxItem> customerSelectionCombo;
+    public JComboBox<HiddenIdCustomComboBoxItem> serviceTypeCombo;
     public JFormattedTextField dateField;
     public JFormattedTextField timeField;
     public JTextArea descriptionArea;
     public JLabel carPlateLabel;
-    public JComboBox<String> carPlateSelectionCombo;
+    public JComboBox<HiddenIdCustomComboBoxItem> carPlateSelectionCombo;
     public Component carPlateSpacing;
     public JLabel technicianLabel;
-    public JComboBox<CustomComboBoxItem> technicianSelectionCombo;
+    public JComboBox<VisibleIdCustomComboBoxItem> technicianSelectionCombo;
     public Component technicianSpacing;
     public JButton createAppointmentBtn;
     private final Appointment appointmentToEdit;
@@ -48,7 +48,7 @@ public class AddAppointmentForm extends JDialog {
         // --- Customer Selection ---
         mainPanel.add(UIUtils.createLabel("Select Customer *"));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));// Placeholders
-        CustomComboBoxItem[] options = {new CustomComboBoxItem("" , "Select a customer")};
+        VisibleIdCustomComboBoxItem[] options = {new VisibleIdCustomComboBoxItem("" , "Select a customer")};
         customerSelectionCombo = UIUtils.createJComboBox(options);
         mainPanel.add(customerSelectionCombo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -57,7 +57,7 @@ public class AddAppointmentForm extends JDialog {
         carPlateLabel = UIUtils.createLabel("Select Car Plate *");
         mainPanel.add(carPlateLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        String[] carPlateOptions = {}; // Placeholders
+        HiddenIdCustomComboBoxItem[] carPlateOptions = {}; // Placeholders
         carPlateSelectionCombo = UIUtils.createJComboBox(carPlateOptions);
         mainPanel.add(carPlateSelectionCombo);
         carPlateSpacing = Box.createRigidArea(new Dimension(0, 20));
@@ -66,7 +66,7 @@ public class AddAppointmentForm extends JDialog {
         // --- Service Type ---
         mainPanel.add(UIUtils.createLabel("Service Type *"));
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        ServiceComboBoxItem[] serviceTypes = {};
+        HiddenIdCustomComboBoxItem[] serviceTypes = {};
         serviceTypeCombo = UIUtils.createJComboBox(serviceTypes);
         mainPanel.add(serviceTypeCombo);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -89,7 +89,7 @@ public class AddAppointmentForm extends JDialog {
         technicianLabel = UIUtils.createLabel("Select Available Technician *");
         mainPanel.add(technicianLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
-        CustomComboBoxItem[] technicianOptions = {new CustomComboBoxItem("" , "Select a technician")}; // Placeholders
+        VisibleIdCustomComboBoxItem[] technicianOptions = {new VisibleIdCustomComboBoxItem("" , "Select a technician")}; // Placeholders
         technicianSelectionCombo = UIUtils.createJComboBox(technicianOptions);
         mainPanel.add(technicianSelectionCombo);
         technicianSpacing = Box.createRigidArea(new Dimension(0, 20));

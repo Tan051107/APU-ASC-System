@@ -19,27 +19,16 @@ public class CustomerService {
     private final CustomerMapper customerMapper = new CustomerMapper();
     private final CrudRepository<Customer> customerCrudRepository = new CrudRepository<>(USER_FILE,customerMapper);
 
-    public void addCustomer(User customerToSignUp) throws SignUpException {
-        customerToSignUp.setUserType(UserType.CUSTOMER);
-        userService.signUpUser(customerToSignUp);
-    }
-
-    public void deleteCustomer(String customerId) throws FileCorruptedException, DeleteException {
+    public void deleteCustomer(String customerId) throws FileCorruptedException, DeleteException, BusinessRuleException {
         AppointmentService appointmentService = new AppointmentService();
-        List<Appointment> notCompletedAppointments = appointmentService.getAppointments(appointment -> appointment.getCustomerId().equalsIgnoreCase(customerId) && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
+        List<Appointment> notCompletedAppointments = appointmentService.
+                getAppointments(appointment -> appointment.getCustomerId().equalsIgnoreCase(customerId)
+                        && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
         if(!notCompletedAppointments.isEmpty()){
             throw new DeleteException("Customer couldn't be deleted because still have upcoming appointments");
         }
         userService.deleteUser(customerId);
         customerCarService.deleteCarByCustomerId(customerId);
-    }
-
-    public void updateCustomer(Customer customer){
-        try {
-            customerCrudRepository.update(customer);
-        } catch (FileCorruptedException | NotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public List<Customer> getCustomers() throws FileCorruptedException {
@@ -57,7 +46,8 @@ public class CustomerService {
     public List<Customer> getCustomersByNameOrEmail(String keyword) throws FileCorruptedException {
         String lowerCaseKeyword = keyword.toLowerCase();
         return getCustomers().stream()
-                .filter(customer -> customer.getName().toLowerCase().contains(lowerCaseKeyword) || customer.getEmail().toLowerCase().contains(lowerCaseKeyword))
+                .filter(customer -> customer.getName().toLowerCase().contains(lowerCaseKeyword)
+                        || customer.getEmail().toLowerCase().contains(lowerCaseKeyword))
                 .toList();
     }
 
