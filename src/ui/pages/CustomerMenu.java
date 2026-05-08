@@ -10,19 +10,15 @@ import java.awt.*;
 
 public class CustomerMenu extends JFrame {
 
-    // Controller used to handle customer business logic and file-based data operations
     private final CustomerController controller;
 
-    // CardLayout is used to switch between customer pages inside one dashboard window
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel contentPanel = new JPanel(cardLayout);
 
-    // Sidebar toggle state
     private boolean isExpanded = true;
     private final JPanel sidebar;
     private final JButton toggleButton;
 
-    // Sidebar navigation buttons
     private final JButton btnServiceHistory;
     private final JButton btnPaymentHistory;
     private final JButton btnNotification;
@@ -31,21 +27,17 @@ public class CustomerMenu extends JFrame {
     private final JButton btnProfile;
     private final JButton btnLogout;
 
-    // Tables used to display appointment, payment, and feedback records
     private JTable serviceHistoryTable;
     private JTable paymentHistoryTable;
     private JTable feedbackTable;
 
-    // Search and filter fields for appointment history
     private JTextField serviceSearchField;
     private JComboBox<String> serviceStatusFilterComboBox;
 
-    // Search and filter fields for payment history
     private JTextField paymentSearchField;
     private JComboBox<String> paymentYearFilterComboBox;
     private JComboBox<String> paymentMonthFilterComboBox;
 
-    // Feedback form components
     private JComboBox<String> appointmentComboBox;
     private JTextField staffField;
     private JTextField technicianField;
@@ -53,12 +45,10 @@ public class CustomerMenu extends JFrame {
     private JSlider technicianRatingSlider;
     private JTextArea commentTextArea;
 
-    // Controllers for shared panels
     private ProfilePanelController profilePanelController;
     private NotificationPanelController notificationPanelController;
 
     public CustomerMenu(String customerId) {
-        // Initialize customer controller using currently logged-in customer ID
         this.controller = new CustomerController(customerId);
 
         setTitle("APU-ASC Customer Dashboard");
@@ -67,9 +57,6 @@ public class CustomerMenu extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // =========================
-        // Create collapsible sidebar
-        // =========================
         sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setPreferredSize(new Dimension(220, getHeight()));
@@ -88,7 +75,6 @@ public class CustomerMenu extends JFrame {
         sidebar.add(togglePanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Navigation buttons for different customer features
         btnServiceHistory = createSidebarButton("View Appointments");
         btnPaymentHistory = createSidebarButton("Payment History");
         btnNotification = createSidebarButton("Notifications");
@@ -108,14 +94,11 @@ public class CustomerMenu extends JFrame {
         sidebar.add(btnProfile);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnNotification);
-        sidebar.add(Box.createVerticalGlue());
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnLogout);
 
         add(sidebar, BorderLayout.WEST);
 
-        // =================================
-        // Register all dashboard pages/cards
-        // =================================
         contentPanel.add(createServiceHistoryPanel(), "SERVICE_HISTORY");
         contentPanel.add(createPaymentHistoryPanel(), "PAYMENT_HISTORY");
         contentPanel.add(createNotificationPanel(), "NOTIFICATION");
@@ -125,9 +108,6 @@ public class CustomerMenu extends JFrame {
 
         add(contentPanel, BorderLayout.CENTER);
 
-        // ======================
-        // Navigation button logic
-        // ======================
         btnServiceHistory.addActionListener(e -> {
             refreshServiceHistory();
             cardLayout.show(contentPanel, "SERVICE_HISTORY");
@@ -152,13 +132,11 @@ public class CustomerMenu extends JFrame {
         });
 
         btnComment.addActionListener(e -> {
-            // Reload completed appointments without submitted feedback
             refreshFeedbackAppointmentDropdown();
             cardLayout.show(contentPanel, "COMMENT");
         });
 
         btnProfile.addActionListener(e -> {
-            // Initialize profile panel with current user information
             if (profilePanelController != null) {
                 profilePanelController.initProfile();
             }
@@ -166,14 +144,11 @@ public class CustomerMenu extends JFrame {
         });
 
         btnLogout.addActionListener(e -> {
-            // Close current dashboard and return to login page
             dispose();
             new Login().createUI();
         });
 
-        // ===========================
-        // Initial refresh when opened
-        // ===========================
+
         refreshServiceHistory();
         refreshPaymentHistory();
         refreshFeedback();
@@ -182,7 +157,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private void toggleSidebar() {
-        // Toggle between expanded and collapsed sidebar view
         isExpanded = !isExpanded;
 
         if (isExpanded) {
@@ -212,7 +186,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private void styleToggleButton(JButton btn) {
-        // Apply styling for sidebar toggle button
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setFont(new Font("Arial", Font.BOLD, 20));
@@ -222,7 +195,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private JButton createSidebarButton(String text) {
-        // Create a reusable styled sidebar button
         JButton button = new JButton(text);
         button.setFocusPainted(false);
         button.setFont(new Font("Arial", Font.BOLD, 14));
@@ -234,7 +206,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private JPanel createServiceHistoryPanel() {
-        // Create appointment history panel with search and status filter
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(UIUtils.createMenuTitle("View Appointments"), BorderLayout.NORTH);
 
@@ -259,7 +230,6 @@ public class CustomerMenu extends JFrame {
 
         panel.add(topPanel, BorderLayout.BEFORE_FIRST_LINE);
 
-        // Load default appointment table with Assigned filter
         serviceHistoryTable = UIUtils.createTable(
                 controller.getServiceHistoryTableModel("", "Assigned")
         );
@@ -269,7 +239,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private JPanel createPaymentHistoryPanel() {
-        // Create payment history panel with search, year filter, and month filter
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(UIUtils.createMenuTitle("Payment History"), BorderLayout.NORTH);
 
@@ -298,20 +267,17 @@ public class CustomerMenu extends JFrame {
 
         panel.add(topPanel, BorderLayout.BEFORE_FIRST_LINE);
 
-        // Load payment records into payment history table
         paymentHistoryTable = UIUtils.createTable(
                 controller.getPaymentHistoryTableModel("", "All", "All")
         );
         panel.add(new JScrollPane(paymentHistoryTable), BorderLayout.CENTER);
 
-        // Load available year and month choices from payment data
         refreshPaymentFilterOptions();
 
         return panel;
     }
 
     private JPanel createFeedbackPanel() {
-        // Create feedback history panel to show all feedback submitted by customer
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(UIUtils.createMenuTitle("My Feedback"), BorderLayout.NORTH);
 
@@ -322,7 +288,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private JPanel createNotificationPanel() {
-        // Create notification panel and link it with notification controller
         NotificationPanel notificationPanel = new NotificationPanel();
         notificationPanelController = new NotificationPanelController(
                 notificationPanel,
@@ -332,7 +297,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private JPanel createCommentPanel() {
-        // Create feedback submission form for completed appointments
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -391,7 +355,6 @@ public class CustomerMenu extends JFrame {
         mainPanel.add(textAreaScroll);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Auto-update staff and technician fields when customer selects another appointment
         appointmentComboBox.addActionListener(e -> updateSelectedAppointmentPeople());
 
         JButton submitButton = UIUtils.createPrimaryButton("Submit Feedback");
@@ -404,21 +367,18 @@ public class CustomerMenu extends JFrame {
     }
 
     private JPanel createProfilePanel() {
-        // Create profile page and connect it with shared profile panel controller
         ProfilePanel profilePanel = new ProfilePanel();
         profilePanelController = new ProfilePanelController(profilePanel, controller.getCustomerUser());
         return profilePanel;
     }
 
     private void refreshServiceHistory() {
-        // Refresh appointment history based on current search text and selected status filter
         String search = serviceSearchField == null ? "" : serviceSearchField.getText().trim();
         String status = serviceStatusFilterComboBox == null ? "Assigned" : serviceStatusFilterComboBox.getSelectedItem().toString();
         serviceHistoryTable.setModel(controller.getServiceHistoryTableModel(search, status));
     }
 
     private void refreshPaymentHistory() {
-        // Refresh payment history based on search text and selected year/month filters
         String search = paymentSearchField == null ? "" : paymentSearchField.getText().trim();
         String year = paymentYearFilterComboBox == null || paymentYearFilterComboBox.getSelectedItem() == null
                 ? "All"
@@ -431,22 +391,19 @@ public class CustomerMenu extends JFrame {
     }
 
     private void refreshPaymentFilterOptions() {
-        // Load available year and month values into combo boxes
         paymentYearFilterComboBox.setModel(controller.getPaymentYearComboModel());
         paymentMonthFilterComboBox.setModel(controller.getPaymentMonthComboModel());
     }
 
     private void refreshFeedback() {
-        // Reload feedback table after feedback creation or page change
         feedbackTable.setModel(controller.getFeedbackTableModel());
     }
 
     private void refreshFeedbackAppointmentDropdown() {
-        // Reload available completed appointments for feedback submission
         appointmentComboBox.setModel(controller.getCompletedAppointmentComboModel());
         commentTextArea.setText("");
 
-        // Reset default slider values to neutral middle rating
+        // Reset to default slider values
         if (staffRatingSlider != null) {
             staffRatingSlider.setValue(3);
         }
@@ -458,7 +415,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private void updateSelectedAppointmentPeople() {
-        // Update staff and technician display fields when appointment selection changes
         if (appointmentComboBox == null || appointmentComboBox.getSelectedItem() == null) {
             if (staffField != null) {
                 staffField.setText("");
@@ -482,7 +438,6 @@ public class CustomerMenu extends JFrame {
     }
 
     private void submitComment() {
-        // Submit feedback for selected completed appointment
         if (appointmentComboBox.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(this, "No completed appointment available for feedback.");
             return;
@@ -495,13 +450,12 @@ public class CustomerMenu extends JFrame {
                 commentTextArea.getText()
         );
 
-        // Refresh feedback table and appointment dropdown after submission
+        // Refresh table and dropdown after submission
         refreshFeedback();
         refreshFeedbackAppointmentDropdown();
     }
 
     private JSlider createRatingSlider() {
-        // Create reusable styled rating slider from 1 to 5
         JSlider slider = new JSlider(1, 5, 3);
         slider.setMajorTickSpacing(1);
         slider.setPaintTicks(true);
@@ -512,7 +466,6 @@ public class CustomerMenu extends JFrame {
         slider.setBackground(Color.WHITE);
         slider.setFont(new Font("Segoe UI", Font.BOLD, 13));
 
-        // Customize slider appearance to match application UI theme
         slider.setUI(new javax.swing.plaf.basic.BasicSliderUI(slider) {
             @Override
             protected Dimension getThumbSize() {
