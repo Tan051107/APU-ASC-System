@@ -1,4 +1,4 @@
-package ui.controller;
+package ui.controller.Manager;
 
 import enums.UserType;
 import exceptions.*;
@@ -82,6 +82,7 @@ public class AddUserFormController {
             User userToEdit = form.getUserToEdit();
             user.setId(userToEdit.getId());
             user.setCreatedAt(userToEdit.getCreatedAt());
+            user.setUserType(userToEdit.getUserType());
             Validator.validatePassword(validationResult,"Password" , userToEdit.getPassword());
             if(validationResult.hasError()){
                 throw new ValidationException(validationResult.getErrors());
