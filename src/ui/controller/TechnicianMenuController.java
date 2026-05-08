@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import enums.AppointmentStatus;
 import enums.UserType;
 
-import exceptions.GetEntityListException;
+import exceptions.*;
 
 import models.Appointment;
 import models.CustomerCar;
@@ -304,18 +304,20 @@ public class TechnicianMenuController {
 
             popupForm.dispose();
 
-        } catch (exceptions.NotFoundException | exceptions.FileCorruptedException e) {
+        } catch (exceptions.NotFoundException | exceptions.FileCorruptedException | exceptions.BusinessRuleException | 
+                exceptions.GetEntityListException e) {
             JOptionPane.showMessageDialog(popupForm, 
                 "Failed to update appointment: " + e.getMessage(), 
                 "Update Error", 
                 JOptionPane.ERROR_MESSAGE); 
                 
         } catch (Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(popupForm, 
                 "Encountered an unexpected error when updating the appointment.", 
                 "System Error", 
                 JOptionPane.ERROR_MESSAGE);
-            // logger.log(Level.SEVERE, e.getMessage());
+            
         }
     }
 }
