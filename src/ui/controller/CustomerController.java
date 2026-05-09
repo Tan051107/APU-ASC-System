@@ -18,8 +18,8 @@ public class CustomerController {
 
     private final String customerId;
 
-    // ================= REPOSITORIES =================
-    // Handle file operations for each module
+    // REPOSITORIES
+    // Handle file operations
     private final CrudRepository<Appointment> appointmentRepo =
             new CrudRepository<>("txt_files/Appointment.txt", new AppointmentMapper());
 
@@ -39,8 +39,8 @@ public class CustomerController {
         this.customerId = customerId;
     }
 
-    // ================= VIEW APPOINTMENT HISTORY =================
-    // Purpose: Display customer's appointments with search + filter
+    // VIEW APPOINTMENT HISTORY
+    // Display appointments with search + filter
     public DefaultTableModel getServiceHistoryTableModel(String search, String statusFilter) {
 
         String[] columns = {"Appointment ID", "Date", "Time", "Service Type", "Description", "Status"};
@@ -52,7 +52,7 @@ public class CustomerController {
 
             for (Appointment a : appointments) {
 
-                // Only show current customer's appointments
+                // Only show current appointments
                 if (!a.getCustomerId().equalsIgnoreCase(customerId)) continue;
 
                 // Get service info
@@ -61,13 +61,13 @@ public class CustomerController {
                 String desc = service == null ? "-" : service.getDetails();
                 String status = a.getStatusService().getDisplayAppointmentStatus();
 
-                // Status filter logic
+                // Status filter
                 boolean matchStatus =
                         statusFilter.equalsIgnoreCase("All") ||
                         (statusFilter.equalsIgnoreCase("Assigned") && a.getStatusService() == AppointmentStatus.ASSIGNED) ||
                         (statusFilter.equalsIgnoreCase("Completed") && a.getStatusService() == AppointmentStatus.COMPLETED);
 
-                // Search logic
+                // Search 
                 boolean matchSearch =
                         keyword.isEmpty() ||
                         a.getId().toLowerCase().contains(keyword) ||
@@ -89,8 +89,8 @@ public class CustomerController {
         return model;
     }
     
-    // ================= DROPDOWN =================
-    // Purpose: Show only completed appointments WITHOUT feedback
+    // DROPDOWN
+    // Show only completed appointments WITHOUT feedback
     public DefaultComboBoxModel<String> getCompletedAppointmentComboModel() {
 
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
@@ -127,8 +127,8 @@ public class CustomerController {
         return model;
     }
 
-    // ================= GET STAFF & TECHNICIAN =================
-    // Purpose: Display staff + technician name in UI
+    // GET STAFF & TECHNICIAN
+    // Display staff + technician name
     public String[] getAppointmentPeopleDetails(String appointmentId) {
         try {
             Appointment appointment = appointmentRepo.getOne(appointmentId);
@@ -152,8 +152,8 @@ public class CustomerController {
         }
     }
 
-    // ================= PAYMENT HISTORY =================
-    // Purpose: Show payment using PaymentRecord.txt (NOT appointment anymore)
+    // PAYMENT HISTORY
+    // Show payment
     public DefaultTableModel getPaymentHistoryTableModel(String search, String year, String month) {
 
         String[] columns = {"Appointment ID", "Service", "Description", "Amount (RM)", "Transaction Type", "Date"};
@@ -214,7 +214,7 @@ public class CustomerController {
         return model;
     }
 
-    // ================= FILTER (YEAR) =================
+    // FILTER (YEAR)
     public DefaultComboBoxModel<String> getPaymentYearComboModel() {
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
         model.addElement("All");
@@ -232,7 +232,7 @@ public class CustomerController {
         return model;
     }
 
-    // ================= FILTER (MONTH) =================
+    // FILTER (MONTH)
     public DefaultComboBoxModel<String> getPaymentMonthComboModel() {
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
         model.addElement("All");
@@ -250,8 +250,8 @@ public class CustomerController {
         return model;
     }
 
-    // ================= FEEDBACK TABLE =================
-    // Purpose: Display all feedback for current customer
+    // FEEDBACK TABLE
+    // Display all feedback
     public DefaultTableModel getFeedbackTableModel() {
 
         String[] columns = {"Feedback ID", "Appointment ID", "Staff Rating", "Technician Rating", "Comment"};
@@ -262,7 +262,7 @@ public class CustomerController {
 
             for (Feedback f : feedbacks) {
 
-                // Only show feedback for THIS customer's appointments
+                // Only show feedback
                 Appointment a = appointmentRepo.getOne(f.getAppointmentId());
                 if (a == null) continue;
 
@@ -284,12 +284,12 @@ public class CustomerController {
         return model;
     }    
     
-    // ================= SUBMIT FEEDBACK =================
-    // IMPORTANT: Update existing record (NOT create new)
+    // SUBMIT FEEDBACK
+    // Update record
     public void submitFeedback(String appointmentId, String staffText, String techText, String comment) {
 
         try {
-            // ===== VALIDATION =====
+            // VALIDATION
             ValidationResult vr = new ValidationResult();
 
             Validator.required(vr, "Appointment ID", appointmentId);
@@ -309,7 +309,7 @@ public class CustomerController {
                 return;
             }
 
-            // ===== BUSINESS RULE =====
+            // BUSINESS RULE
             Appointment a = appointmentRepo.getOne(appointmentId);
 
             if (a == null || !a.getCustomerId().equalsIgnoreCase(customerId)
@@ -319,7 +319,7 @@ public class CustomerController {
                 return;
             }
 
-            // ===== FIND EXISTING FEEDBACK =====
+            // FIND EXISTING FEEDBACK
             Feedback existing = null;
             for (Feedback f : feedbackRepo.getAll()) {
                 if (f.getAppointmentId().equalsIgnoreCase(appointmentId)) {
@@ -339,7 +339,7 @@ public class CustomerController {
                 return;
             }
 
-            // ===== UPDATE =====
+            // UPDATE
             existing.setStaffRating(staff);
             existing.setTechnicianRating(tech);
             existing.setComment(comment == null ? "" : comment.trim());
@@ -353,7 +353,7 @@ public class CustomerController {
         }
     }
 
-    // ================= PROFILE =================
+    // PROFILE
     public User getCustomerUser() {
         try {
             return userRepo.getOne(customerId);
@@ -362,7 +362,7 @@ public class CustomerController {
         }
     }
 
-    // ================= HELPER =================
+    // HELPER
     private Services getServiceById(String id) {
         try {
             return servicesRepo.getOne(id);

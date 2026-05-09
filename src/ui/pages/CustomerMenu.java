@@ -63,7 +63,7 @@ public class CustomerMenu extends JFrame {
         sidebar.setBackground(new Color(45, 52, 54));
         sidebar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Toggle button for expanding/collapsing sidebar
+        // Toggle button for expand/collapse sidebar
         toggleButton = new JButton("≡");
         styleToggleButton(toggleButton);
         toggleButton.addActionListener(e -> toggleSidebar());
@@ -124,7 +124,7 @@ public class CustomerMenu extends JFrame {
         });
 
         btnNotification.addActionListener(e -> {
-            // Refresh notifications every time user opens notification panel
+            // Refresh notifications
             if (notificationPanelController != null) {
                 notificationPanelController.refreshNotifications();
             }
