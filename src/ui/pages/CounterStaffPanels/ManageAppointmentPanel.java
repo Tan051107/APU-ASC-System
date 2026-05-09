@@ -163,7 +163,7 @@ public class ManageAppointmentPanel extends JPanel {
                 customerName = customer.getName();
             }
 
-            Technician technician = appointment.getTechnician();
+            User technician = appointment.getTechnician();
             if (technician != null) {
                 technicianName = technician.getName();
             }

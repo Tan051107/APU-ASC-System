@@ -253,7 +253,7 @@ public class AddAppointmentFormController {
                 String appointmentDateTimeString = selectedAppointmentDate+" "+selectedAppointmentTime;
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                 LocalDateTime appointmentDateTime = LocalDateTime.parse(appointmentDateTimeString, formatter);
-                List<Technician> availableTechnicians;
+                List<User> availableTechnicians;
                 if(addAppointmentForm.isEdit() && addAppointmentForm.getAppointmentToEdit() !=null){
                     availableTechnicians = appointmentService.getAvailableTechnicians(appointmentDateTime,selectedServiceDuration,addAppointmentForm.getAppointmentToEdit().getId());
                 }
@@ -261,7 +261,7 @@ public class AddAppointmentFormController {
                     availableTechnicians = appointmentService.getAvailableTechnicians(appointmentDateTime,selectedServiceDuration,"");
                 }
                 if(!availableTechnicians.isEmpty()){
-                    for(Technician availableTechnician : availableTechnicians){
+                    for(User availableTechnician : availableTechnicians){
                         VisibleIdCustomComboBoxItem technicianComboBoxItem = new VisibleIdCustomComboBoxItem(availableTechnician.getId(), " | "+availableTechnician.getName());
                         addAppointmentForm.technicianSelectionCombo.addItem(technicianComboBoxItem);
                     }

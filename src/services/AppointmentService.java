@@ -24,7 +24,7 @@ public class AppointmentService {
     private final AppointmentMapper appointmentMapper = new AppointmentMapper();
     private final CrudRepository<Appointment> appointmentRepository = new CrudRepository<>(APPOINTMENT_FILE, appointmentMapper);
     private final CustomerCarService customerCarService = new CustomerCarService();
-    private final TechnicianService technicianService = new TechnicianService();
+    private final UserService userService = new UserService();
 
     public List<Appointment> getAllAppointments() throws GetEntityListException {
         try {
@@ -129,7 +129,7 @@ public class AppointmentService {
             CustomerService customerService = new CustomerService();
             List<String> customerIdsFound = customerService.getCustomers(customer -> customer.getName().toLowerCase().contains(keywordLowerCase)).stream().map(Customer::getId).toList();
             List<String> carIdsFound = customerCarService.getCars(customerCar->customerCar.getCarPlate().toLowerCase().contains(keywordLowerCase)).stream().map(CustomerCar::getId).toList();
-            List<String> technicianIdsFound = technicianService.getTechnicians(technician -> technician.getName().toLowerCase().contains(keywordLowerCase)).stream().map(Technician::getId).toList();
+            List<String> technicianIdsFound = userService.getTechnicians(user -> user.getName().toLowerCase().contains(keywordLowerCase)).stream().map(User::getId).toList();
             Predicate<Appointment> keywordPredicate = appointment -> appointment.getId().toLowerCase().contains(keywordLowerCase);
             if(!customerIdsFound.isEmpty()){
                 keywordPredicate = keywordPredicate.or(appointment -> customerIdsFound.contains(appointment.getCustomerId()));
@@ -151,17 +151,16 @@ public class AppointmentService {
         return getAppointments(appointmentPredicate);
     }
 
-    public List<Technician> getAvailableTechnicians(LocalDateTime appointmentDateTime ,int durationInHour, String appointmentToIgnore) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException {
+    public List<User> getAvailableTechnicians(LocalDateTime appointmentDateTime ,int durationInHour, String appointmentToIgnore) throws FileCorruptedException, NotFoundException, GetEntityListException, BusinessRuleException {
         if(isNotValidAppointmentDateTime(appointmentDateTime)){
             throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
         }
-        List<Technician> availableTechnicians = new ArrayList<>();
-        TechnicianService technicianService = new TechnicianService();
-        List<Technician> technicians = technicianService.getTechnicians();
+        List<User> availableTechnicians = new ArrayList<>();
+        List<User> technicians = userService.getTechnicians();
         if(technicians.isEmpty()){
             throw new NotFoundException("Technician list is empty");
         }
-        for(Technician technician : technicians){
+        for(User technician : technicians){
             String technicianId = technician.getId();
             List<Appointment> assignedAppointments = getAppointmentsByTechnician(technicianId).stream()
                     .filter(appointment -> !appointment.getId().equalsIgnoreCase(appointmentToIgnore))
