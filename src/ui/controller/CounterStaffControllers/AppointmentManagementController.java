@@ -20,7 +20,9 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -32,10 +34,12 @@ public class AppointmentManagementController {
     private final PaymentRecordManagementController paymentRecordManagementController;
     private final AppointmentService appointmentService = new AppointmentService();
     Logger logger = Logger.getLogger(AppointmentManagementController.class.getName());
+    JFormattedTextField appointmentDateFilterInput;
 
     public AppointmentManagementController(ManageAppointmentPanel manageAppointmentPanel , ManagePaymentPanel managePaymentPanel){
         this.manageAppointmentPanel = manageAppointmentPanel;
         this.paymentRecordManagementController = new PaymentRecordManagementController(managePaymentPanel);
+        appointmentDateFilterInput =  ((JSpinner.DateEditor) manageAppointmentPanel.dateFilterSpinner.getEditor()).getTextField();
         initPanel();
     }
 
@@ -76,6 +80,7 @@ public class AppointmentManagementController {
     }
 
     private void searchAppointment(){
+        LocalDate appointmentDateFilterValue = getAppointmentDateFilter();
         String keyword = manageAppointmentPanel.searchField.getText();
         String statusFilterSelection = Objects.requireNonNull(manageAppointmentPanel.statusFilterCombo.getSelectedItem()).toString();
         AppointmentStatus appointmentStatusFilterSelected = statusFilterSelection.equalsIgnoreCase("All") ? null :AppointmentStatus.fromString(statusFilterSelection);
@@ -87,12 +92,12 @@ public class AppointmentManagementController {
         else{
             serviceTypeId = serviceTypeSelection.getId();
         }
-        if(keyword.isEmpty() && serviceTypeId.isEmpty() && statusFilterSelection.equalsIgnoreCase("All")){
+        if(keyword.isEmpty() && serviceTypeId.isEmpty() && statusFilterSelection.equalsIgnoreCase("All") && appointmentDateFilterValue == null){
             resetAllAppointments();
         }
         else{
             try {
-                List<Appointment> appointmentsFound = appointmentService.searchAppointment(keyword, appointmentStatusFilterSelected,serviceTypeId);
+                List<Appointment> appointmentsFound = appointmentService.searchAppointment(keyword, appointmentStatusFilterSelected,serviceTypeId, appointmentDateFilterValue);
                 manageAppointmentPanel.setAppointments(appointmentsFound);
                 loadAppointments();
             } catch (FileCorruptedException e) {
@@ -142,6 +147,28 @@ public class AppointmentManagementController {
         }
     }
 
+    private LocalDate getAppointmentDateFilter(){
+        String appointmentDateSelected = appointmentDateFilterInput.getText();
+        if(appointmentDateSelected.equals("yyyy-mm-dd")){
+            return null;
+        }
+        try{
+            return LocalDate.parse(appointmentDateSelected);
+        }
+        catch(DateTimeParseException e){
+            DialogUtil.showWarningMessage("Invalid Appointment Date","Please select valid appointment date for filter");
+            logger.log(Level.SEVERE,e.getMessage());
+        }
+        return null;
+    }
+
+    private void clearAppointmentDateFilter(){
+        final String DATE_FILTER_PLACEHOLDER = "yyyy-mm-dd";
+        appointmentDateFilterInput.setValue(null);
+        appointmentDateFilterInput.setText(DATE_FILTER_PLACEHOLDER);
+        searchAppointment();
+    }
+
 
     private void initPanel(){
         resetAllAppointments();
@@ -152,5 +179,7 @@ public class AppointmentManagementController {
         manageAppointmentPanel.serviceTypeFilterCombo.addActionListener(e->searchAppointment());
         manageAppointmentPanel.statusFilterCombo.addActionListener(e->searchAppointment());
         manageAppointmentPanel.exportBtn.addActionListener(e->exportAppointment());
+        appointmentDateFilterInput.addActionListener(e->searchAppointment());
+        manageAppointmentPanel.clearDateFilterBtn.addActionListener(e->clearAppointmentDateFilter());
     }
 }

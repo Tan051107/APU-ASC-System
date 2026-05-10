@@ -117,7 +117,7 @@ public class AppointmentService {
         return appointmentRepository.getAll(appointment -> appointment.getTechnicianId().equalsIgnoreCase(technicianId));
     }
 
-    public List<Appointment> searchAppointment(String keyword , AppointmentStatus appointmentStatus , String serviceTypeSelectionFilter) throws FileCorruptedException {
+    public List<Appointment> searchAppointment(String keyword , AppointmentStatus appointmentStatus , String serviceTypeSelectionFilter , LocalDate appointmentDateFilter) throws FileCorruptedException {
         Predicate<Appointment> appointmentPredicate = appointment -> true;
         if(!keyword.isEmpty()){
             String keywordLowerCase = keyword.toLowerCase();
@@ -142,6 +142,9 @@ public class AppointmentService {
         }
         if(!serviceTypeSelectionFilter.isEmpty()){
             appointmentPredicate = appointmentPredicate.and(appointment -> appointment.getServiceId().equalsIgnoreCase(serviceTypeSelectionFilter));
+        }
+        if(appointmentDateFilter != null){
+            appointmentPredicate = appointmentPredicate.and(appointment -> appointment.getDate().equals(appointmentDateFilter));
         }
         return getAppointments(appointmentPredicate);
     }
