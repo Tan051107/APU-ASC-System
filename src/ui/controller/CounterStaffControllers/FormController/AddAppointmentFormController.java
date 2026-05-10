@@ -40,7 +40,7 @@ public class AddAppointmentFormController {
         if(!addAppointmentForm.isEdit()){
             hideCarPlateField();
         }
-        initializeFields();
+        initFields();
         addAppointmentForm.customerSelectionCombo.addActionListener(e-> updateCarPlateField());
         addAppointmentForm.technicianSelectionCombo.addPopupMenuListener(new PopupMenuListener() {
             @Override
@@ -67,7 +67,7 @@ public class AddAppointmentFormController {
         });
     }
 
-    private void initializeFields() {
+    private void initFields() {
         if(addAppointmentForm.isEdit() && addAppointmentForm.getAppointmentToEdit() !=null){
             Appointment appointmentToEdit = addAppointmentForm.getAppointmentToEdit();
             String customerId = appointmentToEdit.getCustomerId();

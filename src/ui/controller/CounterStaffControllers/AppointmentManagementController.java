@@ -41,7 +41,9 @@ public class AppointmentManagementController {
 
     private void openAddAppointmentForm(boolean isEdit , Appointment appointmentToAdd){
         Window parent = SwingUtilities.getWindowAncestor(manageAppointmentPanel);
-        AddAppointmentForm addAppointmentForm = new AddAppointmentForm((Frame)parent, isEdit, appointmentToAdd, manageAppointmentPanel.getLoginStaff());
+        AddAppointmentForm addAppointmentForm = new AddAppointmentForm(
+                (Frame)parent, isEdit, appointmentToAdd, manageAppointmentPanel.getLoginStaff()
+        );
         new AddAppointmentFormController(addAppointmentForm);
         addAppointmentForm.addWindowListener(new WindowAdapter() {
             @Override
@@ -144,7 +146,8 @@ public class AppointmentManagementController {
     private void initPanel(){
         resetAllAppointments();
         initServiceTypeComboBox();
-        manageAppointmentPanel.newAppointmentBtn.addActionListener(e->openAddAppointmentForm(false , null));
+        manageAppointmentPanel.newAppointmentBtn.addActionListener(e->openAddAppointmentForm(false ,
+                null));
         manageAppointmentPanel.searchField.addActionListener(e->searchAppointment());
         manageAppointmentPanel.serviceTypeFilterCombo.addActionListener(e->searchAppointment());
         manageAppointmentPanel.statusFilterCombo.addActionListener(e->searchAppointment());

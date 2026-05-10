@@ -16,12 +16,10 @@ public class MakePaymentForm extends JDialog {
     public JLabel amountLbl;
     public JComboBox<String> paymentMethodCombo;
     public JButton makePaymentBtn;
-    private final PaymentRecord paymentRecord;
     private final User loginStaff;
 
     public MakePaymentForm(Frame owner, PaymentRecord record, User loginStaff) {
         super(owner, "Collect Payment", true);
-        this.paymentRecord = record;
         this.loginStaff = loginStaff;
 
         setSize(450, 650);
@@ -95,7 +93,6 @@ public class MakePaymentForm extends JDialog {
         container.add(row);
         container.add(Box.createRigidArea(new Dimension(0, 10)));
     }
-
 
     public User getLoginStaff() {
         return loginStaff;

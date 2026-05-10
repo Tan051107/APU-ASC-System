@@ -10,7 +10,6 @@ import utils.DialogUtil;
 import utils.validators.ValidationResult;
 import utils.validators.Validator;
 
-import java.awt.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,21 +32,16 @@ public class AddCustomerFormController {
                 addCustomer();
             }
         });
-        setUpForm();
+        initFields();
     }
 
-    private void setUpForm(){
+    private void initFields(){
         if(form.isEdit() && form.getCustomerToEdit() !=null){
             form.nameField.setText(form.getCustomerToEdit().getName());
-            form.nameField.setForeground(Color.BLACK);
             form.emailField.setText(form.getCustomerToEdit().getEmail());
-            form.emailField.setForeground(Color.BLACK);
             form.passwordField.setText(form.getCustomerToEdit().getPassword());
-            form.passwordField.setForeground(Color.BLACK);
             form.phoneField.setText(form.getCustomerToEdit().getContactNumber());
-            form.phoneField.setForeground(Color.BLACK);
             form.confirmPasswordField.setText(form.getCustomerToEdit().getPassword());
-            form.confirmPasswordField.setForeground(Color.BLACK);
         }
     }
 
@@ -89,14 +83,16 @@ public class AddCustomerFormController {
             }
             user.setPassword(customerToEdit.getPassword());
             userService.updateUser(user);
-            DialogUtil.showInfoMessage("Updated Successfully" , String.format("Successfully updated %s." , user.getName()));
+            DialogUtil.showInfoMessage("Updated Successfully" ,
+                    String.format("Successfully updated %s." , user.getName()));
             form.dispose();
         }
         catch (NotFoundException | ValidationException e ) {
             DialogUtil.showErrorMessage("Failed to Update Customer" , e.getMessage());
         }
         catch (Exception e) {
-            DialogUtil.showErrorMessage("Failed to Update Customer" , "Encountered error when updating customer");
+            DialogUtil.showErrorMessage("Failed to Update Customer" ,
+                    "Encountered error when to update customer details");
             logger.log(Level.SEVERE ,e.getMessage());
         }
     }

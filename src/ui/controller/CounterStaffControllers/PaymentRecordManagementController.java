@@ -8,11 +8,10 @@ import services.*;
 import ui.controller.CounterStaffControllers.FormController.MakePaymentFormController;
 import ui.pages.CounterStaffPanels.ManagePaymentPanel;
 import ui.pages.CounterStaffPanels.forms.MakePaymentForm;
-import ui.pages.CounterStaffPanels.forms.ServiceReceipt;
+import ui.pages.CounterStaffPanels.receipt.ServiceReceipt;
 import utils.CSVExporter;
 import utils.DialogUtil;
 import utils.exporters.CsvExporters.PaymentRecordCsvExporter;
-import utils.exporters.interfaces.CsvExporter;
 
 import javax.swing.*;
 import java.awt.*;
