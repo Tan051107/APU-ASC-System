@@ -5,10 +5,12 @@ import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import exceptions.NotFoundException;
 import exceptions.UpdateException;
+import mapper.PaymentRecordMapper;
 import mapper.ServicesMapper;
 import models.Notification;
+import models.PaymentRecord;
 import models.Services;
-import repositories.ServicesRepository;
+import repositories.CrudRepository;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 public class ServicesService {
     private final String SERVICES_FILE = "txt_files/Services.txt";
     private final ServicesMapper servicesMapper = new ServicesMapper();
-    private final ServicesRepository<Services> servicesRepository = new ServicesRepository<>(SERVICES_FILE , servicesMapper);
+    private final CrudRepository<Services> servicesRepository = new CrudRepository<>(SERVICES_FILE , servicesMapper);
     //private final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public List<Services> getServices() throws GetEntityListException {

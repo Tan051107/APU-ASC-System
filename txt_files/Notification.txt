@@ -69,3 +69,4 @@ N23897|Appointment Updated|APP-82962 is updated|User||TP758201|2026-05-10T03:09:
 N44668|Payment Is Made|Payment is successfully made for appointment APP-80002 at 10-05-2026 03:14 am|User||TP758201|2026-05-10T03:14:44.325460100|2026-05-10T03:14:44.325460100
 N63700|Payment Is Made|Payment is successfully made for appointment APP-82962 at 10-05-2026 03:14 am|User||TP758201|2026-05-10T03:14:56.474851500|2026-05-10T03:14:56.474851500
 N06952|Payment Is Made|Payment is successfully made for appointment APP-87439 at 10-05-2026 03:14 am|User||TP758201|2026-05-10T03:14:58.668004900|2026-05-10T03:14:58.668004900
+N91075|Service Information Updated|Service price is updated to RM 700.0|All|||2026-05-11T16:08:43.734624700|2026-05-11T16:08:43.734624700
