@@ -88,8 +88,10 @@ public class AppointmentService {
         Appointment originalAppt = appointmentRepository.getOne(appointmentToUpdateId);
         boolean isTimeChanged = !originalAppt.getDate().equals(appointmentToUpdate.getDate()) || 
                                 !originalAppt.getTime().equals(appointmentToUpdate.getTime());
-        if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
-            throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
+        if(isTimeChanged) {                        
+            if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
+                throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
+            }
         }
         if(carHasClashAppointment(appointmentToUpdate, appointmentToUpdateId)){
             throw new BusinessRuleException("Car already has an appointment during the date and time chosen");
