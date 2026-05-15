@@ -57,7 +57,7 @@ public class Services extends BaseModel{
         this.details = details;
     }
 
-    public LocalDate getDate() {
+    /*public LocalDate getDate() {
         return date;
     }
 
@@ -71,7 +71,7 @@ public class Services extends BaseModel{
 
     public void setTime(LocalTime time) {
         this.time = time;
-    }
+    }*/
 
     public int getDuration() {
         return duration;

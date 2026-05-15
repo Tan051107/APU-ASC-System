@@ -10,6 +10,7 @@ import utils.validators.ValidationResult;
 import utils.validators.Validator;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 public class UserService {
@@ -25,6 +26,22 @@ public class UserService {
             throw new GetEntityListException(e.getMessage());
         }
     }
+
+    public List<User> getTechnicians() throws GetEntityListException {
+        try{
+            return userRepository.getAll(technician -> technician.getUserType().equals(UserType.TECHNICIAN));
+        } catch (FileCorruptedException e) {
+            throw new GetEntityListException(e.getMessage());
+        }
+    }
+
+    public List<User> getTechnicians(Predicate<User> filter) throws FileCorruptedException {
+        Predicate<User> isTechnician = user -> user.getUserType().equals(UserType.TECHNICIAN);
+        Predicate<User> combinedFilter = isTechnician.and(filter);
+        return userRepository.getAll(combinedFilter);
+    }
+
+
 
     public User getUserById(String id) throws GetEntityListException {
         try{

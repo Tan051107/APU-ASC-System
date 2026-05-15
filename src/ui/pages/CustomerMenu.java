@@ -11,6 +11,7 @@ import java.awt.*;
 public class CustomerMenu extends JFrame {
 
     private final CustomerController controller;
+
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel contentPanel = new JPanel(cardLayout);
 
@@ -62,6 +63,7 @@ public class CustomerMenu extends JFrame {
         sidebar.setBackground(new Color(45, 52, 54));
         sidebar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Toggle button for expand/collapse sidebar
         toggleButton = new JButton("≡");
         styleToggleButton(toggleButton);
         toggleButton.addActionListener(e -> toggleSidebar());
@@ -122,6 +124,7 @@ public class CustomerMenu extends JFrame {
         });
 
         btnNotification.addActionListener(e -> {
+            // Refresh notifications
             if (notificationPanelController != null) {
                 notificationPanelController.refreshNotifications();
             }
@@ -134,7 +137,9 @@ public class CustomerMenu extends JFrame {
         });
 
         btnProfile.addActionListener(e -> {
-            profilePanelController.initProfile();
+            if (profilePanelController != null) {
+                profilePanelController.initProfile();
+            }
             cardLayout.show(contentPanel, "PROFILE");
         });
 
@@ -142,6 +147,7 @@ public class CustomerMenu extends JFrame {
             dispose();
             new Login().createUI();
         });
+
 
         refreshServiceHistory();
         refreshPaymentHistory();
@@ -152,6 +158,7 @@ public class CustomerMenu extends JFrame {
 
     private void toggleSidebar() {
         isExpanded = !isExpanded;
+
         if (isExpanded) {
             sidebar.setPreferredSize(new Dimension(220, getHeight()));
             btnServiceHistory.setVisible(true);
@@ -173,6 +180,7 @@ public class CustomerMenu extends JFrame {
             btnLogout.setVisible(false);
             toggleButton.setText("»");
         }
+
         sidebar.revalidate();
         sidebar.repaint();
     }
@@ -202,6 +210,7 @@ public class CustomerMenu extends JFrame {
         panel.add(UIUtils.createMenuTitle("View Appointments"), BorderLayout.NORTH);
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+
         topPanel.add(new JLabel("Search:"));
         serviceSearchField = UIUtils.createTextField();
         serviceSearchField.setPreferredSize(new Dimension(240, 35));
@@ -393,12 +402,15 @@ public class CustomerMenu extends JFrame {
     private void refreshFeedbackAppointmentDropdown() {
         appointmentComboBox.setModel(controller.getCompletedAppointmentComboModel());
         commentTextArea.setText("");
+
+        // Reset to default slider values
         if (staffRatingSlider != null) {
             staffRatingSlider.setValue(3);
         }
         if (technicianRatingSlider != null) {
             technicianRatingSlider.setValue(3);
         }
+
         updateSelectedAppointmentPeople();
     }
 
@@ -438,10 +450,11 @@ public class CustomerMenu extends JFrame {
                 commentTextArea.getText()
         );
 
+        // Refresh table and dropdown after submission
         refreshFeedback();
         refreshFeedbackAppointmentDropdown();
     }
-    
+
     private JSlider createRatingSlider() {
         JSlider slider = new JSlider(1, 5, 3);
         slider.setMajorTickSpacing(1);
@@ -456,23 +469,23 @@ public class CustomerMenu extends JFrame {
         slider.setUI(new javax.swing.plaf.basic.BasicSliderUI(slider) {
             @Override
             protected Dimension getThumbSize() {
-                return new Dimension(14, 20); 
+                return new Dimension(14, 20);
             }
 
             @Override
             public void paintTrack(Graphics g) {
                 Rectangle trackBounds = trackRect;
-                int trackHeight = 4; 
+                int trackHeight = 4;
                 int trackY = trackBounds.y + (trackBounds.height - trackHeight) / 2;
 
-                g.setColor(new Color(220, 220, 220)); 
+                g.setColor(new Color(220, 220, 220));
                 g.fillRect(trackBounds.x, trackY, trackBounds.width, trackHeight);
 
                 int thumbX = thumbRect.x + thumbRect.width / 2;
                 int filledWidth = thumbX - trackBounds.x;
-                
+
                 if (filledWidth > 0) {
-                    g.setColor(new Color(37, 99, 235)); 
+                    g.setColor(new Color(37, 99, 235));
                     g.fillRect(trackBounds.x, trackY, filledWidth, trackHeight);
                 }
             }
@@ -493,9 +506,10 @@ public class CustomerMenu extends JFrame {
                 g.setColor(new Color(150, 150, 150));
                 g.drawPolygon(xPoints, yPoints, 5);
             }
-            @Override
-            public void paintFocus(Graphics g) {}
 
+            @Override
+            public void paintFocus(Graphics g) {
+            }
         });
 
         return slider;
