@@ -147,9 +147,9 @@ public class Appointment extends BaseModel{
         return userService.getUserById(staffId);
     }
 
-    public Technician getTechnician() throws FileCorruptedException {
-        TechnicianService technicianService = new TechnicianService();
-        return technicianService.getTechnicianById(technicianId);
+    public User getTechnician() throws GetEntityListException {
+        UserService userService = new UserService();
+        return userService.getUserById(technicianId);
     }
 
 
