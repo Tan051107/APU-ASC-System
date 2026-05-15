@@ -22,3 +22,5 @@ public interface BaseRepository <T extends BaseModel>{
     void create(T object) throws IOException;
     void delete(String id) throws IOException, FileCorruptedException, DeleteException;
 }
+
+
