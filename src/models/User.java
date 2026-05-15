@@ -1,8 +1,6 @@
 package models;
 
 import enums.UserType;
-import services.UserService;
-
 import java.time.LocalDateTime;
 
 public class User extends BaseModel {
@@ -23,7 +21,8 @@ public class User extends BaseModel {
         this.contactNumber = contactNumber;
     }
 
-    public User(String id, LocalDateTime createdAt, LocalDateTime updatedAt, String name, String email, String password, String contactNumber) {
+    public User(String id, LocalDateTime createdAt,
+                LocalDateTime updatedAt, String name, String email, String password, String contactNumber) {
         super(id, createdAt, updatedAt);
         this.name = name;
         this.email = email;
@@ -70,6 +69,6 @@ public class User extends BaseModel {
     public void setUserType(UserType userType) {
         this.userType = userType;
     }
-
-
 }
+
+

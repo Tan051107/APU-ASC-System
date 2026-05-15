@@ -22,9 +22,11 @@ public class Customer extends User{
         setUserType(UserType.CUSTOMER);
     }
 
-    public Customer(String id, LocalDateTime createdAt, LocalDateTime updatedAt, String name, String email, String password, String contactNumber) {
+    public Customer(String id, LocalDateTime createdAt,
+                    LocalDateTime updatedAt, String name, String email, String password, String contactNumber) {
         super(id, createdAt, updatedAt, name, email, password, contactNumber);
         setUserType(UserType.CUSTOMER);
     }
 
 }
+

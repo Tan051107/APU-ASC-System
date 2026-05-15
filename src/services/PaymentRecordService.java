@@ -32,6 +32,7 @@ public class PaymentRecordService {
         return paymentRecordCrudRepository.getAll(paymentRecord -> paymentRecord.getAppointmentId().equalsIgnoreCase(appointmentId)).getFirst();
     }
 
+
     public void addPaymentRecord(PaymentRecord paymentRecord) throws IOException {
         String paymentRecordId = generatePaymentId();
         paymentRecord.setId(paymentRecordId);
@@ -50,7 +51,8 @@ public class PaymentRecordService {
         paymentRecordCrudRepository.delete(paymentRecordToDelete.getId());
     }
 
-    public void makePayment(PaymentRecord paymentRecordToMakePayment) throws GetEntityListException, BusinessRuleException, FileCorruptedException, NotFoundException, IOException {
+    public void makePayment(PaymentRecord paymentRecordToMakePayment) throws
+            GetEntityListException, BusinessRuleException, FileCorruptedException, NotFoundException, IOException {
         AppointmentService appointmentService = new AppointmentService();
         Appointment appointment = appointmentService.getAppointmentById(paymentRecordToMakePayment.getAppointmentId());
         if(!appointment.getStatusService().equals(AppointmentStatus.COMPLETED)){
@@ -61,21 +63,30 @@ public class PaymentRecordService {
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
         String appointmentDateTimeString = paymentRecordToMakePayment.getPaymentDateTime().format(dateTimeFormatter);
-        createNotification(paymentRecordToMakePayment.getAppointment().getCustomerId(),"Payment Is Made" ,String.format("Payment is successfully made for appointment %s at %s" , paymentRecordToMakePayment.getAppointmentId() , appointmentDateTimeString));
+        createNotification(paymentRecordToMakePayment.getAppointment().getCustomerId(),
+                "Payment Is Made" ,
+                String.format("Payment is successfully made for appointment %s at %s" ,
+                        paymentRecordToMakePayment.getAppointmentId() , appointmentDateTimeString));
     }
 
-    public List<PaymentRecord> searchPaymentRecord(String keyword , String paymentStatus , String paymentMethod) throws FileCorruptedException {
+    public List<PaymentRecord> searchPaymentRecord(String keyword , String paymentStatus , String paymentMethod)
+            throws FileCorruptedException {
         Predicate<PaymentRecord> paymentRecordPredicate =paymentRecord -> true;
         if(!keyword.isEmpty()){
             String keywordLowerCase = keyword.toLowerCase();
-            paymentRecordPredicate = paymentRecordPredicate.and(paymentRecord -> paymentRecord.getAppointmentId().toLowerCase().contains(keywordLowerCase) || paymentRecord.getId().toLowerCase().contains(keywordLowerCase));
+            paymentRecordPredicate = paymentRecordPredicate.and(
+                    paymentRecord -> paymentRecord.getAppointmentId().toLowerCase().contains(keywordLowerCase)
+                            || paymentRecord.getId().toLowerCase().contains(keywordLowerCase));
         }
         if(!paymentStatus.isEmpty()){
             boolean hasPaid = paymentStatus.equalsIgnoreCase("paid");
-            paymentRecordPredicate = paymentRecordPredicate.and(paymentRecord -> paymentRecord.isHasPaid() == hasPaid);
+            paymentRecordPredicate = paymentRecordPredicate.and(paymentRecord ->
+                    paymentRecord.isHasPaid() == hasPaid);
         }
         if(!paymentMethod.isEmpty()){
-            paymentRecordPredicate = paymentRecordPredicate.and(paymentRecord -> paymentRecord.getPaymentMethod() != null && paymentRecord.getPaymentMethod().equalsIgnoreCase(paymentMethod));
+            paymentRecordPredicate = paymentRecordPredicate.and(paymentRecord ->
+                    paymentRecord.getPaymentMethod() != null &&
+                            paymentRecord.getPaymentMethod().equalsIgnoreCase(paymentMethod));
         }
 
         return paymentRecordCrudRepository.getAll(paymentRecordPredicate);

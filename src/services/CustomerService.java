@@ -30,7 +30,13 @@ public class CustomerService {
         userService.deleteUser(customerId);
         customerCarService.deleteCarByCustomerId(customerId);
     }
-
+    public List<Customer> getCustomersByNameOrEmail(String keyword) throws FileCorruptedException {
+        String lowerCaseKeyword = keyword.toLowerCase();
+        return getCustomers().stream()
+                .filter(customer -> customer.getName().toLowerCase().contains(lowerCaseKeyword)
+                        || customer.getEmail().toLowerCase().contains(lowerCaseKeyword))
+                .toList();
+    }
     public List<Customer> getCustomers() throws FileCorruptedException {
         return customerCrudRepository.getAll(customer -> customer.getUserType().equals(UserType.CUSTOMER));
     }
@@ -41,14 +47,6 @@ public class CustomerService {
 
     public Customer getCustomerById(String customerId) throws FileCorruptedException {
         return customerCrudRepository.getOne(customerId);
-    }
-
-    public List<Customer> getCustomersByNameOrEmail(String keyword) throws FileCorruptedException {
-        String lowerCaseKeyword = keyword.toLowerCase();
-        return getCustomers().stream()
-                .filter(customer -> customer.getName().toLowerCase().contains(lowerCaseKeyword)
-                        || customer.getEmail().toLowerCase().contains(lowerCaseKeyword))
-                .toList();
     }
 
 }

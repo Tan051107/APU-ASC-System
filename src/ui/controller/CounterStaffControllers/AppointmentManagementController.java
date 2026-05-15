@@ -64,7 +64,8 @@ public class AppointmentManagementController {
     }
 
     private void handleCancel(Appointment appointment) {
-        boolean confirmToCancel = DialogUtil.showConfirmationMessage("Confirm to Cancel?" , String.format("Are you sure you want to cancel %s?" , appointment.getId()));
+        boolean confirmToCancel = DialogUtil.showConfirmationMessage(
+                "Confirm to Cancel?" , String.format("Are you sure you want to cancel %s?" , appointment.getId()));
         if(confirmToCancel){
             try {
                 appointmentService.cancelAppointment(appointment);
@@ -82,9 +83,12 @@ public class AppointmentManagementController {
     private void searchAppointment(){
         LocalDate appointmentDateFilterValue = getAppointmentDateFilter();
         String keyword = manageAppointmentPanel.searchField.getText();
-        String statusFilterSelection = Objects.requireNonNull(manageAppointmentPanel.statusFilterCombo.getSelectedItem()).toString();
-        AppointmentStatus appointmentStatusFilterSelected = statusFilterSelection.equalsIgnoreCase("All") ? null :AppointmentStatus.fromString(statusFilterSelection);
-        HiddenIdCustomComboBoxItem serviceTypeSelection = (HiddenIdCustomComboBoxItem) manageAppointmentPanel.serviceTypeFilterCombo.getSelectedItem();
+        String statusFilterSelection = Objects.requireNonNull(
+                manageAppointmentPanel.statusFilterCombo.getSelectedItem()).toString();
+        AppointmentStatus appointmentStatusFilterSelected = statusFilterSelection.equalsIgnoreCase(
+                "All") ? null :AppointmentStatus.fromString(statusFilterSelection);
+        HiddenIdCustomComboBoxItem serviceTypeSelection =
+                (HiddenIdCustomComboBoxItem) manageAppointmentPanel.serviceTypeFilterCombo.getSelectedItem();
         String serviceTypeId;
         if(serviceTypeSelection == null){
             serviceTypeId = "";
@@ -92,12 +96,14 @@ public class AppointmentManagementController {
         else{
             serviceTypeId = serviceTypeSelection.getId();
         }
-        if(keyword.isEmpty() && serviceTypeId.isEmpty() && statusFilterSelection.equalsIgnoreCase("All") && appointmentDateFilterValue == null){
+        if(keyword.isEmpty() && serviceTypeId.isEmpty() && statusFilterSelection.equalsIgnoreCase("All")
+                && appointmentDateFilterValue == null){
             resetAllAppointments();
         }
         else{
             try {
-                List<Appointment> appointmentsFound = appointmentService.searchAppointment(keyword, appointmentStatusFilterSelected,serviceTypeId, appointmentDateFilterValue);
+                List<Appointment> appointmentsFound = appointmentService.searchAppointment(keyword,
+                        appointmentStatusFilterSelected,serviceTypeId, appointmentDateFilterValue);
                 manageAppointmentPanel.setAppointments(appointmentsFound);
                 loadAppointments();
             } catch (FileCorruptedException e) {
@@ -156,7 +162,8 @@ public class AppointmentManagementController {
             return LocalDate.parse(appointmentDateSelected);
         }
         catch(DateTimeParseException e){
-            DialogUtil.showWarningMessage("Invalid Appointment Date","Please select valid appointment date for filter");
+            DialogUtil.showWarningMessage("Invalid Appointment Date",
+                    "Please select valid appointment date for filter");
             logger.log(Level.SEVERE,e.getMessage());
         }
         return null;
@@ -178,8 +185,8 @@ public class AppointmentManagementController {
         manageAppointmentPanel.searchField.addActionListener(e->searchAppointment());
         manageAppointmentPanel.serviceTypeFilterCombo.addActionListener(e->searchAppointment());
         manageAppointmentPanel.statusFilterCombo.addActionListener(e->searchAppointment());
-        manageAppointmentPanel.exportBtn.addActionListener(e->exportAppointment());
         appointmentDateFilterInput.addActionListener(e->searchAppointment());
+        manageAppointmentPanel.exportBtn.addActionListener(e->exportAppointment());
         manageAppointmentPanel.clearDateFilterBtn.addActionListener(e->clearAppointmentDateFilter());
     }
 }

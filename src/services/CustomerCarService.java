@@ -92,6 +92,13 @@ public class CustomerCarService {
             throw new UpdateException(e.getMessage());
         }
     }
+    private boolean hasNotCompletedAppointment(String carId) throws FileCorruptedException {
+        AppointmentService appointmentService = new AppointmentService();
+        List<Appointment> upcomingAppointments =
+                appointmentService.getAppointments(appointment -> appointment.getCarId().equals(carId)
+                        && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
+        return !upcomingAppointments.isEmpty();
+    }
 
     private String generateCarId(){
         try {
@@ -111,12 +118,5 @@ public class CustomerCarService {
         return year > currentYear;
     }
 
-    private boolean hasNotCompletedAppointment(String carId) throws FileCorruptedException {
-        AppointmentService appointmentService = new AppointmentService();
-        List<Appointment> upcomingAppointments =
-                appointmentService.getAppointments(appointment -> appointment.getCarId().equals(carId)
-                        && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
-        return !upcomingAppointments.isEmpty();
-    }
 
 }

@@ -69,6 +69,20 @@ public class AddCustomerFormController {
             DialogUtil.showWarningMessage("Validation Error" , e.getMessage());
         }
     }
+    private User getUser(ValidationResult validationResult) throws ValidationException {
+        String name = form.nameField.getText();
+        String email = form.emailField.getText();
+        String contactNumber = form.phoneField.getText();
+        Validator.required(validationResult, "Name", name);
+        Validator.validateEmail(validationResult, email);
+        Validator.validatePhone(validationResult , contactNumber);
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setContactNumber(contactNumber);
+        user.setUserType(UserType.CUSTOMER);
+        return user;
+    }
 
     private void updateCustomer(){
         try {
@@ -98,18 +112,4 @@ public class AddCustomerFormController {
     }
 
 
-    private User getUser(ValidationResult validationResult) throws ValidationException {
-        String name = form.nameField.getText();
-        String email = form.emailField.getText();
-        String contactNumber = form.phoneField.getText();
-        Validator.required(validationResult, "Name", name);
-        Validator.validateEmail(validationResult, email);
-        Validator.validatePhone(validationResult , contactNumber);
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setContactNumber(contactNumber);
-        user.setUserType(UserType.CUSTOMER);
-        return user;
-    }
 }

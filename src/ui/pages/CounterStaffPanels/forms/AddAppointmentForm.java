@@ -26,7 +26,7 @@ public class AddAppointmentForm extends JDialog {
     private final User loginStaff;
 
     public AddAppointmentForm(Frame owner, boolean isEdit , Appointment appointmentToEdit, User loginStaff) {
-        super(owner, "Create New Appointment", true);
+        super(owner, isEdit? "Update Appointment": "Create New Appointment", true);
         this.loginStaff =loginStaff;
         this.appointmentToEdit = appointmentToEdit;
         this.isEdit  = isEdit;
