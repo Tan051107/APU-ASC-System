@@ -1,10 +1,8 @@
 package ui.controller;
 
 import enums.AppointmentStatus;
-import exceptions.FileCorruptedException;
-import mapper.*;
 import models.*;
-import repositories.CrudRepository;
+import services.*;
 import utils.DialogUtil;
 import utils.validators.ValidationResult;
 import utils.validators.Validator;
@@ -13,27 +11,20 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.time.Month;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CustomerController {
 
     private final String customerId;
+    private final Logger logger = Logger.getLogger(CustomerController.class.getName());
 
-    // REPOSITORIES
-    // Handle file operations
-    private final CrudRepository<Appointment> appointmentRepo =
-            new CrudRepository<>("txt_files/Appointment.txt", new AppointmentMapper());
-
-    private final CrudRepository<Feedback> feedbackRepo =
-            new CrudRepository<>("txt_files/Feedback.txt", new FeedbackMapper());
-
-    private final CrudRepository<User> userRepo =
-            new CrudRepository<>("txt_files/User.txt", new UserMapper());
-
-    private final CrudRepository<Services> servicesRepo =
-            new CrudRepository<>("txt_files/Services.txt", new ServicesMapper());
-
-    private final CrudRepository<PaymentRecord> paymentRepo =
-            new CrudRepository<>("txt_files/PaymentRecord.txt", new PaymentRecordMapper());
+    // SERVICES
+    private final AppointmentService appointmentService = new AppointmentService();
+    private final FeedbackService feedbackService = new FeedbackService();
+    private final UserService userService = new UserService();
+    private final ServicesService servicesService = new ServicesService();
+    private final PaymentRecordService paymentRecordService = new PaymentRecordService();
 
     public CustomerController(String customerId) {
         this.customerId = customerId;
@@ -47,12 +38,12 @@ public class CustomerController {
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
         try {
-            List<Appointment> appointments = appointmentRepo.getAll();
+            List<Appointment> appointments = appointmentService.getAllAppointments();
             String keyword = search == null ? "" : search.toLowerCase();
 
             for (Appointment a : appointments) {
 
-                // Only show current appointments
+                // Only show current customer's appointments
                 if (!a.getCustomerId().equalsIgnoreCase(customerId)) continue;
 
                 // Get service info
@@ -65,16 +56,16 @@ public class CustomerController {
                 boolean matchStatus =
                         statusFilter.equalsIgnoreCase("All") ||
                         (statusFilter.equalsIgnoreCase("Assigned") && a.getStatusService() == AppointmentStatus.ASSIGNED) ||
-                        (statusFilter.equalsIgnoreCase("Completed") && a.getStatusService() == AppointmentStatus.COMPLETED);
+                        (statusFilter.equalsIgnoreCase("Completed") && a.getStatusService() == AppointmentStatus.COMPLETED) ||
+                        (statusFilter.equalsIgnoreCase("Cancelled") && a.getStatusService() == AppointmentStatus.CANCELLED);
 
-                // Search 
+                // Search
                 boolean matchSearch =
                         keyword.isEmpty() ||
                         a.getId().toLowerCase().contains(keyword) ||
                         type.toLowerCase().contains(keyword) ||
                         desc.toLowerCase().contains(keyword);
 
-                // Add row if matches filter
                 if (matchStatus && matchSearch) {
                     model.addRow(new Object[]{
                             a.getId(), a.getDate(), a.getTime(), type, desc, status
@@ -83,21 +74,21 @@ public class CustomerController {
             }
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             DialogUtil.showErrorMessage("Error", "Failed to load appointments");
         }
 
         return model;
     }
-    
+
     // DROPDOWN
-    // Show only completed appointments WITHOUT feedback
+    // Show only completed appointments WITHOUT feedback submitted by customer yet
     public DefaultComboBoxModel<String> getCompletedAppointmentComboModel() {
 
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 
         try {
-            List<Appointment> appointments = appointmentRepo.getAll();
-            List<Feedback> feedbacks = feedbackRepo.getAll();
+            List<Appointment> appointments = appointmentService.getAllAppointments();
 
             for (Appointment a : appointments) {
 
@@ -107,13 +98,11 @@ public class CustomerController {
                 // Must be completed
                 if (a.getStatusService() != AppointmentStatus.COMPLETED) continue;
 
-                // Check if already has feedback
-                boolean alreadyRated = feedbacks.stream()
-                        .anyMatch(f ->
-                                f.getAppointmentId().equalsIgnoreCase(a.getId()) &&
-                                f.getStaffRating() != null &&
-                                f.getStaffRating() > 0
-                        );
+                // Check if customer already submitted rating via FeedbackService
+                Feedback existing = feedbackService.getFeedbackByAppointmentId(a.getId());
+                boolean alreadyRated = existing != null
+                        && existing.getStaffRating() != null
+                        && existing.getStaffRating() > 0;
 
                 if (!alreadyRated) {
                     model.addElement(a.getId());
@@ -121,6 +110,7 @@ public class CustomerController {
             }
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             DialogUtil.showErrorMessage("Error", "Failed to load appointments");
         }
 
@@ -128,14 +118,14 @@ public class CustomerController {
     }
 
     // GET STAFF & TECHNICIAN
-    // Display staff + technician name
+    // Display staff + technician name for a given appointment
     public String[] getAppointmentPeopleDetails(String appointmentId) {
         try {
-            Appointment appointment = appointmentRepo.getOne(appointmentId);
+            Appointment appointment = appointmentService.getAppointmentById(appointmentId);
             if (appointment == null) return null;
 
-            User staff = userRepo.getOne(appointment.getStaffId());
-            User technician = userRepo.getOne(appointment.getTechnicianId());
+            User staff = userService.getUserById(appointment.getStaffId());
+            User technician = userService.getUserById(appointment.getTechnicianId());
 
             String staffText = (staff == null)
                     ? appointment.getStaffId()
@@ -148,24 +138,25 @@ public class CustomerController {
             return new String[]{staffText, technicianText};
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             return null;
         }
     }
 
     // PAYMENT HISTORY
-    // Show payment
+    // Show payment records for this customer
     public DefaultTableModel getPaymentHistoryTableModel(String search, String year, String month) {
 
         String[] columns = {"Appointment ID", "Service", "Description", "Amount (RM)", "Transaction Type", "Date"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
         try {
-            List<PaymentRecord> payments = paymentRepo.getAll();
+            List<PaymentRecord> payments = paymentRecordService.getPaymentRecords();
             String keyword = search == null ? "" : search.toLowerCase();
 
             for (PaymentRecord p : payments) {
 
-                Appointment a = appointmentRepo.getOne(p.getAppointmentId());
+                Appointment a = appointmentService.getAppointmentById(p.getAppointmentId());
                 if (a == null) continue;
 
                 // Only show own payment
@@ -186,11 +177,11 @@ public class CustomerController {
                         : p.getPaymentDateTime().toLocalDate().toString();
 
                 // Extract year/month for filter
-                String y = (p.getPaymentDateTime() == null) ? "" :
-                        String.valueOf(p.getPaymentDateTime().getYear());
+                String y = (p.getPaymentDateTime() == null) ? ""
+                        : String.valueOf(p.getPaymentDateTime().getYear());
 
-                String m = (p.getPaymentDateTime() == null) ? "" :
-                        Month.of(p.getPaymentDateTime().getMonthValue()).name();
+                String m = (p.getPaymentDateTime() == null) ? ""
+                        : Month.of(p.getPaymentDateTime().getMonthValue()).name();
 
                 boolean matchYear = year.equalsIgnoreCase("All") || y.equals(year);
                 boolean matchMonth = month.equalsIgnoreCase("All") || m.equalsIgnoreCase(month);
@@ -208,6 +199,7 @@ public class CustomerController {
             }
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             DialogUtil.showErrorMessage("Error", "Failed to load payment history");
         }
 
@@ -221,13 +213,15 @@ public class CustomerController {
 
         try {
             Set<String> years = new LinkedHashSet<>();
-            for (PaymentRecord p : paymentRepo.getAll()) {
+            for (PaymentRecord p : paymentRecordService.getPaymentRecords()) {
                 if (p.getPaymentDateTime() != null) {
                     years.add(String.valueOf(p.getPaymentDateTime().getYear()));
                 }
             }
             years.forEach(model::addElement);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+        }
 
         return model;
     }
@@ -239,13 +233,15 @@ public class CustomerController {
 
         try {
             Set<String> months = new LinkedHashSet<>();
-            for (PaymentRecord p : paymentRepo.getAll()) {
+            for (PaymentRecord p : paymentRecordService.getPaymentRecords()) {
                 if (p.getPaymentDateTime() != null) {
                     months.add(Month.of(p.getPaymentDateTime().getMonthValue()).name());
                 }
             }
             months.forEach(model::addElement);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+        }
 
         return model;
     }
@@ -258,12 +254,12 @@ public class CustomerController {
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
         try {
-            List<Feedback> feedbacks = feedbackRepo.getAll();
+            List<Feedback> feedbacks = feedbackService.getFeedbacks();
 
             for (Feedback f : feedbacks) {
 
-                // Only show feedback
-                Appointment a = appointmentRepo.getOne(f.getAppointmentId());
+                // Only show feedback for this customer
+                Appointment a = appointmentService.getAppointmentById(f.getAppointmentId());
                 if (a == null) continue;
 
                 if (!a.getCustomerId().equalsIgnoreCase(customerId)) continue;
@@ -278,20 +274,20 @@ public class CustomerController {
             }
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             DialogUtil.showErrorMessage("Error", "Failed to load feedback");
         }
-        
+
         return model;
-    }    
-    
+    }
+
     // SUBMIT FEEDBACK
-    // Update record
+    // Customer rates staff and technician for completed appointment
     public void submitFeedback(String appointmentId, String staffText, String techText, String comment) {
 
         try {
             // VALIDATION
             ValidationResult vr = new ValidationResult();
-
             Validator.required(vr, "Appointment ID", appointmentId);
             Validator.validateInteger(vr, "Staff Rating", staffText);
             Validator.validateInteger(vr, "Technician Rating", techText);
@@ -301,54 +297,53 @@ public class CustomerController {
                 return;
             }
 
-            int staff = Integer.parseInt(staffText);
-            int tech = Integer.parseInt(techText);
+            int staffRating = Integer.parseInt(staffText);
+            int techRating = Integer.parseInt(techText);
 
-            if (staff < 1 || staff > 5 || tech < 1 || tech > 5) {
-                DialogUtil.showWarningMessage("Validation Error", "Rating must be 1–5");
+            // Rating range check
+            if (staffRating < 1 || staffRating > 5 || techRating < 1 || techRating > 5) {
+                DialogUtil.showWarningMessage("Validation Error", "Rating must be between 1 and 5");
                 return;
             }
 
             // BUSINESS RULE
-            Appointment a = appointmentRepo.getOne(appointmentId);
+            Appointment a = appointmentService.getAppointmentById(appointmentId);
 
-            if (a == null || !a.getCustomerId().equalsIgnoreCase(customerId)
-                    || a.getStatusService() != AppointmentStatus.COMPLETED) {
-
-                DialogUtil.showWarningMessage("Error", "Invalid appointment");
+            if (a == null || !a.getCustomerId().equalsIgnoreCase(customerId)) {
+                DialogUtil.showWarningMessage("Error", "Appointment not found");
                 return;
             }
 
-            // FIND EXISTING FEEDBACK
-            Feedback existing = null;
-            for (Feedback f : feedbackRepo.getAll()) {
-                if (f.getAppointmentId().equalsIgnoreCase(appointmentId)) {
-                    existing = f;
-                    break;
-                }
+            if (a.getStatusService() != AppointmentStatus.COMPLETED) {
+                DialogUtil.showWarningMessage("Error", "Feedback can only be submitted for completed appointments");
+                return;
             }
+
+            // FIND EXISTING FEEDBACK via FeedbackService
+            Feedback existing = feedbackService.getFeedbackByAppointmentId(appointmentId);
 
             if (existing == null) {
-                DialogUtil.showErrorMessage("Error", "Feedback record not found");
+                DialogUtil.showErrorMessage("Error", "Feedback record not found. Please contact staff.");
                 return;
             }
 
-            // Prevent duplicate submission
+            // PREVENT DUPLICATE
             if (existing.getStaffRating() != null && existing.getStaffRating() > 0) {
-                DialogUtil.showWarningMessage("Error", "Already submitted");
+                DialogUtil.showWarningMessage("Already Submitted", "You have already submitted feedback for this appointment");
                 return;
             }
 
-            // UPDATE
-            existing.setStaffRating(staff);
-            existing.setTechnicianRating(tech);
+            // UPDATE feedback w customer's ratings and comment
+            existing.setStaffRating(staffRating);
+            existing.setTechnicianRating(techRating);
             existing.setComment(comment == null ? "" : comment.trim());
 
-            feedbackRepo.update(existing);
+            feedbackService.updateFeedback(existing);
 
-            DialogUtil.showInfoMessage("Success", "Feedback submitted");
+            DialogUtil.showInfoMessage("Success", "Feedback submitted successfully!");
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             DialogUtil.showErrorMessage("Error", "Failed to submit feedback");
         }
     }
@@ -356,8 +351,9 @@ public class CustomerController {
     // PROFILE
     public User getCustomerUser() {
         try {
-            return userRepo.getOne(customerId);
+            return userService.getUserById(customerId);
         } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             return null;
         }
     }
@@ -365,7 +361,7 @@ public class CustomerController {
     // HELPER
     private Services getServiceById(String id) {
         try {
-            return servicesRepo.getOne(id);
+            return servicesService.getServicesById(id);
         } catch (Exception e) {
             return null;
         }
