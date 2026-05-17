@@ -1,14 +1,15 @@
 package utils.validators;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
 public class Validator {
 
     public static void required(ValidationResult result, String fieldName,String value){
         if(value == null || value.trim().isEmpty()){
             String errorMessage = fieldName + " is required.";
+            result.addError(errorMessage);
+            return;
+        }
+        if(value.contains("|")){
+            String errorMessage = fieldName + " cannot contain the pipe character ('|').";
             result.addError(errorMessage);
         }
     }
@@ -22,12 +23,22 @@ public class Validator {
         if(value.length() < 8){
             String errorMessage = fieldName + " must have at least 8 character";
             result.addError(errorMessage);
+            return;
+        }
+        if(value.contains("|")){
+            String errorMessage = fieldName + " cannot contain the pipe character ('|').";
+            result.addError(errorMessage);
         }
     }
 
     public static void validateEmail(ValidationResult result , String value){
         if(value == null || value.trim().isEmpty()){
             String errorMessage = "Email" + " is required.";
+            result.addError(errorMessage);
+            return;
+        }
+        if(value.contains("|")){
+            String errorMessage ="Email cannot contain the pipe character ('|').";
             result.addError(errorMessage);
             return;
         }
@@ -51,13 +62,6 @@ public class Validator {
         }
         if(value.trim().length() != 10){
             result.addError("Phone number length must be 10");
-        }
-    }
-
-    public static <T> void validateRequiredList(ValidationResult result , String fieldName, List<T> values){
-        if(values.isEmpty()){
-            String errorMessage = fieldName + " is required";
-            result.addError(errorMessage);
         }
     }
 
