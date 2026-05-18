@@ -218,7 +218,7 @@ public class CustomerMenu extends JFrame {
         topPanel.add(serviceSearchField);
 
         topPanel.add(new JLabel("Status:"));
-        serviceStatusFilterComboBox = new JComboBox<>(new String[]{"Assigned", "Completed", "All"});
+        serviceStatusFilterComboBox = new JComboBox<>(new String[]{"Assigned", "Completed", "Cancelled", "All"});
         serviceStatusFilterComboBox.setPreferredSize(new Dimension(140, 35));
         serviceStatusFilterComboBox.setSelectedItem("Assigned");
         topPanel.add(serviceStatusFilterComboBox);
