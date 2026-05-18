@@ -40,7 +40,7 @@ public class AddAppointmentFormController {
         if(!addAppointmentForm.isEdit()){
             hideCarPlateField();
         }
-        initializeFields();
+        initFields();
         addAppointmentForm.customerSelectionCombo.addActionListener(e-> updateCarPlateField());
         addAppointmentForm.technicianSelectionCombo.addPopupMenuListener(new PopupMenuListener() {
             @Override
@@ -67,7 +67,7 @@ public class AddAppointmentFormController {
         });
     }
 
-    private void initializeFields() {
+    private void initFields() {
         if(addAppointmentForm.isEdit() && addAppointmentForm.getAppointmentToEdit() !=null){
             Appointment appointmentToEdit = addAppointmentForm.getAppointmentToEdit();
             String customerId = appointmentToEdit.getCustomerId();
@@ -134,10 +134,14 @@ public class AddAppointmentFormController {
     }
 
     private Appointment fieldToAppointment() throws ValidationException {
-        VisibleIdCustomComboBoxItem customerSelected = (VisibleIdCustomComboBoxItem) addAppointmentForm.customerSelectionCombo.getSelectedItem();
-        HiddenIdCustomComboBoxItem serviceSelected = (HiddenIdCustomComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
-        VisibleIdCustomComboBoxItem technicianSelected = (VisibleIdCustomComboBoxItem)addAppointmentForm.technicianSelectionCombo.getSelectedItem();
-        VisibleIdCustomComboBoxItem carSelected = (VisibleIdCustomComboBoxItem) addAppointmentForm.carPlateSelectionCombo.getSelectedItem();
+        VisibleIdCustomComboBoxItem customerSelected =
+                (VisibleIdCustomComboBoxItem) addAppointmentForm.customerSelectionCombo.getSelectedItem();
+        HiddenIdCustomComboBoxItem serviceSelected =
+                (HiddenIdCustomComboBoxItem) addAppointmentForm.serviceTypeCombo.getSelectedItem();
+        VisibleIdCustomComboBoxItem technicianSelected =
+                (VisibleIdCustomComboBoxItem)addAppointmentForm.technicianSelectionCombo.getSelectedItem();
+        VisibleIdCustomComboBoxItem carSelected =
+                (VisibleIdCustomComboBoxItem) addAppointmentForm.carPlateSelectionCombo.getSelectedItem();
         String description = addAppointmentForm.descriptionArea.getText();
         String appointmentDateString = addAppointmentForm.dateField.getText();
         String appointmentTimeString = addAppointmentForm.timeField.getText();
@@ -271,7 +275,7 @@ public class AddAppointmentFormController {
                 DialogUtil.showErrorMessage("Failed to get available technician" , e.getMessage());
             }
             catch (DateTimeParseException e){
-                DialogUtil.showErrorMessage("Failed to get available technician" , "Please fill in appointment date and time");
+                DialogUtil.showErrorMessage("Failed to get available technician" , "Please fill in valid appointment date and time");
                 logger.log(Level.SEVERE , e.getMessage());
             } catch (FileCorruptedException e) {
                 DialogUtil.showErrorMessage("Failed to get available technician" , "Encountered error when getting available technicians");

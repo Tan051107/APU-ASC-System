@@ -1,4 +1,4 @@
-package ui.pages.CounterStaffPanels.forms;
+package ui.pages.CounterStaffPanels.receipt;
 
 import exceptions.GetEntityListException;
 import models.*;

@@ -37,7 +37,7 @@ public class CustomerManagementController {
     private void initListeners() {
         manageCustomerPanel.addCustomerBtn.addActionListener(e -> openAddCustomerForm(false, null));
         manageCustomerPanel.searchField.addActionListener(e->searchCustomers());
-        manageCustomerPanel.exportBtn.addActionListener(e -> exportCustomerData());
+        manageCustomerPanel.exportBtn.addActionListener(e -> exportCustomer());
         resetAllCustomers();
     }
 
@@ -131,7 +131,7 @@ public class CustomerManagementController {
         }
     }
 
-    private void exportCustomerData(){
+    private void exportCustomer(){
         List<Customer> customers = manageCustomerPanel.getCustomers();
         CustomerCsvExporter customerCsvExporter = new CustomerCsvExporter();
         CSVExporter<Customer> csvExporter = new CSVExporter<>();

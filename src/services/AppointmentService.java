@@ -53,7 +53,8 @@ public class AppointmentService {
             // Generate a unique ID and assign it before saving
             String appointmentId = generateId();
             appointmentToAdd.setId(appointmentId);
-            LocalDateTime chosenAppointmentDateTime = LocalDateTime.of(appointmentToAdd.getDate(),appointmentToAdd.getTime());
+            LocalDateTime chosenAppointmentDateTime =
+                    LocalDateTime.of(appointmentToAdd.getDate(),appointmentToAdd.getTime());
             if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
                 throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
             }
@@ -74,8 +75,12 @@ public class AppointmentService {
             LocalDateTime appointmentDateTime = LocalDateTime.of(appointmentToAdd.getDate(),appointmentToAdd.getTime());
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
             String appointmentDateTimeString = appointmentDateTime.format(dateTimeFormatter);
-            createNotification(appointmentToAdd.getCustomerId() , "Appointment Created" , "An appointment is created and is scheduled on "+appointmentDateTimeString);
-            createNotification(appointmentToAdd.getTechnicianId() , "Appointment Created" , "An appointment is created and is scheduled on "+appointmentDateTimeString);
+            createNotification(appointmentToAdd.getCustomerId() ,
+                    "Appointment Created" ,
+                    "An appointment is created and is scheduled on "+appointmentDateTimeString);
+            createNotification(appointmentToAdd.getTechnicianId() ,
+                    "Appointment Created" ,
+                    "An appointment is created and is scheduled on "+appointmentDateTimeString);
 
         } catch (Exception e) {
             throw new Exception("Failed to create appointment: " + e.getMessage());
@@ -86,10 +91,12 @@ public class AppointmentService {
         LocalDateTime chosenAppointmentDateTime = LocalDateTime.of(appointmentToUpdate.getDate(),appointmentToUpdate.getTime());
         String appointmentToUpdateId = appointmentToUpdate.getId();
         Appointment originalAppt = appointmentRepository.getOne(appointmentToUpdateId);
-        boolean isTimeChanged = !originalAppt.getDate().equals(appointmentToUpdate.getDate()) || 
+        boolean isTimeChanged = !originalAppt.getDate().equals(appointmentToUpdate.getDate()) ||
                                 !originalAppt.getTime().equals(appointmentToUpdate.getTime());
-        if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
-            throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
+        if(isTimeChanged) {
+            if(isNotValidAppointmentDateTime(chosenAppointmentDateTime)){
+                throw new BusinessRuleException("Appointment date chosen must be within 14 days from now");
+            }
         }
         if(carHasClashAppointment(appointmentToUpdate, appointmentToUpdateId)){
             throw new BusinessRuleException("Car already has an appointment during the date and time chosen");
@@ -122,15 +129,22 @@ public class AppointmentService {
         return appointmentRepository.getAll(appointment -> appointment.getTechnicianId().equalsIgnoreCase(technicianId));
     }
 
-    public List<Appointment> searchAppointment(String keyword , AppointmentStatus appointmentStatus , String serviceTypeSelectionFilter) throws FileCorruptedException {
+    public List<Appointment> searchAppointment(String keyword , AppointmentStatus appointmentStatus ,
+                                               String serviceTypeSelectionFilter , LocalDate appointmentDateFilter)
+            throws FileCorruptedException {
         Predicate<Appointment> appointmentPredicate = appointment -> true;
         if(!keyword.isEmpty()){
             String keywordLowerCase = keyword.toLowerCase();
             CustomerService customerService = new CustomerService();
-            List<String> customerIdsFound = customerService.getCustomers(customer -> customer.getName().toLowerCase().contains(keywordLowerCase)).stream().map(Customer::getId).toList();
-            List<String> carIdsFound = customerCarService.getCars(customerCar->customerCar.getCarPlate().toLowerCase().contains(keywordLowerCase)).stream().map(CustomerCar::getId).toList();
+            List<String> customerIdsFound = customerService.getCustomers(
+                    customer -> customer.getName().toLowerCase().contains(keywordLowerCase)).
+                    stream().map(Customer::getId).toList();
+            List<String> carIdsFound = customerCarService.getCars(customerCar->
+                    customerCar.getCarPlate().toLowerCase().
+                    contains(keywordLowerCase)).stream().map(CustomerCar::getId).toList();
             List<String> technicianIdsFound = userService.getTechnicians(user -> user.getName().toLowerCase().contains(keywordLowerCase)).stream().map(User::getId).toList();
-            Predicate<Appointment> keywordPredicate = appointment -> appointment.getId().toLowerCase().contains(keywordLowerCase);
+            Predicate<Appointment> keywordPredicate = appointment -> appointment.getId().toLowerCase().
+                    contains(keywordLowerCase);
             if(!customerIdsFound.isEmpty()){
                 keywordPredicate = keywordPredicate.or(appointment -> customerIdsFound.contains(appointment.getCustomerId()));
             }
@@ -146,7 +160,12 @@ public class AppointmentService {
             appointmentPredicate = appointmentPredicate.and(appointment -> appointment.getStatusService().equals(appointmentStatus));
         }
         if(!serviceTypeSelectionFilter.isEmpty()){
-            appointmentPredicate = appointmentPredicate.and(appointment -> appointment.getServiceId().equalsIgnoreCase(serviceTypeSelectionFilter));
+            appointmentPredicate = appointmentPredicate.and
+                    (appointment -> appointment.getServiceId().equalsIgnoreCase(serviceTypeSelectionFilter));
+        }
+        if(appointmentDateFilter != null){
+            appointmentPredicate = appointmentPredicate.and
+                    (appointment -> appointment.getDate().equals(appointmentDateFilter));
         }
         return getAppointments(appointmentPredicate);
     }

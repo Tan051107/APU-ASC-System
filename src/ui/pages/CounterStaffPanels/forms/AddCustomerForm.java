@@ -15,23 +15,16 @@ public class AddCustomerForm extends JDialog {
     public JLabel confirmPasswordLabel;
     public JTextField confirmPasswordField;
     public JButton addCustomerButton;
-    private boolean isEdit;
-    private Customer customerToEdit;
+    private final boolean isEdit;
+    private final Customer customerToEdit;
 
     public Customer getCustomerToEdit() {
         return customerToEdit;
     }
 
-    public void setCustomerToEdit(Customer customerToEdit) {
-        this.customerToEdit = customerToEdit;
-    }
 
     public boolean isEdit() {
         return isEdit;
-    }
-
-    public void setEdit(boolean edit) {
-        isEdit = edit;
     }
 
 

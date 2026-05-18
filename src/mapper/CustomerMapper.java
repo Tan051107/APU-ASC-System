@@ -28,6 +28,7 @@ public class CustomerMapper implements Mapper<Customer> {
 
     @Override
     public String toString(Customer customer){
-        return String.join("|" , customer.getId(),customer.getName(),customer.getEmail(), customer.getPassword(),customer.getContactNumber(),customer.getUserType().getDisplayUserType() , customer.getCreatedAt().toString(),customer.getUpdatedAt().toString());
+        return String.join("|" ,
+                customer.getId(),customer.getName(),customer.getEmail(), customer.getPassword(),customer.getContactNumber(),customer.getUserType().getDisplayUserType() , customer.getCreatedAt().toString(),customer.getUpdatedAt().toString());
     }
 }

@@ -33,7 +33,7 @@ public class CounterStaffMenu extends JFrame {
     public CounterStaffMenu(User loginStaff) {
         this.loginStaff = loginStaff;
         setTitle("APU-ASC Counter Staff Dashboard");
-        setSize(900, 600);
+        setSize(1100, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the window
         setLayout(new BorderLayout());

@@ -10,3 +10,6 @@ public interface Mapper<T extends BaseModel>{
 
     String toString(T object);
 }
+
+
+

@@ -2,7 +2,6 @@ package services;
 
 import java.util.List;
 
-import exceptions.DeleteException;
 import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import exceptions.NotFoundException;
@@ -65,10 +64,6 @@ public class FeedbackService {
 
     public void updateFeedback(Feedback feedbackToUpdate) throws FileCorruptedException, NotFoundException, UpdateException {
         feedbackRepository.update(feedbackToUpdate);
-    }
-
-    public void deleteFeedback(String feedbackId) throws DeleteException {
-        feedbackRepository.delete(feedbackId);
     }
 
     private String generateId(){

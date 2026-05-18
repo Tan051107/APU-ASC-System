@@ -8,11 +8,10 @@ import services.*;
 import ui.controller.CounterStaffControllers.FormController.MakePaymentFormController;
 import ui.pages.CounterStaffPanels.ManagePaymentPanel;
 import ui.pages.CounterStaffPanels.forms.MakePaymentForm;
-import ui.pages.CounterStaffPanels.forms.ServiceReceipt;
+import ui.pages.CounterStaffPanels.receipt.ServiceReceipt;
 import utils.CSVExporter;
 import utils.DialogUtil;
 import utils.exporters.CsvExporters.PaymentRecordCsvExporter;
-import utils.exporters.interfaces.CsvExporter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,10 +48,12 @@ public class PaymentRecordManagementController {
         List<PaymentRecord> paymentRecords = managePaymentPanel.getPaymentRecords();
         for(PaymentRecord paymentRecord : paymentRecords){
             try {
-                boolean showActionButton = paymentRecord.getAppointment().getStatusService().equals(AppointmentStatus.COMPLETED);
+                boolean showActionButton =
+                        paymentRecord.getAppointment().getStatusService().equals(AppointmentStatus.COMPLETED);
                 managePaymentPanel.addPaymentRecordRow(paymentRecord,this::onCollect,this::onViewReceipt , showActionButton);
             } catch (GetEntityListException e) {
-                DialogUtil.showErrorMessage("Failed to load appointments" , "Encountered errors when getting payment records");
+                DialogUtil.showErrorMessage("Failed to load appointments" ,
+                        "Encountered errors when getting payment records");
                 logger.log(Level.SEVERE,e.getMessage());
             }
         }
@@ -60,7 +61,8 @@ public class PaymentRecordManagementController {
 
     private void onCollect(PaymentRecord paymentRecord){
         Window parent = SwingUtilities.getWindowAncestor(managePaymentPanel);
-        MakePaymentForm makePaymentForm = new MakePaymentForm((Frame) parent, paymentRecord,managePaymentPanel.getLoginStaff());
+        MakePaymentForm makePaymentForm = new MakePaymentForm((Frame) parent,
+                paymentRecord,managePaymentPanel.getLoginStaff());
         new MakePaymentFormController(makePaymentForm , paymentRecord);
         makePaymentForm.addWindowListener(new WindowAdapter() {
             @Override
@@ -88,16 +90,22 @@ public class PaymentRecordManagementController {
 
     private void searchPaymentRecord(){
         String keyword = managePaymentPanel.searchField.getText();
-        String paymentMethodFilterSelection = Objects.requireNonNull(managePaymentPanel.paymentMethodFilterCombo.getSelectedItem()).toString();
-        String paymentStatusFilterSelection = Objects.requireNonNull(managePaymentPanel.statusFilterCombo.getSelectedItem()).toString();
-        if(paymentStatusFilterSelection.equalsIgnoreCase("all") && paymentMethodFilterSelection.equalsIgnoreCase("all") && keyword.isEmpty()){
+        String paymentMethodFilterSelection =
+                Objects.requireNonNull(managePaymentPanel.paymentMethodFilterCombo.getSelectedItem()).toString();
+        String paymentStatusFilterSelection =
+                Objects.requireNonNull(managePaymentPanel.statusFilterCombo.getSelectedItem()).toString();
+        if(paymentStatusFilterSelection.equalsIgnoreCase("all")
+                && paymentMethodFilterSelection.equalsIgnoreCase("all") && keyword.isEmpty()){
             resetAllPaymentRecords();
         }
         else{
-            String paymentMethodSelected = paymentMethodFilterSelection.equalsIgnoreCase("all") ? "" : paymentMethodFilterSelection;
-            String paymentStatusSelected = paymentStatusFilterSelection.equalsIgnoreCase("all") ? "" :paymentStatusFilterSelection;
+            String paymentMethodSelected = paymentMethodFilterSelection.equalsIgnoreCase("all")
+                    ? "" : paymentMethodFilterSelection;
+            String paymentStatusSelected = paymentStatusFilterSelection.equalsIgnoreCase("all")
+                    ? "" :paymentStatusFilterSelection;
             try {
-                List<PaymentRecord> paymentRecordsFound = paymentRecordService.searchPaymentRecord(keyword,paymentStatusSelected,paymentMethodSelected);
+                List<PaymentRecord> paymentRecordsFound =
+                        paymentRecordService.searchPaymentRecord(keyword,paymentStatusSelected,paymentMethodSelected);
                 System.out.println(paymentRecordsFound.toString());
                 managePaymentPanel.setPaymentRecords(paymentRecordsFound);
                 loadPaymentRecords();

@@ -11,12 +11,17 @@ import utils.DialogUtil;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ManageAppointmentPanel extends JPanel {
+    private static final String DATE_FILTER_PLACEHOLDER = "yyyy-mm-dd";
     private final Logger logger = Logger.getLogger(ManageAppointmentPanel.class.getName());
     private final JPanel rowsContainer;
     public JButton newAppointmentBtn;
@@ -24,6 +29,8 @@ public class ManageAppointmentPanel extends JPanel {
     public JTextField searchField;
     public JComboBox<HiddenIdCustomComboBoxItem> serviceTypeFilterCombo;
     public JComboBox<String> statusFilterCombo;
+    public JSpinner dateFilterSpinner;
+    public JButton clearDateFilterBtn;
     private List<Appointment> appointments;
     private final User loginStaff;
 
@@ -66,15 +73,19 @@ public class ManageAppointmentPanel extends JPanel {
         // Row 2: Spacing and Search Field
         headerContainer.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
+        JPanel searchPanel = new JPanel();
+        searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
         searchPanel.setOpaque(false);
+
+        JPanel primaryFilterRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
+        primaryFilterRow.setOpaque(false);
         JLabel searchLabel = UIUtils.createLabel("Search:");
-        searchPanel.add(searchLabel);
+        primaryFilterRow.add(searchLabel);
         searchField = UIUtils.createTextField();
         searchField.setPreferredSize(new Dimension(300, 45));
         searchField.setMaximumSize(new Dimension(300, 45));
         searchField.setToolTipText("Search by ID, Technician, Customer, or Vehicle");
-        searchPanel.add(searchField);
+        primaryFilterRow.add(searchField);
 
         // --- Service Type Filter ---
         JPanel serviceTypeFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -86,7 +97,7 @@ public class ManageAppointmentPanel extends JPanel {
         serviceTypeFilterCombo = UIUtils.createJComboBox(serviceOptions);
         serviceTypeFilterCombo.setPreferredSize(new Dimension(180, 45));
         serviceTypeFilterPanel.add(serviceTypeFilterCombo);
-        searchPanel.add(serviceTypeFilterPanel);
+        primaryFilterRow.add(serviceTypeFilterPanel);
 
         // --- Status Filter ---
         JPanel statusFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -97,7 +108,52 @@ public class ManageAppointmentPanel extends JPanel {
         statusFilterCombo = UIUtils.createJComboBox(statusOptions);
         statusFilterCombo.setPreferredSize(new Dimension(150, 45));
         statusFilterPanel.add(statusFilterCombo);
-        searchPanel.add(statusFilterPanel);
+        primaryFilterRow.add(statusFilterPanel);
+
+        // --- Appointment Date Filter ---
+        JPanel dateFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        dateFilterPanel.setOpaque(false);
+        JLabel dateLabel = UIUtils.createLabel("Date:");
+        dateFilterPanel.add(dateLabel);
+        SpinnerDateModel dateModel = new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_MONTH);
+        dateFilterSpinner = new JSpinner(dateModel);
+        dateFilterSpinner.setEditor(new JSpinner.DateEditor(dateFilterSpinner, "yyyy-MM-dd"));
+        dateFilterSpinner.setPreferredSize(new Dimension(150, 45));
+        dateFilterSpinner.setToolTipText("Filter by appointment date (YYYY-MM-DD). You can type or use arrows.");
+        JComponent spinnerEditor = dateFilterSpinner.getEditor();
+        spinnerEditor.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                BorderFactory.createEmptyBorder(2, 2, 2, 2)
+        ));
+        JFormattedTextField dateEditorField = ((JSpinner.DateEditor) dateFilterSpinner.getEditor()).getTextField();
+        dateEditorField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (DATE_FILTER_PLACEHOLDER.equals(dateEditorField.getText())) {
+                    dateEditorField.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (dateEditorField.getText() == null || dateEditorField.getText().trim().isEmpty()) {
+                    setDateFilterPlaceholder();
+                }
+            }
+        });
+        dateFilterPanel.add(dateFilterSpinner);
+
+        clearDateFilterBtn = UIUtils.createSecondaryButton("Clear");
+        clearDateFilterBtn.setPreferredSize(new Dimension(90, 40));
+        clearDateFilterBtn.setToolTipText("Clear date filter");
+//        clearDateFilterBtn.addActionListener(e -> setDateFilterPlaceholder());
+        dateFilterPanel.add(clearDateFilterBtn);
+
+        searchPanel.add(primaryFilterRow);
+        searchPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        searchPanel.add(dateFilterPanel);
+
+        setDateFilterPlaceholder();
 
         headerContainer.add(searchPanel);
 
@@ -295,5 +351,11 @@ public class ManageAppointmentPanel extends JPanel {
 
     public User getLoginStaff() {
         return loginStaff;
+    }
+
+    private void setDateFilterPlaceholder() {
+        JFormattedTextField editorField = ((JSpinner.DateEditor) dateFilterSpinner.getEditor()).getTextField();
+        editorField.setValue(null);
+        editorField.setText(DATE_FILTER_PLACEHOLDER);
     }
 }

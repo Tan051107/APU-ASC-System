@@ -23,14 +23,14 @@ public class AddVehicleFormController {
 
     public AddVehicleFormController(AddVehicleForm addVehicleForm){
         this.addVehicleForm = addVehicleForm;
-        setUpListener();
+        initListeners();
     }
 
-    public void setUpListener(){
-        setUpForm();
+    private void initListeners(){
+        initFields();
         addVehicleForm.addVehicleButton.addActionListener(e -> {
             if(addVehicleForm.isEdit()){
-                editVehicle();
+                updateVehicle();
             }
             else{
                 addVehicle();
@@ -38,7 +38,7 @@ public class AddVehicleFormController {
         });
     }
 
-    public void setUpForm(){
+    private void initFields(){
         if(addVehicleForm.isEdit() && addVehicleForm.getCustomerCar()!=null){
             CustomerCar customerCar = addVehicleForm.getCustomerCar();
             addVehicleForm.plateField.setText(customerCar.getCarPlate());
@@ -50,7 +50,7 @@ public class AddVehicleFormController {
         }
     }
 
-    private CustomerCar inputToCustomerCar() throws ValidationException {
+    private CustomerCar fieldToCustomerCar() throws ValidationException {
         Customer vehicleOwner = addVehicleForm.getCustomer();
         String carPlate = addVehicleForm.plateField.getText();
         String brand = addVehicleForm.brandField.getText();
@@ -78,10 +78,10 @@ public class AddVehicleFormController {
         return customerCar;
     }
 
-    public void addVehicle(){
+    private void addVehicle(){
         try {
             System.out.println("calling to add vehicle");
-            CustomerCar vehicleToBeAdded = inputToCustomerCar();
+            CustomerCar vehicleToBeAdded = fieldToCustomerCar();
             customerCarService.addCar(vehicleToBeAdded);
             DialogUtil.showInfoMessage("Added Successfully" , String.format("Successfully added %s." , vehicleToBeAdded.getCarPlate()));
             addVehicleForm.dispose();
@@ -92,9 +92,9 @@ public class AddVehicleFormController {
         }
     }
 
-    public void editVehicle(){
+    private void updateVehicle(){
         try {
-            CustomerCar vehicleToBeUpdated = inputToCustomerCar();
+            CustomerCar vehicleToBeUpdated = fieldToCustomerCar();
             vehicleToBeUpdated.setId(addVehicleForm.getCustomerCar().getId());
             vehicleToBeUpdated.setCreatedAt(addVehicleForm.getCustomerCar().getCreatedAt());
             customerCarService.updateCar(vehicleToBeUpdated);

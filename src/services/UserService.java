@@ -80,7 +80,10 @@ public class UserService {
     }
 
     public void updateUser(User userToUpdate) throws FileCorruptedException, NotFoundException,BusinessRuleException {
-        boolean userHasExisted = !userRepository.getAll(user -> user.getEmail().equalsIgnoreCase(userToUpdate.getEmail()) && !user.getId().equalsIgnoreCase(userToUpdate.getId())).isEmpty();
+        boolean userHasExisted = !userRepository.getAll(user ->
+                user.getEmail().equalsIgnoreCase(userToUpdate.getEmail())
+                        && !user.getId().equalsIgnoreCase(userToUpdate.getId())
+        ).isEmpty();
         if(userHasExisted){
             throw new BusinessRuleException("Email is taken. Please select another email");
         }
