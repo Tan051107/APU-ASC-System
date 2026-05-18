@@ -6,9 +6,7 @@ import models.User;
 import ui.controller.NotificationPanelController;
 import ui.controller.Manager.ManagerMenuController;
 import ui.controller.Manager.UserManagementController;
-import ui.pages.Manager.RatingReports;
 import ui.utils.UIUtils;
-import utils.DialogUtil;
 
 import java.awt.*;
 
@@ -230,7 +228,7 @@ public class ManagerMenu extends JFrame {
         return panel;
     }
 
-    private JPanel createSetPricesPanel() {
+    private JPanel createSetPricesPanel() { 
         JPanel panel = new JPanel(new BorderLayout());
         JLabel title = displayMenuTitle("Automotive Service Pricing Management");
         panel.add(title, BorderLayout.NORTH);
@@ -353,7 +351,7 @@ public class ManagerMenu extends JFrame {
         
         gridPanel.add(createReportCard("Current Month Appointments", currentMonthAppointment, e -> {
             ui.pages.Manager.AppointmentReports viewPanel = new ui.pages.Manager.AppointmentReports(this);
-            new ui.controller.AppointmentReportsController(viewPanel);
+            new ui.controller.Manager.AppointmentReportsController(viewPanel);
             viewPanel.setVisible(true);
         }));
 

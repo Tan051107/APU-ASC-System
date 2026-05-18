@@ -35,14 +35,14 @@ public class ServicesService {
         }
     }
 
-    public Services getServicesByName(String name) throws GetEntityListException {
+    /* public Services getServicesByName(String name) throws GetEntityListException {
         try{
             return servicesRepository.getAll(services -> services.getName().equalsIgnoreCase(name)).getFirst();
         }
         catch (FileCorruptedException e){
             throw new GetEntityListException(e.getMessage());
         }
-    }
+    } */
 
     public void updateService(Services serviceToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, UpdateException, IOException {
 
@@ -50,9 +50,9 @@ public class ServicesService {
         createNotification("Service Information Updated" , "Service price is updated to RM " +serviceToUpdate.getPrice());
     }
 
-    public Services findOne(String serviceId) throws FileCorruptedException {
+/*     public Services findOne(String serviceId) throws FileCorruptedException {
         return servicesRepository.getOne(serviceId);
-    }
+    } */
 
     private void createNotification(String title , String message) throws IOException {
         NotificationService notificationService = new NotificationService();

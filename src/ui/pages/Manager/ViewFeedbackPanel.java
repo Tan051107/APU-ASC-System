@@ -7,20 +7,18 @@ import java.awt.*;
 
 public class ViewFeedbackPanel extends JDialog {
     
-    public JTextField feedbackId = new JTextField("-");
-    public JTextField appointmentId = new JTextField("-");
-    public JTextField technicianId = new JTextField("-");
-    public JTextField technicianName = new JTextField("-");
-    public JTextField technicianFeedback = new JTextField("-");;
-    //public JTextArea technicianFeedback = new JTextArea(3, 10);
-    public JTextField staffId = new JTextField("-");
-    public JTextField staffName = new JTextField("-");
-    public JTextField customerId = new JTextField("-");
-    public JTextField customerName = new JTextField("-");
-    public JTextField comment = new JTextField("-");
-    //public JTextArea comment = new JTextArea(3, 10);
-    public JTextField technicianRating = new JTextField("-");
-    public JTextField staffRating = new JTextField("-");
+    public JTextField feedbackId;
+    public JTextField appointmentId;
+    public JTextField technicianId;
+    public JTextField technicianName;
+    public JTextField technicianFeedback;
+    public JTextField staffId;
+    public JTextField staffName;
+    public JTextField customerId;
+    public JTextField customerName;
+    public JTextField comment;
+    public JTextField technicianRating;
+    public JTextField staffRating;
     public JButton closeButton;
 
     public ViewFeedbackPanel(JFrame parent) {
@@ -30,19 +28,6 @@ public class ViewFeedbackPanel extends JDialog {
         setSize(450, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        technicianFeedback.setEditable(false);
-        comment.setEditable(false);
-        feedbackId.setEditable(false);
-        appointmentId.setEditable(false);
-        technicianId.setEditable(false);
-        technicianName.setEditable(false);
-        staffId.setEditable(false);
-        staffName.setEditable(false);
-        customerId.setEditable(false);
-        customerName.setEditable(false);
-        technicianRating.setEditable(false);
-        staffRating.setEditable(false);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -120,6 +105,19 @@ public class ViewFeedbackPanel extends JDialog {
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        technicianFeedback.setEditable(false);
+        comment.setEditable(false);
+        feedbackId.setEditable(false);
+        appointmentId.setEditable(false);
+        technicianId.setEditable(false);
+        technicianName.setEditable(false);
+        staffId.setEditable(false);
+        staffName.setEditable(false);
+        customerId.setEditable(false);
+        customerName.setEditable(false);
+        technicianRating.setEditable(false);
+        staffRating.setEditable(false);
 
         add(scrollPane);
     }

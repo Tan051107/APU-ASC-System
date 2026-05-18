@@ -2,7 +2,6 @@ package ui.controller.Manager;
 import services.UserService;
 import ui.pages.Login;
 import ui.pages.ManagerMenu;
-import ui.pages.Manager.AppointmentReports;
 import ui.pages.Manager.ViewFeedbackPanel;
 import utils.DialogUtil;
 import services.ServicesService;

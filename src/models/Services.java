@@ -32,7 +32,6 @@ public class Services extends BaseModel{
         this.duration = duration;
     }
 
-    // Getter and Setter
 
     public String getName(){
         return name;
@@ -56,22 +55,6 @@ public class Services extends BaseModel{
     public void setDetails(String details){
         this.details = details;
     }
-
-    /*public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public LocalTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalTime time) {
-        this.time = time;
-    }*/
 
     public int getDuration() {
         return duration;
