@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 public class UserManagementController {
     private final ManagerMenu managerMenu;
     private final UserService userService = new UserService();
-    //Logger logger = Logger.getLogger(UserManagementController.class.getName());
 
     public UserManagementController(ManagerMenu managerMenu) {
         this.managerMenu = managerMenu;
@@ -76,7 +75,6 @@ public class UserManagementController {
                 
             } catch (Exception ex) {
                 DialogUtil.showErrorMessage("Error", "Error loading user data: " + ex.getMessage());
-                // logger.log(Level.SEVERE, ex.getMessage());
             }
         });
     }
@@ -105,7 +103,6 @@ public class UserManagementController {
                 DialogUtil.showErrorMessage("Failed to Delete Customer" , e.getMessage());
             } catch (Exception e){
                 DialogUtil.showErrorMessage("Failed to Delete Customer" , e.getMessage());
-                // logger.log(Level.SEVERE, ex.getMessage());
             }
         }
     }

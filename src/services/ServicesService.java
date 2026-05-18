@@ -5,10 +5,8 @@ import exceptions.FileCorruptedException;
 import exceptions.GetEntityListException;
 import exceptions.NotFoundException;
 import exceptions.UpdateException;
-import mapper.PaymentRecordMapper;
 import mapper.ServicesMapper;
 import models.Notification;
-import models.PaymentRecord;
 import models.Services;
 import repositories.CrudRepository;
 
@@ -19,7 +17,6 @@ public class ServicesService {
     private final String SERVICES_FILE = "txt_files/Services.txt";
     private final ServicesMapper servicesMapper = new ServicesMapper();
     private final CrudRepository<Services> servicesRepository = new CrudRepository<>(SERVICES_FILE , servicesMapper);
-    //private final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public List<Services> getServices() throws GetEntityListException {
         try{
@@ -37,24 +34,11 @@ public class ServicesService {
         }
     }
 
-    /* public Services getServicesByName(String name) throws GetEntityListException {
-        try{
-            return servicesRepository.getAll(services -> services.getName().equalsIgnoreCase(name)).getFirst();
-        }
-        catch (FileCorruptedException e){
-            throw new GetEntityListException(e.getMessage());
-        }
-    } */
-
     public void updateService(Services serviceToUpdate) throws FileCorruptedException, NotFoundException, GetEntityListException, UpdateException, IOException {
 
         servicesRepository.update(serviceToUpdate);
         createNotification("Service Information Updated" , "Service price is updated to RM " +serviceToUpdate.getPrice());
     }
-
-/*     public Services findOne(String serviceId) throws FileCorruptedException {
-        return servicesRepository.getOne(serviceId);
-    } */
 
     private void createNotification(String title , String message) throws IOException {
         NotificationService notificationService = new NotificationService();

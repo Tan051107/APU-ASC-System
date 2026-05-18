@@ -133,18 +133,14 @@ public class ManagerMenuController {
 
     public Object[] loadServiceDetails(String serviceId) {
         try {
-            // 1. Ask your service class to find the exact service directly!
-            // No need to loop through the whole list.
             Services service = servicesService.getServicesById(serviceId);
             
-            // 2. Check if the service was actually found
             if (service != null) {
                 String formattedPrice = String.format("%.2f", service.getPrice());
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                 String lastEdited = (service.getUpdatedAt() != null) 
                                     ? service.getUpdatedAt().format(formatter) 
                                     : "Never";
-                // 3. Return a single array containing the data
                 return new Object[] {
                     service.getId(),
                     service.getName(),
@@ -162,29 +158,22 @@ public class ManagerMenuController {
                 JOptionPane.ERROR_MESSAGE
             );
         }
-        
-        // 4. Return null if the service wasn't found or an error occurred
         return null; 
     }
 
     public boolean updateServicePrice(String serviceId, double newPrice) {
         try {
-            // 1. Fetch the complete, existing service from the text file
             Services serviceToUpdate = servicesService.getServicesById(serviceId);
 
             if (serviceToUpdate == null) {
                 JOptionPane.showMessageDialog(null, "Could not find the selected service in the database.", "Not Found", JOptionPane.WARNING_MESSAGE);
                 return false; // Update failed
             }
-
-            // 2. Update ONLY the price (the rest of the data stays exactly the same)
             serviceToUpdate.setPrice(newPrice);
             serviceToUpdate.setUpdatedAt(LocalDateTime.now());
-
-            // 3. Send the modified object back to be saved
             servicesService.updateService(serviceToUpdate);
 
-            return true; // Update successful!
+            return true;
 
         } catch (GetEntityListException | FileCorruptedException | NotFoundException | UpdateException | IOException e) {
             // Catch all the exceptions your backend throws and display them to the manager
@@ -194,7 +183,7 @@ public class ManagerMenuController {
                 "Update Error", 
                 JOptionPane.ERROR_MESSAGE
             );
-            return false; // Update failed
+            return false; 
         }
     }
 

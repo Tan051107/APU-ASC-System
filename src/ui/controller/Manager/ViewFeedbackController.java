@@ -12,8 +12,6 @@ import utils.DialogUtil;
 public class ViewFeedbackController {
     private final ViewFeedbackPanel panel;
     private final String targetFeedbackId;
-    
-    // Initialize your services
     private final FeedbackService feedbackService = new FeedbackService();
     private final AppointmentService appointmentService = new AppointmentService();
     private final UserService userService = new UserService();
@@ -32,20 +30,16 @@ public class ViewFeedbackController {
 
     private void loadData() {
         try {
-            // 1. Fetch the Feedback
             Feedback feedback = feedbackService.getFeedbackById(targetFeedbackId);
             if (feedback == null) throw new Exception("Feedback not found.");
 
-            // 2. Fetch the linked Appointment
             Appointment appointment = appointmentService.getAppointmentById(feedback.getAppointmentId());
             if (appointment == null) throw new Exception("Linked appointment not found.");
 
-            // 3. Fetch the Users based on IDs stored in the appointment
             User customer = userService.getUserById(appointment.getCustomerId());
             User technician = userService.getUserById(appointment.getTechnicianId());
             User staff = userService.getUserById(appointment.getStaffId());
 
-            // 4. Populate the UI Panel
             panel.feedbackId.setText(feedback.getId());
             panel.appointmentId.setText(appointment.getId());
             

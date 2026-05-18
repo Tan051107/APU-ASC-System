@@ -15,7 +15,6 @@ import java.awt.*;
 public class AddUserFormController {
     private final AddUserForm form;
     private final UserService userService = new UserService();
-    //private final Logger logger = Logger.getLogger(AddUserFormController.class.getName());
 
     public AddUserFormController(AddUserForm form) {
         this.form = form;
@@ -97,7 +96,6 @@ public class AddUserFormController {
         }
         catch (Exception e) {
             DialogUtil.showErrorMessage("Failed to Update Customer" , "Encountered error when updating customer");
-            //logger.log(Level.SEVERE ,e.getMessage());
         }
     }
 

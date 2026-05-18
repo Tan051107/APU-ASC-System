@@ -426,18 +426,6 @@ public class ManagerMenu extends JFrame {
         return label;
     }
 
-    /* private JButton createCRUDButton(String text) {
-        JButton button = new JButton(text);
-        Dimension buttonSize = new Dimension(150, 50);
-        button.setPreferredSize(buttonSize);
-        button.setFocusPainted(false);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(99, 110, 114));
-        button.setForeground(Color.WHITE);
-        button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
-        return button;
-    } */
-
     public void refreshUserTable() {
         if (userTable != null) {
             userTable.setModel(controller.loadUserToTable());

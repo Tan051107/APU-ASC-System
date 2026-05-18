@@ -76,3 +76,8 @@ N03572|Appointment Created|An appointment is created and is scheduled on 14-05-2
 N03956|Appointment Created|An appointment is created and is scheduled on 14-05-2026 01:00 pm|User||TP982184|2026-05-14T04:30:45.412670200|2026-05-14T04:30:45.412670200
 N25784|Appointment Updated|APP-85688 is updated|User||TP982184|2026-05-14T04:31:46.422130|2026-05-14T04:31:46.422130
 N96172|Appointment Updated|APP-85688 is updated|User||TP758201|2026-05-14T04:31:46.423131700|2026-05-14T04:31:46.423131700
+N91973|Service Information Updated|Service price is updated to RM 800.0|All|||2026-05-18T12:14:04.263154900|2026-05-18T12:14:04.263154900
+N55966|Service Information Updated|Service price is updated to RM 700.0|All|||2026-05-18T12:19:34.250803700|2026-05-18T12:19:34.250803700
+N01643|Service Information Updated|Service price is updated to RM 800.0|All|||2026-05-18T12:20:04.132737800|2026-05-18T12:20:04.132737800
+N05791|Service Information Updated|Service price is updated to RM 700.0|All|||2026-05-18T12:23:03.031646700|2026-05-18T12:23:03.031646700
+N24696|Service Information Updated|Service price is updated to RM 800.0|All|||2026-05-18T12:24:31.732413|2026-05-18T12:24:31.732413
