@@ -59,14 +59,4 @@ public class Services extends BaseModel{
         this.duration = duration;
     }
 
-    @Override
-    public String toString() {
-        return "Services{" +
-                "id='" + getId() + '\'' + 
-                ", serviceName='" + name + '\'' +
-                ", servicePrice='" + price + '\'' +
-                ", serviceDetails='" + details + '\'' +
-                ", serviceDuration='" + duration + '\'' +
-                '}';
-    }
 }

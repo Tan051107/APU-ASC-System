@@ -14,7 +14,7 @@ public class Feedback extends BaseModel {
     }
 
     public Feedback(String appointmentId, String technicianFeedback, Integer staffRating, Integer technicianRating, String comment) {
-        super(); // Calls BaseModel's default constructor
+        super();
         this.appointmentId = appointmentId;
         this.technicianFeedback = technicianFeedback;
         this.staffRating = staffRating;                
@@ -24,7 +24,7 @@ public class Feedback extends BaseModel {
 
     public Feedback(String id, LocalDateTime createdAt, LocalDateTime updatedAt, 
                        String appointmentId, String technicianFeedback, Integer staffRating, Integer technicianRating, String comment) {
-        super(id, createdAt, updatedAt); // Passes ID and timestamps up to BaseModel
+        super(id, createdAt, updatedAt); 
         this.appointmentId = appointmentId;
         this.technicianFeedback = technicianFeedback;
         this.staffRating = staffRating;
@@ -72,14 +72,4 @@ public class Feedback extends BaseModel {
         this.comment = comment;
     }
 
-    @Override
-    public String toString() {
-        return "Feedback{" +
-                "id='" + getId() + '\'' + 
-                ", appointmentId='" + appointmentId + '\'' +
-                ", staffRating='" + staffRating + '\'' +
-                ", technicianRating='" + technicianRating + '\'' +
-                ", comment='" + comment + '\'' +
-                '}';
-    }
 }
