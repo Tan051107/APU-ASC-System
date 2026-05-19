@@ -30,6 +30,7 @@ public class UserMapper implements Mapper<User> {
 
     @Override
     public String toString(User user){
-        return String.join("|" , user.getId(),user.getName(),user.getEmail(), user.getPassword(),user.getContactNumber(),user.getUserType().getDisplayUserType() , user.getCreatedAt().toString(),user.getUpdatedAt().toString());
+        return String.join("|" , user.getId(),user.getName(),user.getEmail(), user.getPassword(),user.getContactNumber(),
+        user.getUserType().getDisplayUserType() , user.getCreatedAt().toString(),user.getUpdatedAt().toString());
     }
 }
