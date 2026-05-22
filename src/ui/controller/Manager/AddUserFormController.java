@@ -75,6 +75,12 @@ public class AddUserFormController {
     }
 
     private void updateUser(){
+        String password = form.passwordField.getText();
+        String confirmPassword = form.confirmPasswordField.getText();
+        if (!confirmPassword.equals(password)) {
+            DialogUtil.showWarningMessage("Validation Error" , "Passwords do not match");
+            return;
+        }
         try {
             ValidationResult validationResult = new ValidationResult();
             User user = getUser(validationResult);
@@ -82,11 +88,11 @@ public class AddUserFormController {
             user.setId(userToEdit.getId());
             user.setCreatedAt(userToEdit.getCreatedAt());
             user.setUserType(userToEdit.getUserType());
-            Validator.validatePassword(validationResult,"Password" , userToEdit.getPassword());
+            Validator.validatePassword(validationResult,"Password" , password);
             if(validationResult.hasError()){
                 throw new ValidationException(validationResult.getErrors());
             }
-            user.setPassword(userToEdit.getPassword());
+            user.setPassword(password);
             userService.updateUser(user);
             DialogUtil.showInfoMessage("Updated Successfully" , String.format("Successfully updated %s." , user.getName()));
             form.dispose();
