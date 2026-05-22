@@ -307,6 +307,16 @@ public class AppointmentService {
         return paymentRecord;
     }
 
+    public boolean hasActiveAppointments(String technicianId) throws FileCorruptedException {
+        List<Appointment> appointments = getAppointmentsByTechnician(technicianId);
+        for (Appointment appointment : appointments) {
+            if (appointment.getStatusService() == AppointmentStatus.ASSIGNED) {
+                return true; 
+            }
+        }
+        return false;
+    }
+
     private void createNotification(String recipientId , String title , String message) throws IOException {
         NotificationService notificationService = new NotificationService();
         Notification notification = new Notification();
