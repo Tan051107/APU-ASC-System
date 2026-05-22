@@ -92,10 +92,10 @@ public class AddUserFormController {
             form.dispose();
         }
         catch (NotFoundException | ValidationException  e ) {
-            DialogUtil.showErrorMessage("Failed to Update Customer" , e.getMessage());
+            DialogUtil.showErrorMessage("Failed to Update User" , e.getMessage());
         }
         catch (Exception e) {
-            DialogUtil.showErrorMessage("Failed to Update Customer" , "Encountered error when updating customer");
+            DialogUtil.showErrorMessage("Failed to Update User" , "Encountered error when updating user");
         }
     }
 

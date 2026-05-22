@@ -210,7 +210,8 @@ public class ManagerMenu extends JFrame {
                     JOptionPane.showMessageDialog(this, "No User Found with ID: " + currenttext, "Search Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Invalid format. Please use TP followed by 6 digits (e.g., TP012345).", "Format Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Invalid format. Please use TP followed by 6 digits (e.g., TP012345).", 
+                "Format Error", JOptionPane.WARNING_MESSAGE);
             }
         });
 

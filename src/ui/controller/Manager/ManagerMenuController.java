@@ -99,7 +99,6 @@ public class ManagerMenuController {
                 JOptionPane.ERROR_MESSAGE
             );
         }
-        
         return tableModel;
     }
     

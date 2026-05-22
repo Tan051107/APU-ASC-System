@@ -24,7 +24,6 @@ public class UserManagementController {
     }
 
     private void initListeners() {
-        // Add New User
         managerMenu.addUser.addActionListener(e -> openAddUserForm(false, null));
 
         // Edit User Listener
