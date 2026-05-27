@@ -6,7 +6,7 @@ import exceptions.*;
 import mapper.CustomerMapper;
 import models.Appointment;
 import models.Customer;
-import models.User;
+
 import repositories.CrudRepository;
 
 import java.util.List;

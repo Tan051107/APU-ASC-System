@@ -39,14 +39,13 @@ public class Login extends Component {
         gbc.weighty = 1;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        // Container for everything to keep it centered
         JPanel mainContainer = new JPanel();
         mainContainer.setOpaque(false);
         mainContainer.setLayout(new BoxLayout(mainContainer, BoxLayout.Y_AXIS));
         mainContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        // ---------- HEADER ----------
+        // header
         JPanel header = new JPanel();
         header.setOpaque(false);
         header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
@@ -75,7 +74,6 @@ public class Login extends Component {
 //        header.add(Box.createRigidArea(new Dimension(0, 5)));
 //        header.add(subtitle);
 
-        // ---------- AUTH CARD ----------
         RoundedPanel authCard = new RoundedPanel(25);
         authCard.setBackground(Color.WHITE);
         authCard.setLayout(new GridBagLayout());
@@ -161,7 +159,7 @@ public class Login extends Component {
         panel.add(signInButton);
         panel.add(Box.createRigidArea(new Dimension(0, 30)));
 
-        // Quick Demo Login
+        // Quick Demo Login Buttons
         JLabel demoLabel = new JLabel("QUICK DEMO LOGIN");
         demoLabel.setForeground(new Color(140, 140, 140));
         demoLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -277,8 +275,6 @@ public class Login extends Component {
         p.add(btn);
         return p;
     }
-
-    // ---------- CUSTOM PANELS ----------
 
     class GradientPanel extends JPanel {
         public GradientPanel() {

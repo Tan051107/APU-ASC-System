@@ -13,8 +13,6 @@ import utils.DialogUtil;
 import utils.validators.ValidationResult;
 import utils.validators.Validator;
 
-import javax.security.auth.login.LoginException;
-import javax.swing.*;
 import java.awt.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;

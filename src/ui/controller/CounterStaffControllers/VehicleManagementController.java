@@ -1,13 +1,10 @@
 package ui.controller.CounterStaffControllers;
 
-import enums.AppointmentStatus;
 import exceptions.BusinessRuleException;
 import exceptions.DeleteException;
 import exceptions.FileCorruptedException;
-import models.Appointment;
 import models.Customer;
 import models.CustomerCar;
-import services.AppointmentService;
 import services.CustomerCarService;
 import ui.controller.CounterStaffControllers.FormController.AddVehicleFormController;
 import ui.pages.CounterStaffPanels.components.VehicleRow;
@@ -17,7 +14,6 @@ import utils.DialogUtil;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
