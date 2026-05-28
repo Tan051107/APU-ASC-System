@@ -45,7 +45,7 @@ public class ViewFeedbackController {
             
             panel.technicianId.setText(technician != null ? technician.getId() : "N/A");
             panel.technicianName.setText(technician != null ? technician.getName() : "N/A");
-            panel.technicianFeedback.setText(feedback.getTechnicianFeedback());
+            panel.technicianFeedback.setText(feedback.getTechnicianFeedback() != null && !feedback.getTechnicianFeedback().equalsIgnoreCase("null") ? feedback.getTechnicianFeedback() : "No feedback given");
             if (feedback.getTechnicianRating() == null){
                 panel.technicianRating.setText("No rating given");
             } else {

@@ -41,7 +41,7 @@ public class CustomerCarService {
     }
 
     public void addCar(CustomerCar carToAdd) throws BusinessRuleException, IOException, FileCorruptedException {
-        boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate())).isEmpty();
+        boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate().trim())).isEmpty();
         final int maxCarAllowed = 3;
         boolean hasReachedMaxCarAllowed = getCustomerCars(carToAdd.getCustomerId()).size() >=maxCarAllowed;
         if(carPlateHasExisted){
@@ -79,7 +79,7 @@ public class CustomerCarService {
     }
 
     public void updateCar(CustomerCar carToUpdate) throws FileCorruptedException,UpdateException {
-        boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar ->customerCar.getCarPlate().equalsIgnoreCase(carToUpdate.getCarPlate()) && !customerCar.getId().equalsIgnoreCase(carToUpdate.getId())).isEmpty();
+        boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar ->customerCar.getCarPlate().equalsIgnoreCase(carToUpdate.getCarPlate().trim()) && !customerCar.getId().equalsIgnoreCase(carToUpdate.getId())).isEmpty();
         if(carPlateHasExisted){
             throw new UpdateException("Car plate has already been recorded");
         }
