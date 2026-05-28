@@ -50,10 +50,7 @@ public class ManagerMenuController {
                 return;
             }
 
-            // Grab the Feedback ID from Column 0
             String feedbackId = managerMenu.feedbackTable.getValueAt(selectedRow, 0).toString();
-
-            // Open the UI and let the Controller fetch the data
             ViewFeedbackPanel viewPanel = new ViewFeedbackPanel(managerMenu);
             new ViewFeedbackController(viewPanel, feedbackId);
             viewPanel.setVisible(true);
@@ -166,7 +163,7 @@ public class ManagerMenuController {
 
             if (serviceToUpdate == null) {
                 JOptionPane.showMessageDialog(null, "Could not find the selected service in the database.", "Not Found", JOptionPane.WARNING_MESSAGE);
-                return false; // Update failed
+                return false;
             }
             serviceToUpdate.setPrice(newPrice);
             serviceToUpdate.setUpdatedAt(LocalDateTime.now());
@@ -175,7 +172,6 @@ public class ManagerMenuController {
             return true;
 
         } catch (GetEntityListException | FileCorruptedException | NotFoundException | UpdateException | IOException e) {
-            // Catch all the exceptions your backend throws and display them to the manager
             JOptionPane.showMessageDialog(
                 null, 
                 "Failed to update service price: " + e.getMessage(), 

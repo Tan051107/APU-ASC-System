@@ -48,7 +48,6 @@ public class UserManagementController {
                 
             } catch (Exception ex) {
                 DialogUtil.showErrorMessage("Error", "Error loading user data: " + ex.getMessage());
-                // logger.log(Level.SEVERE, ex.getMessage());
             }
         });
 

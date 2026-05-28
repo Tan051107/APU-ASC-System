@@ -301,7 +301,16 @@ public class ManagerMenu extends JFrame {
                 double newPrice = Double.parseDouble(priceField.getText().trim());
                 newPrice = Math.round(newPrice * 100.0) / 100.0; 
                 
-
+                if (newPrice < 0) {
+                    JOptionPane.showMessageDialog(
+                        this, 
+                        "Price cannot be negative. Please enter a value of 0 or higher.", 
+                        "Input Error", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return; 
+                }
+                
                 boolean isSuccess = controller.updateServicePrice(id, newPrice);
 
                 if (isSuccess) {
