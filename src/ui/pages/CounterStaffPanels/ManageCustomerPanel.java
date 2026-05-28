@@ -19,7 +19,7 @@ public class ManageCustomerPanel extends JPanel {
         setBackground(new Color(249, 250, 251)); // Very light gray background
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        // --- TOP HEADER ---
+        // Top Header
         JPanel topHeader = new JPanel(new BorderLayout());
         topHeader.setOpaque(false);
         topHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
@@ -69,7 +69,7 @@ public class ManageCustomerPanel extends JPanel {
 
         add(topHeader, BorderLayout.NORTH);
 
-        // --- CARD CONTAINER ---
+        // Card Container
         cardContainer = new JPanel();
         cardContainer.setOpaque(false);
         cardContainer.setLayout(new BoxLayout(cardContainer, BoxLayout.Y_AXIS));

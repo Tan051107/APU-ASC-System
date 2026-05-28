@@ -43,7 +43,7 @@ public class TechnicianMenuController {
         try {
             allAppointments = appointmentService.getAllAppointments();
         } catch (GetEntityListException e) {
-            System.err.println("Error reading appointments: " + e.getMessage());
+            //System.err.println("Error reading appointments: " + e.getMessage());
         }
 
         String[] columns = {"Appt ID","Plate Number", "Date", "Time", "Status"};
@@ -70,7 +70,7 @@ public class TechnicianMenuController {
                 tableModel.addRow(rowData);
 
             } catch (Exception e) {
-                System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
+                //System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
             }
         }
 
@@ -119,7 +119,7 @@ public class TechnicianMenuController {
                 }
                 
             } catch (Exception e) {
-                System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
+                //System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
             }
         }
 
@@ -131,7 +131,7 @@ public class TechnicianMenuController {
         try {
             allAppointments = appointmentService.getAllAppointments();
         } catch (GetEntityListException e) {
-            System.err.println("Error reading appointments: " + e.getMessage());
+            //System.err.println("Error reading appointments: " + e.getMessage());
         }
 
         String[] columns = {"Appt ID","Plate Number", "Date", "Time", "Status"};
@@ -157,7 +157,7 @@ public class TechnicianMenuController {
                 tableModel.addRow(rowData);
 
             } catch (Exception e) {
-                System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
+                //System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
             }
             
         }
@@ -205,7 +205,7 @@ public class TechnicianMenuController {
                 }
                 
             } catch (Exception e) {
-                System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
+                //System.err.println("Error reading car for appointment " + appt.getId() + ": " + e.getMessage());
             }
         }
 
@@ -276,7 +276,7 @@ public class TechnicianMenuController {
         return null;
     }
 
-    // View Appointment Controllers
+    // View Appointment Controller
     public void completeAppointment(Appointment appointmentToEdit, JDialog popupForm, String technicianFeedback) {
         try {
             if (appointmentToEdit.getStatusService() == AppointmentStatus.COMPLETED) {

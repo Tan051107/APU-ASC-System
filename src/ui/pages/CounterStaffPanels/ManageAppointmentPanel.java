@@ -40,7 +40,7 @@ public class ManageAppointmentPanel extends JPanel {
         setBackground(new Color(249, 250, 251)); // Very light gray background
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        // --- TOP HEADER ---
+        // Top Header
         JPanel headerContainer = new JPanel();
         headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.Y_AXIS));
         headerContainer.setOpaque(false);
@@ -87,7 +87,7 @@ public class ManageAppointmentPanel extends JPanel {
         searchField.setToolTipText("Search by ID, Technician, Customer, or Vehicle");
         primaryFilterRow.add(searchField);
 
-        // --- Service Type Filter ---
+        // Service Type Filter
         JPanel serviceTypeFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         serviceTypeFilterPanel.setOpaque(false);
         JLabel serviceLabel = UIUtils.createLabel("Service Type:");
@@ -99,7 +99,7 @@ public class ManageAppointmentPanel extends JPanel {
         serviceTypeFilterPanel.add(serviceTypeFilterCombo);
         primaryFilterRow.add(serviceTypeFilterPanel);
 
-        // --- Status Filter ---
+        // Status Filter 
         JPanel statusFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         statusFilterPanel.setOpaque(false);
         JLabel statusLabel = UIUtils.createLabel("Status:");
@@ -110,7 +110,7 @@ public class ManageAppointmentPanel extends JPanel {
         statusFilterPanel.add(statusFilterCombo);
         primaryFilterRow.add(statusFilterPanel);
 
-        // --- Appointment Date Filter ---
+        // Appointment Date Filter 
         JPanel dateFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         dateFilterPanel.setOpaque(false);
         JLabel dateLabel = UIUtils.createLabel("Date:");
@@ -159,7 +159,7 @@ public class ManageAppointmentPanel extends JPanel {
 
         add(headerContainer, BorderLayout.NORTH);
 
-        // --- TABLE CONTAINER ---
+        // Table Container
         RoundedPanel tableCard = new RoundedPanel(15);
         tableCard.setBackground(Color.WHITE);
         tableCard.setLayout(new BorderLayout());
