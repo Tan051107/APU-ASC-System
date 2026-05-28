@@ -59,10 +59,10 @@ public class CustomerCarService {
     }
 
     public void deleteCarById(String carId) throws DeleteException, FileCorruptedException, BusinessRuleException {
-        customerCarCrudRepository.delete(carId);
         if(hasNotCompletedAppointment(carId)){
             throw new BusinessRuleException("Not allowed to delete car when still have upcoming appointments");
         }
+        customerCarCrudRepository.delete(carId);
     }
 
     public void deleteCarByCustomerId(String customerId) throws FileCorruptedException, BusinessRuleException {
