@@ -288,7 +288,7 @@ public class TechnicianMenu extends JFrame {
                     viewPopup.completeButton.addActionListener(event -> {
                         String feedbackText = viewPopup.feedbackArea.getText().trim();
                         ValidationResult result = new ValidationResult();
-                        Validator.validateText(result, "Technician Feedback", feedbackText);
+                        Validator.required(result, "Technician Feedback", feedbackText);
                         if (result.hasError()) {
                             JOptionPane.showMessageDialog(viewPopup, 
                                 result.getErrors(), 
@@ -413,7 +413,6 @@ public class TechnicianMenu extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             }
 
-
         });
 
         bottomPanel.add(viewBtn);
@@ -421,20 +420,6 @@ public class TechnicianMenu extends JFrame {
 
         return panel;
     }
-
-    /* private JPanel createReportsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel title = displayMenuTitle("Service Centre Reporting & Analytics");
-        panel.add(title, BorderLayout.NORTH);
-
-        JTextArea reportArea = new JTextArea("--- Monthly Summary ---\nTotal Revenue: RM 15,400\nTotal Vehicles Serviced: 142\nMost Popular Service: Standard Oil Change");
-        reportArea.setEditable(false);
-        reportArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        reportArea.setMargin(new Insets(10, 10, 10, 10));
-        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
-
-        return panel;
-    } */
 
     private JLabel displayMenuTitle(String text) {
         JLabel label = new JLabel(text);

@@ -3,7 +3,6 @@ package ui.controller;
 import exceptions.BusinessRuleException;
 import exceptions.FileCorruptedException;
 import exceptions.NotFoundException;
-import exceptions.UpdateException;
 import models.User;
 import services.UserService;
 import ui.pages.ProfilePanel;

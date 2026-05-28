@@ -2,6 +2,7 @@ package ui.controller.Manager;
 
 import exceptions.DeleteException;
 import models.User;
+import services.AppointmentService;
 import services.UserService;
 import ui.pages.Manager.forms.AddUserForm;
 import ui.pages.ManagerMenu;
@@ -17,7 +18,6 @@ import javax.swing.SwingUtilities;
 public class UserManagementController {
     private final ManagerMenu managerMenu;
     private final UserService userService = new UserService();
-    //Logger logger = Logger.getLogger(UserManagementController.class.getName());
 
     public UserManagementController(ManagerMenu managerMenu) {
         this.managerMenu = managerMenu;
@@ -25,7 +25,6 @@ public class UserManagementController {
     }
 
     private void initListeners() {
-        // Add New User
         managerMenu.addUser.addActionListener(e -> openAddUserForm(false, null));
 
         // Edit User Listener
@@ -49,7 +48,6 @@ public class UserManagementController {
                 
             } catch (Exception ex) {
                 DialogUtil.showErrorMessage("Error", "Error loading user data: " + ex.getMessage());
-                // logger.log(Level.SEVERE, ex.getMessage());
             }
         });
 
@@ -68,15 +66,26 @@ public class UserManagementController {
                     return;
                 }
                 User userToDelete = userService.getUserById(targetUserId); 
-                if (userToDelete != null) {
-                    deleteUser(userToDelete);
-                } else {
+                if (userToDelete == null) {
                     DialogUtil.showInfoMessage("User Details Not Found!", "User details could not be found.");
+                    return;
                 }
+
+                String selectedUserRole = userToDelete.getUserType().getDisplayUserType();
+                if (selectedUserRole.equals("Technician")) {
+                    AppointmentService appointmentService = new AppointmentService();
+                    if (appointmentService.hasActiveAppointments(targetUserId)) {
+                        DialogUtil.showWarningMessage(
+                            "Action Denied", 
+                            "This technician has active or pending appointments and cannot be deleted."
+                        );
+                        return;
+                    }
+                }
+                deleteUser(userToDelete);
                 
             } catch (Exception ex) {
                 DialogUtil.showErrorMessage("Error", "Error loading user data: " + ex.getMessage());
-                // logger.log(Level.SEVERE, ex.getMessage());
             }
         });
     }
@@ -105,7 +114,6 @@ public class UserManagementController {
                 DialogUtil.showErrorMessage("Failed to Delete Customer" , e.getMessage());
             } catch (Exception e){
                 DialogUtil.showErrorMessage("Failed to Delete Customer" , e.getMessage());
-                // logger.log(Level.SEVERE, ex.getMessage());
             }
         }
     }

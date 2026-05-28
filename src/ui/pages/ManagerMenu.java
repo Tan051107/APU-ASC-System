@@ -6,9 +6,7 @@ import models.User;
 import ui.controller.NotificationPanelController;
 import ui.controller.Manager.ManagerMenuController;
 import ui.controller.Manager.UserManagementController;
-import ui.pages.Manager.RatingReports;
 import ui.utils.UIUtils;
-import utils.DialogUtil;
 
 import java.awt.*;
 
@@ -212,7 +210,8 @@ public class ManagerMenu extends JFrame {
                     JOptionPane.showMessageDialog(this, "No User Found with ID: " + currenttext, "Search Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Invalid format. Please use TP followed by 6 digits (e.g., TP012345).", "Format Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Invalid format. Please use TP followed by 6 digits (e.g., TP012345).", 
+                "Format Error", JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -230,7 +229,7 @@ public class ManagerMenu extends JFrame {
         return panel;
     }
 
-    private JPanel createSetPricesPanel() {
+    private JPanel createSetPricesPanel() { 
         JPanel panel = new JPanel(new BorderLayout());
         JLabel title = displayMenuTitle("Automotive Service Pricing Management");
         panel.add(title, BorderLayout.NORTH);
@@ -302,7 +301,16 @@ public class ManagerMenu extends JFrame {
                 double newPrice = Double.parseDouble(priceField.getText().trim());
                 newPrice = Math.round(newPrice * 100.0) / 100.0; 
                 
-
+                if (newPrice < 0) {
+                    JOptionPane.showMessageDialog(
+                        this, 
+                        "Price cannot be negative. Please enter a value of 0 or higher.", 
+                        "Input Error", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return; 
+                }
+                
                 boolean isSuccess = controller.updateServicePrice(id, newPrice);
 
                 if (isSuccess) {
@@ -353,7 +361,7 @@ public class ManagerMenu extends JFrame {
         
         gridPanel.add(createReportCard("Current Month Appointments", currentMonthAppointment, e -> {
             ui.pages.Manager.AppointmentReports viewPanel = new ui.pages.Manager.AppointmentReports(this);
-            new ui.controller.AppointmentReportsController(viewPanel);
+            new ui.controller.Manager.AppointmentReportsController(viewPanel);
             viewPanel.setVisible(true);
         }));
 
@@ -427,18 +435,6 @@ public class ManagerMenu extends JFrame {
         label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         return label;
     }
-
-    /* private JButton createCRUDButton(String text) {
-        JButton button = new JButton(text);
-        Dimension buttonSize = new Dimension(150, 50);
-        button.setPreferredSize(buttonSize);
-        button.setFocusPainted(false);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(99, 110, 114));
-        button.setForeground(Color.WHITE);
-        button.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
-        return button;
-    } */
 
     public void refreshUserTable() {
         if (userTable != null) {

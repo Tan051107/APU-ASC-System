@@ -76,6 +76,22 @@ N03572|Appointment Created|An appointment is created and is scheduled on 14-05-2
 N03956|Appointment Created|An appointment is created and is scheduled on 14-05-2026 01:00 pm|User||TP982184|2026-05-14T04:30:45.412670200|2026-05-14T04:30:45.412670200
 N25784|Appointment Updated|APP-85688 is updated|User||TP982184|2026-05-14T04:31:46.422130|2026-05-14T04:31:46.422130
 N96172|Appointment Updated|APP-85688 is updated|User||TP758201|2026-05-14T04:31:46.423131700|2026-05-14T04:31:46.423131700
+N91973|Service Information Updated|Service price is updated to RM 800.0|All|||2026-05-18T12:14:04.263154900|2026-05-18T12:14:04.263154900
+N55966|Service Information Updated|Service price is updated to RM 700.0|All|||2026-05-18T12:19:34.250803700|2026-05-18T12:19:34.250803700
+N01643|Service Information Updated|Service price is updated to RM 800.0|All|||2026-05-18T12:20:04.132737800|2026-05-18T12:20:04.132737800
+N05791|Service Information Updated|Service price is updated to RM 700.0|All|||2026-05-18T12:23:03.031646700|2026-05-18T12:23:03.031646700
+N24696|Service Information Updated|Service price is updated to RM 800.0|All|||2026-05-18T12:24:31.732413|2026-05-18T12:24:31.732413
+N50541|Appointment Created|An appointment is created and is scheduled on 25-05-2026 09:00 am|User||TP991703|2026-05-22T13:23:43.087514200|2026-05-22T13:23:43.087514200
+N35402|Appointment Created|An appointment is created and is scheduled on 25-05-2026 09:00 am|User||TP982184|2026-05-22T13:23:43.088751500|2026-05-22T13:23:43.088751500
+N78833|Appointment Updated|APP-69825 is updated|User||TP982184|2026-05-22T13:26:14.353788500|2026-05-22T13:26:14.353788500
+N06865|Appointment Updated|APP-69825 is updated|User||TP991703|2026-05-22T13:26:14.355169200|2026-05-22T13:26:14.355169200
+N75042|Payment Is Made|Payment is successfully made for appointment APP-69825 at 22-05-2026 01:28 pm|User||TP991703|2026-05-22T13:28:59.745514600|2026-05-22T13:28:59.745514600
+N30960|Appointment Created|An appointment is created and is scheduled on 25-05-2026 09:00 am|User||TP991703|2026-05-22T23:05:54.753796|2026-05-22T23:05:54.753796
+N24411|Appointment Created|An appointment is created and is scheduled on 25-05-2026 09:00 am|User||TP982184|2026-05-22T23:05:54.754863300|2026-05-22T23:05:54.754863300
+N93243|Appointment Created|An appointment is created and is scheduled on 25-05-2026 09:00 am|User||TP991703|2026-05-22T23:07:33.360674200|2026-05-22T23:07:33.360674200
+N16988|Appointment Created|An appointment is created and is scheduled on 25-05-2026 09:00 am|User||TP530640|2026-05-22T23:07:33.360674200|2026-05-22T23:07:33.360674200
+N32220|Appointment Updated|APP-24438 is updated|User||TP530640|2026-05-22T23:20:11.571758300|2026-05-22T23:20:11.571758300
+N18036|Appointment Updated|APP-24438 is updated|User||TP991703|2026-05-22T23:20:11.574102900|2026-05-22T23:20:11.574102900
 N56487|Appointment Created|An appointment is created and is scheduled on 26-05-2026 12:12 PM|User||TP991703|2026-05-23T03:55:35.625923400|2026-05-23T03:55:35.625923400
 N01829|Appointment Created|An appointment is created and is scheduled on 26-05-2026 12:12 PM|User||TP278981|2026-05-23T03:55:35.626923100|2026-05-23T03:55:35.626923100
 N19251|Appointment Created|An appointment is created and is scheduled on 27-05-2026 02:25 PM|User||TP991703|2026-05-23T03:56:20.666697500|2026-05-23T03:56:20.666697500

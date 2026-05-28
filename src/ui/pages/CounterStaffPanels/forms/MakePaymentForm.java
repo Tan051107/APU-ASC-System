@@ -1,7 +1,5 @@
 package ui.pages.CounterStaffPanels.forms;
 
-import exceptions.FileCorruptedException;
-import exceptions.GetEntityListException;
 import models.PaymentRecord;
 import models.User;
 import ui.utils.UIUtils;

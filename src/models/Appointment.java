@@ -26,7 +26,7 @@ public class Appointment extends BaseModel{
 
     public Appointment(String customerId,String staffId, String technicianId, String serviceId, 
                        LocalDate date, LocalTime time, AppointmentStatus statusService, String description, String carId) {
-        super(); // Calls BaseModel's default constructor
+        super(); 
         this.customerId = customerId;
         this.staffId = staffId;                
         this.technicianId = technicianId;
@@ -41,7 +41,7 @@ public class Appointment extends BaseModel{
     public Appointment(String id, LocalDateTime createdAt, LocalDateTime updatedAt, 
                        String customerId, String staffId, String technicianId, String serviceId, 
                        LocalDate date, LocalTime time, AppointmentStatus statusService, String description, String carId) {
-        super(id, createdAt, updatedAt); // Passes ID and timestamps up to BaseModel
+        super(id, createdAt, updatedAt);
         this.customerId = customerId;
         this.staffId = staffId;
         this.technicianId = technicianId;
@@ -150,22 +150,5 @@ public class Appointment extends BaseModel{
     public User getTechnician() throws GetEntityListException {
         UserService userService = new UserService();
         return userService.getUserById(technicianId);
-    }
-
-
-    @Override
-    public String toString() {
-        return "Appointment{" +
-                "id='" + getId() + '\'' + 
-                ", customerId='" + customerId + '\'' +
-                ", staffId='" + staffId + '\'' +
-                ", technicianId='" + technicianId + '\'' +
-                ", serviceId='" + serviceId + '\'' +
-                ", date=" + date + '\'' +
-                ", time=" + time + '\'' +
-                ", statusService=" + statusService + '\'' +
-                ", description=" + description + '\'' +
-                ", carId=" + carId + '\'' +
-                '}';
     }
 }

@@ -2,7 +2,6 @@ package ui.controller.Manager;
 import services.UserService;
 import ui.pages.Login;
 import ui.pages.ManagerMenu;
-import ui.pages.Manager.AppointmentReports;
 import ui.pages.Manager.ViewFeedbackPanel;
 import utils.DialogUtil;
 import services.ServicesService;
@@ -51,10 +50,7 @@ public class ManagerMenuController {
                 return;
             }
 
-            // Grab the Feedback ID from Column 0
             String feedbackId = managerMenu.feedbackTable.getValueAt(selectedRow, 0).toString();
-
-            // Open the UI and let the Controller fetch the data
             ViewFeedbackPanel viewPanel = new ViewFeedbackPanel(managerMenu);
             new ViewFeedbackController(viewPanel, feedbackId);
             viewPanel.setVisible(true);
@@ -100,7 +96,6 @@ public class ManagerMenuController {
                 JOptionPane.ERROR_MESSAGE
             );
         }
-        
         return tableModel;
     }
     
@@ -134,18 +129,14 @@ public class ManagerMenuController {
 
     public Object[] loadServiceDetails(String serviceId) {
         try {
-            // 1. Ask your service class to find the exact service directly!
-            // No need to loop through the whole list.
             Services service = servicesService.getServicesById(serviceId);
             
-            // 2. Check if the service was actually found
             if (service != null) {
                 String formattedPrice = String.format("%.2f", service.getPrice());
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                 String lastEdited = (service.getUpdatedAt() != null) 
                                     ? service.getUpdatedAt().format(formatter) 
                                     : "Never";
-                // 3. Return a single array containing the data
                 return new Object[] {
                     service.getId(),
                     service.getName(),
@@ -163,39 +154,31 @@ public class ManagerMenuController {
                 JOptionPane.ERROR_MESSAGE
             );
         }
-        
-        // 4. Return null if the service wasn't found or an error occurred
         return null; 
     }
 
     public boolean updateServicePrice(String serviceId, double newPrice) {
         try {
-            // 1. Fetch the complete, existing service from the text file
             Services serviceToUpdate = servicesService.getServicesById(serviceId);
 
             if (serviceToUpdate == null) {
                 JOptionPane.showMessageDialog(null, "Could not find the selected service in the database.", "Not Found", JOptionPane.WARNING_MESSAGE);
-                return false; // Update failed
+                return false;
             }
-
-            // 2. Update ONLY the price (the rest of the data stays exactly the same)
             serviceToUpdate.setPrice(newPrice);
             serviceToUpdate.setUpdatedAt(LocalDateTime.now());
-
-            // 3. Send the modified object back to be saved
             servicesService.updateService(serviceToUpdate);
 
-            return true; // Update successful!
+            return true;
 
         } catch (GetEntityListException | FileCorruptedException | NotFoundException | UpdateException | IOException e) {
-            // Catch all the exceptions your backend throws and display them to the manager
             JOptionPane.showMessageDialog(
                 null, 
                 "Failed to update service price: " + e.getMessage(), 
                 "Update Error", 
                 JOptionPane.ERROR_MESSAGE
             );
-            return false; // Update failed
+            return false; 
         }
     }
 

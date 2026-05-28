@@ -3,10 +3,6 @@ package services;
 import exceptions.BusinessRuleException;
 import exceptions.GetEntityListException;
 import models.User;
-import utils.validators.ValidationResult;
-import utils.validators.Validator;
-
-import javax.security.auth.login.LoginException;
 
 public class AuthService {
 

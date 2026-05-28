@@ -6,12 +6,9 @@ import mapper.UserMapper;
 import models.User;
 import repositories.CrudRepository;
 import utils.RandomIdGenerator;
-import utils.validators.ValidationResult;
-import utils.validators.Validator;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 
 public class UserService {
     private final String USER_FILE = "txt_files/User.txt";

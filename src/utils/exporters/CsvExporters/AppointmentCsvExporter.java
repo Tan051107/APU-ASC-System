@@ -24,9 +24,15 @@ public class AppointmentCsvExporter implements CsvExporter<Appointment> {
                 DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
                 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                 String appointmentId = appointment.getId();
-                String customerName = appointment.getCustomer().getName();
-                String carPlate =appointment.getCar().getCarPlate();
-                String technicianName = appointment.getTechnician().getName();
+                String customerName = (appointment.getCustomer() != null && appointment.getCustomer().getName() != null) 
+                                        ? appointment.getCustomer().getName() 
+                                        : "";
+                String carPlate = (appointment.getCar() != null && appointment.getCar().getCarPlate() != null) 
+                                    ? appointment.getCar().getCarPlate() 
+                                    : "";
+                String technicianName = (appointment.getTechnician() != null && appointment.getTechnician().getName() != null) 
+                                        ? appointment.getTechnician().getName() 
+                                        : "Unassigned";
                 Services serviceChosen = appointment.getService();
                 String serviceName = serviceChosen.getName();
                 String serviceDuration = String.valueOf(serviceChosen.getDuration());

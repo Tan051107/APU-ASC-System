@@ -46,7 +46,7 @@ public class RatingReportController {
             for (Feedback feedback : allFeedbackRecords) {
                 Appointment appointment = appointmentService.getAppointmentById(feedback.getAppointmentId());
                 
-                if (appointment == null) continue; // Skip if appointment data is missing
+                if (appointment == null) continue;
 
                 String userId = null;
                 Integer rating = null;

@@ -131,7 +131,6 @@ public class ViewAppointment extends JDialog{
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(UIUtils.createLabel(labelText), gbc);
 
-        // Constraints for the Text Field
         gbc.gridx = 1;
         gbc.weightx = 0.85;
         gbc.fill = GridBagConstraints.HORIZONTAL;

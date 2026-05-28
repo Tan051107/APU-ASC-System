@@ -306,6 +306,11 @@ public class CustomerController {
                 return;
             }
 
+            if (comment.contains("|")) {
+                DialogUtil.showWarningMessage("Validation Error", "Comment Cannot include Pipe Character '|'");
+                return;
+            }
+
             // BUSINESS RULE
             Appointment a = appointmentService.getAppointmentById(appointmentId);
 
