@@ -41,10 +41,9 @@ public class CustomerCarService {
     }
 
     public void addCar(CustomerCar carToAdd) throws BusinessRuleException, IOException, FileCorruptedException {
-        boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar->customerCar.getCarPlate().equalsIgnoreCase(carToAdd.getCarPlate())).isEmpty();
         final int maxCarAllowed = 3;
         boolean hasReachedMaxCarAllowed = getCustomerCars(carToAdd.getCustomerId()).size() >=maxCarAllowed;
-        if(carPlateHasExisted){
+        if(carPlateExisted(carToAdd.getCarPlate(), null)){
             throw new BusinessRuleException("Car plate has existed");
         }
         if(hasReachedMaxCarAllowed){
@@ -59,10 +58,10 @@ public class CustomerCarService {
     }
 
     public void deleteCarById(String carId) throws DeleteException, FileCorruptedException, BusinessRuleException {
-        customerCarCrudRepository.delete(carId);
         if(hasNotCompletedAppointment(carId)){
             throw new BusinessRuleException("Not allowed to delete car when still have upcoming appointments");
         }
+        customerCarCrudRepository.delete(carId);
     }
 
     public void deleteCarByCustomerId(String customerId) throws FileCorruptedException, BusinessRuleException {
@@ -79,8 +78,7 @@ public class CustomerCarService {
     }
 
     public void updateCar(CustomerCar carToUpdate) throws FileCorruptedException,UpdateException {
-        boolean carPlateHasExisted = !customerCarCrudRepository.getAll(customerCar ->customerCar.getCarPlate().equalsIgnoreCase(carToUpdate.getCarPlate()) && !customerCar.getId().equalsIgnoreCase(carToUpdate.getId())).isEmpty();
-        if(carPlateHasExisted){
+        if(carPlateExisted(carToUpdate.getCarPlate(),carToUpdate.getId())){
             throw new UpdateException("Car plate has already been recorded");
         }
         if(hasExceededCurrentYear(carToUpdate.getManufactureYear())){
@@ -98,6 +96,18 @@ public class CustomerCarService {
                 appointmentService.getAppointments(appointment -> appointment.getCarId().equals(carId)
                         && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED));
         return !upcomingAppointments.isEmpty();
+    }
+
+    private boolean carPlateExisted(String carPlate, String carIdToIgnore) throws FileCorruptedException {
+        String newCarRemovedSpaceCarPlate = carPlate.replace(" " , "");
+        List<CustomerCar> customerCars = getCars();
+        for(CustomerCar customerCar : customerCars){
+            String existingCarRemovedSpaceCarPlate = customerCar.getCarPlate().replace(" " , "");
+            if(existingCarRemovedSpaceCarPlate.equalsIgnoreCase(newCarRemovedSpaceCarPlate) && !customerCar.getId().equalsIgnoreCase(carIdToIgnore)){
+                return true;
+            }
+        }
+        return false;
     }
 
     private String generateCarId(){
