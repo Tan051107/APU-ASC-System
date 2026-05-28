@@ -45,13 +45,13 @@ public class Login extends Component {
         mainContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        // header
+        // Header
         JPanel header = new JPanel();
         header.setOpaque(false);
         header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        //logo
+        // Logo
         ImageIcon logoIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/images/logo.png")));
         Image img = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         JLabel logo = new JLabel(new ImageIcon(img));
@@ -278,7 +278,7 @@ public class Login extends Component {
 
     class GradientPanel extends JPanel {
         public GradientPanel() {
-            setBackground(new Color(245, 247, 250)); // modern light gray
+            setBackground(new Color(245, 247, 250));
         }
     }
 }

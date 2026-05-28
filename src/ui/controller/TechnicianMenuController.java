@@ -276,7 +276,7 @@ public class TechnicianMenuController {
         return null;
     }
 
-    // View Appointment Controllers
+    // View Appointment Controller
     public void completeAppointment(Appointment appointmentToEdit, JDialog popupForm, String technicianFeedback) {
         try {
             if (appointmentToEdit.getStatusService() == AppointmentStatus.COMPLETED) {

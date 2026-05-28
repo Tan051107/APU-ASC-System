@@ -25,7 +25,7 @@ public class ManagePaymentPanel extends JPanel {
         setBackground(new Color(249, 250, 251)); // Very light gray background
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        // --- TOP HEADER ---
+        // Top Header
         JPanel headerContainer = new JPanel();
         headerContainer.setLayout(new BoxLayout(headerContainer, BoxLayout.Y_AXIS));
         headerContainer.setOpaque(false);
@@ -64,7 +64,7 @@ public class ManagePaymentPanel extends JPanel {
         searchField.setToolTipText("Search by Record Id and Appointment Id");
         searchPanel.add(searchField);
 
-        // --- Status Filter ---
+        // Status Filter
         JPanel statusFilterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         statusFilterPanel.setOpaque(false);
         JLabel statusLabel = UIUtils.createLabel("Payment Status:");
@@ -75,7 +75,7 @@ public class ManagePaymentPanel extends JPanel {
         statusFilterPanel.add(statusFilterCombo);
         searchPanel.add(statusFilterPanel);
 
-        // --- Payment Method Filter ---
+        // Payment Method Filter
         JPanel paymentMethodPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         statusFilterPanel.setOpaque(false);
         JLabel paymentMethodLabel = UIUtils.createLabel("Payment Method");
@@ -90,7 +90,7 @@ public class ManagePaymentPanel extends JPanel {
 
         add(headerContainer, BorderLayout.NORTH);
 
-        // --- TABLE CONTAINER ---
+        // Table Container
         RoundedPanel tableCard = new RoundedPanel(15);
         tableCard.setBackground(Color.WHITE);
         tableCard.setLayout(new BorderLayout());

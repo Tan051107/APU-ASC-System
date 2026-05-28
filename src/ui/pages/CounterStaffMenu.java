@@ -37,7 +37,7 @@ public class CounterStaffMenu extends JFrame {
         setLocationRelativeTo(null); // Center the window
         setLayout(new BorderLayout());
 
-        //Create the Sidebar Navigation
+        // Sidebar Navigation
         sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setBackground(new Color(45, 52, 54)); // Dark grey background
@@ -56,7 +56,7 @@ public class CounterStaffMenu extends JFrame {
         sidebar.add(togglePanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Create Navigation Buttons
+        // Navigation Buttons
         manageCustomerBtn = createSidebarButton("Manage Customers");
         manageAppointmentBtn = createSidebarButton("Manage Appointments");
         managePaymentBtn = createSidebarButton("Manage Payment");
@@ -98,7 +98,7 @@ public class CounterStaffMenu extends JFrame {
 
         add(contentPanel, BorderLayout.CENTER);
 
-        //Add Action Listeners to swap cards when buttons are clicked
+        // Action Listeners to swap cards when buttons are clicked
         manageCustomerBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Customer"));
         manageAppointmentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Appointment"));
         managePaymentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Payment"));

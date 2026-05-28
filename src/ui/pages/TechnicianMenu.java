@@ -347,7 +347,6 @@ public class TechnicianMenu extends JFrame {
         controlsPanel.add(UIUtils.createLabel("Search: "));
         JTextField searchField = UIUtils.createTextField();
         searchField.setColumns(30);
-
         // Search Bar:END
 
         // Table reset runnable
