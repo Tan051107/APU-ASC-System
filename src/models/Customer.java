@@ -11,10 +11,7 @@ public class Customer extends User{
     private final CustomerCarService customerCarService = new CustomerCarService();
 
     public Customer() {
-    }
-
-    public List<CustomerCar> getCars() throws FileCorruptedException {
-        return customerCarService.getCustomerCars(getId());
+        setUserType(UserType.CUSTOMER);
     }
 
     public Customer(String name, String email, String password, String contactNumber) {
@@ -26,6 +23,10 @@ public class Customer extends User{
                     LocalDateTime updatedAt, String name, String email, String password, String contactNumber) {
         super(id, createdAt, updatedAt, name, email, password, contactNumber);
         setUserType(UserType.CUSTOMER);
+    }
+
+    public List<CustomerCar> getCars() throws FileCorruptedException {
+        return customerCarService.getCustomerCars(getId());
     }
 
 }

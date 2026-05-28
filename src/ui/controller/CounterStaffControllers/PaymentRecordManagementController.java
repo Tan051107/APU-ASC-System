@@ -39,7 +39,8 @@ public class PaymentRecordManagementController {
             managePaymentPanel.setPaymentRecords(paymentRecords);
             loadPaymentRecords();
         } catch (FileCorruptedException e) {
-            DialogUtil.showErrorMessage("Failed to get payment records" , "Encountered errors when getting payment records");
+            DialogUtil.showErrorMessage("Failed to get payment records" ,
+                    "Encountered errors when getting payment records");
             logger.log(Level.SEVERE,e.getMessage());
         }
     }

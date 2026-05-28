@@ -117,7 +117,8 @@ public class AppointmentManagementController {
         for(Appointment appointment : appointments){
             LocalDateTime appointmentDateTime = LocalDateTime.of(appointment.getDate(),appointment.getTime());
             LocalDateTime now = LocalDateTime.now();
-            boolean showActionButtons = appointment.getStatusService().equals(AppointmentStatus.ASSIGNED) && now.isBefore(appointmentDateTime);
+            boolean showActionButtons = appointment.getStatusService().equals(AppointmentStatus.ASSIGNED) &&
+                    now.isBefore(appointmentDateTime);
             manageAppointmentPanel.addAppointmentRow(appointment, this::handleEdit, this::handleCancel,showActionButtons);
         }
     }

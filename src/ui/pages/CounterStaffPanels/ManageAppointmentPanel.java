@@ -201,7 +201,7 @@ public class ManageAppointmentPanel extends JPanel {
         return header;
     }
 
-    public void addAppointmentRow(Appointment appointment, Consumer<Appointment> onEdit, Consumer<Appointment> onDelete , boolean showActionButtons) {
+    public void addAppointmentRow(Appointment appointment, Consumer<Appointment> handleEdit, Consumer<Appointment> handleCancel , boolean showActionButtons) {
         CustomerCarService customerCarService =new CustomerCarService();
         String serviceName = "Service";
         String serviceDuration = "0";
@@ -286,8 +286,8 @@ public class ManageAppointmentPanel extends JPanel {
         editBtn.setVisible(showActionButtons);
         deleteBtn.setVisible(showActionButtons);
         
-        editBtn.addActionListener(e -> onEdit.accept(appointment));
-        deleteBtn.addActionListener(e -> onDelete.accept(appointment));
+        editBtn.addActionListener(e -> handleEdit.accept(appointment));
+        deleteBtn.addActionListener(e -> handleCancel.accept(appointment));
         
         actions.add(editBtn);
         actions.add(deleteBtn);

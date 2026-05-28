@@ -28,6 +28,32 @@ public class SignInController {
         setUpController();
     }
 
+    private void routeUser(User user) {
+        switch (user.getUserType()){
+            case SUPER_MANAGER:
+            case MANAGER:
+                ManagerMenu managerMenu = new ManagerMenu(user);
+                managerMenu.setVisible(true);
+                break;
+            case CUSTOMER:
+                loginPage.dispose();
+                new CustomerMenu(user.getId()).setVisible(true);
+                break;
+            case COUNTER_STAFF:
+                loginPage.dispose();
+                new CounterStaffMenu(user).setVisible(true);
+                break;
+            case TECHNICIAN:
+                TechnicianMenu techMenu = new TechnicianMenu(user);
+                techMenu.setVisible(true);
+                break;
+            default:
+                DialogUtil.showErrorMessage("Login Error","User Role not found" );
+        }
+        // Close login page
+        loginPage.dispose();
+    }
+
     public void setUpController(){
 
         loginPage.signInButton.addActionListener(e -> signIn());
@@ -95,51 +121,18 @@ public class SignInController {
     public void demoManagerLogin(){
         loginPage.emailField.setText("Jacob@gmail.com");
         loginPage.passwordField.setText("12345678");
-        loginPage.emailField.setForeground(Color.BLACK);
-        loginPage.passwordField.setForeground(Color.BLACK);
     }
     public void demoCustomerLogin(){
         loginPage.emailField.setText("Ben@gmail.com");
         loginPage.passwordField.setText("12345678");
-        loginPage.emailField.setForeground(Color.BLACK);
-        loginPage.passwordField.setForeground(Color.BLACK);
     }
     public void demoTechnicianLogin(){
         loginPage.emailField.setText("Smith@gmail.com");
         loginPage.passwordField.setText("12345678");
-        loginPage.emailField.setForeground(Color.BLACK);
-        loginPage.passwordField.setForeground(Color.BLACK);
     }
     public void demoCounterStaffLogin(){
         loginPage.emailField.setText("Abu@gmail.com");
         loginPage.passwordField.setText("12345678");
-        loginPage.emailField.setForeground(Color.BLACK);
-        loginPage.passwordField.setForeground(Color.BLACK);
     }
 
-    private void routeUser(User user) {
-        switch (user.getUserType()){
-            case SUPER_MANAGER:
-            case MANAGER:
-                ManagerMenu managerMenu = new ManagerMenu(user);
-                managerMenu.setVisible(true);
-                break;
-            case CUSTOMER:
-                loginPage.dispose();
-                new CustomerMenu(user.getId()).setVisible(true);
-                break;
-            case COUNTER_STAFF:
-                loginPage.dispose();
-                new CounterStaffMenu(user).setVisible(true);
-                break;
-            case TECHNICIAN:
-                TechnicianMenu techMenu = new TechnicianMenu(user);
-                techMenu.setVisible(true);
-                break;
-            default:
-                DialogUtil.showErrorMessage("Login Error","User Role not found" );
-        }
-        // Close login page
-        loginPage.dispose();
-    }
 }
