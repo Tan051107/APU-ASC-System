@@ -15,7 +15,6 @@ import java.awt.*;
 
 public class CounterStaffMenu extends JFrame {
 
-    // Panel that will hold all the different views
     private final JPanel contentPanel;
     private final CardLayout cardLayout;
     private boolean isExpanded = true;
@@ -38,7 +37,7 @@ public class CounterStaffMenu extends JFrame {
         setLocationRelativeTo(null); // Center the window
         setLayout(new BorderLayout());
 
-        // 1. Create the Sidebar Navigation
+        //Create the Sidebar Navigation
         sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setBackground(new Color(45, 52, 54)); // Dark grey background
@@ -79,12 +78,10 @@ public class CounterStaffMenu extends JFrame {
 
         add(sidebar, BorderLayout.WEST);
 
-        // 2. Create the Content Panel with CardLayout
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
         // Add the individual function panels to the CardLayout
-        // The string acts as an ID to call the specific panel later
         ManageCustomerPanel manageCustomerPanel = new ManageCustomerPanel();
         new CustomerManagementController(manageCustomerPanel);
         contentPanel.add(manageCustomerPanel, "Manage Customer");
@@ -101,7 +98,7 @@ public class CounterStaffMenu extends JFrame {
 
         add(contentPanel, BorderLayout.CENTER);
 
-        // 3. Add Action Listeners to swap cards when buttons are clicked
+        //Add Action Listeners to swap cards when buttons are clicked
         manageCustomerBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Customer"));
         manageAppointmentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Appointment"));
         managePaymentBtn.addActionListener(e -> cardLayout.show(contentPanel, "Manage Payment"));
@@ -149,7 +146,6 @@ public class CounterStaffMenu extends JFrame {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    // Helper method to style buttons uniformly
     private JButton createSidebarButton(String text) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
@@ -172,7 +168,4 @@ public class CounterStaffMenu extends JFrame {
         return notificationPanel;
     }
 
-    public User getLoginStaff() {
-        return loginStaff;
-    }
 }

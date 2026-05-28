@@ -261,6 +261,7 @@ public class AppointmentService {
         return appointmentStartTime.isBefore(operationStartTime) || appointmentEndTime.isAfter(operationEndTime);
     }
 
+    //Validate whether car has an appointment on selected appointment date and time
     private boolean carHasClashAppointment(Appointment newAppointment , String appointmentToIgnore) throws FileCorruptedException, GetEntityListException {
         String appointmentCar = newAppointment.getCarId();
         List<Appointment> carAppointments = appointmentRepository.getAll(appointment -> appointment.getCarId().equalsIgnoreCase(appointmentCar) && !appointment.getId().equalsIgnoreCase(appointmentToIgnore) && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED)); //Remove appointment to ignore from checking
@@ -282,6 +283,7 @@ public class AppointmentService {
         return false;
     }
 
+    //Check whether car has appointments that are not completed yet
     private boolean carHasNotCompletedAppointment(Appointment appointmentToSave, String appointmentToIgnore) throws FileCorruptedException, GetEntityListException {
         List<Appointment> appointments = getAppointments(appointment -> appointment.getCarId().equalsIgnoreCase(appointmentToSave.getCarId()) && appointment.getStatusService().equals(AppointmentStatus.ASSIGNED) && !appointment.getId().equalsIgnoreCase(appointmentToIgnore));
         if(appointments.isEmpty()){
